@@ -99,6 +99,7 @@ class AdminProductsControllerCore extends AdminController
         $this->max_file_size = (int)(Configuration::get('PS_LIMIT_UPLOAD_FILE_VALUE') * 1000000);
         $this->max_image_size = (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE');
         $this->allow_export = true;
+        
 
         $this->available_tabs_lang = array(
             'Informations' => $this->l('Information'),
