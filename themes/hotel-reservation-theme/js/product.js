@@ -1453,7 +1453,6 @@ var BookingForm = {
     },
     getFormData: function () {
         let formData = new FormData($('form#booking-form').get(0));
-        formData.append('room_type_demands', JSON.stringify(getRoomsExtraDemands()));
         formData.append('room_service_products', JSON.stringify(getRoomsServiceProducts()));
         return formData;
     },
