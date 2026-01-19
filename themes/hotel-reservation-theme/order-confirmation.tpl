@@ -139,11 +139,11 @@
 																						<a data-date_from="{$rm_v['data_form']}" data-date_to="{$rm_v['data_to']}" data-id_product="{$data_v['id_product']}" data-id_order="{$data_v['id_order']}" data-action="{$link->getPageLink('order-detail')}" class="open_rooms_extra_services_panel" href="#rooms_type_extra_services_form">
 																				{/if}
 																				{if $group_use_tax}
-																					{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'])  currency=$objOrderCurrency}
+																					{displayWtPriceWithCurrency price=$rm_v['additional_services_price_ti']  currency=$objOrderCurrency}
 																				{else}
-																					{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_te'] + $rm_v['additional_services_price_te']) currency=$objOrderCurrency}
+																					{displayWtPriceWithCurrency price=$rm_v['additional_services_price_te'] currency=$objOrderCurrency}
 																				{/if}
-																				{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
+																				{if isset($rm_v['additional_services']) && $rm_v['additional_services']}
 																					</a>
 																				{/if}
 																			</dd>
@@ -154,11 +154,11 @@
 																			<dt class="col-xs-5">{l s='Total Price'}</dt>
 																			<dd class="col-xs-7">
 																				{if $group_use_tax}
-																					{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
+																					{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['additional_services_price_ti'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
 																				{else}
-																					{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['extra_demands_price_te'] + $rm_v['additional_services_price_te'] +  $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
+																					{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['additional_services_price_te'] +  $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
 																				{/if}
-																				{if (isset($rm_v['extra_demands']) && $rm_v['extra_demands']) || isset($rm_v['additional_services']) && $rm_v['additional_services']}
+																				{if isset($rm_v['additional_services']) && $rm_v['additional_services']}
 																					<span class="order-price-info">
 																						<img src="{$img_dir}icon/icon-info.svg" />
 																					</span>
@@ -185,9 +185,9 @@
 																								<div class="text-right">
 																									<p>
 																										{if $group_use_tax}
-																											{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_ti'] + $rm_v['additional_services_price_ti'])  currency=$objOrderCurrency}
+																											{displayWtPriceWithCurrency price=($rm_v['additional_services_price_ti'])  currency=$objOrderCurrency}
 																										{else}
-																											{displayWtPriceWithCurrency price=($rm_v['extra_demands_price_te'] + $rm_v['additional_services_price_te']) currency=$objOrderCurrency}
+																											{displayWtPriceWithCurrency price=($rm_v['additional_services_price_te']) currency=$objOrderCurrency}
 																										{/if}
 																									</p>
 																								</div>

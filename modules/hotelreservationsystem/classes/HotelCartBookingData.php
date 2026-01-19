@@ -1159,7 +1159,6 @@ class HotelCartBookingData extends ObjectModel
         $context = Context::getContext();
         $cart_detail_data = $this->getCartCurrentDataByCartId((int) $id_cart);
         if ($cart_detail_data) {
-            $objRoomDemands = new HotelRoomTypeDemand();
             $objServiceProductCartDetail = new ServiceProductCartDetail();
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
 
@@ -1222,29 +1221,7 @@ class HotelCartBookingData extends ObjectModel
                 $cart_detail_data[$key]['feature_price'] = $feature_price;
                 $cart_detail_data[$key]['feature_price_tax_excl'] = $feature_price_tax_excl;
                 $cart_detail_data[$key]['feature_price_diff'] = $feature_price_diff;
-                // add extra demands
-                $cart_detail_data[$key]['extra_demands'] = $objRoomDemands->getRoomTypeDemands(
-                    $value['id_product']
-                );
-                $cart_detail_data[$key]['selected_demands'] = $this->getCartExtraDemands(
-                    $id_cart,
-                    $value['id_product'],
-                    $value['id_room'],
-                    $value['date_from'],
-                    $value['date_to'],
-                    0,
-                    1
-                );
-                $cart_detail_data[$key]['demand_price'] = $this->getCartExtraDemands(
-                    $id_cart,
-                    $value['id_product'],
-                    $value['id_room'],
-                    $value['date_from'],
-                    $value['date_to'],
-                    1,
-                    0,
-                    false
-                );
+
                 $cart_detail_data[$key]['additional_service'] = $objRoomTypeServiceProduct->getServiceProductsData(
                     $value['id_product'],
                     1,
@@ -1536,7 +1513,6 @@ class HotelCartBookingData extends ObjectModel
             $objHotelBranch = new HotelBranchInformation();
             $objHtlFeatures = new HotelFeatures();
             $objCartBookingData = new HotelCartBookingData();
-            $objRoomDemands = new HotelRoomTypeDemand();
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             $objServiceProductCartDetail = new ServiceProductCartDetail();
 
@@ -1585,8 +1561,6 @@ class HotelCartBookingData extends ObjectModel
                         $cartHotelData[$prodKey]['cover_img'] = $coverImg;
 
                         if ($detailed) {
-                            // extra demands
-                            $cartHotelData[$prodKey]['extra_demands'] = $objRoomDemands->getRoomTypeDemands($product['id_product']);
                             $cartHotelData[$prodKey]['service_products'] = $objRoomTypeServiceProduct->getServiceProductsData(
                                 $product['id_product'],
                                 1,
@@ -1644,15 +1618,7 @@ class HotelCartBookingData extends ObjectModel
                         if (isset($cartBookingDetails) && $cartBookingDetails) {
                             foreach ($cartBookingDetails as $data_k => $data_v) {
                                 $dateJoin = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
-                                $demandPrice = $objCartBookingData->getCartExtraDemands(
-                                    $context->cart->id,
-                                    $data_v['id_product'],
-                                    $data_v['id_room'],
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    1
-                                );
-                                $serviceProductPrice = $objServiceProductCartDetail->getServiceProductsInCart(
+                                $totalAdditionalServicePrice = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $context->cart->id,
                                     [],
                                     null,
@@ -1665,7 +1631,6 @@ class HotelCartBookingData extends ObjectModel
                                     0
                                 );
 
-                                $totalAdditionalServicePrice = $demandPrice + $serviceProductPrice;
                                 $occupancy = array(
                                     array(
                                         'adults' => $data_v['adults'],

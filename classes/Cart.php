@@ -1913,14 +1913,12 @@ class CartCore extends ObjectModel
                 }
             }
 
-            // price of extra demands on room type in the cart
-            $totalDemandsPrice += $objCartBookingData->getCartExtraDemands($this->id, $product['id_product'], 0, 0, 0, 1, 0, (int)$with_taxes);
-        }
+                 }
         foreach ($products_total as $key => $price) {
             $order_total += $price;
         }
 
-        $order_total_products = $order_total + $totalDemandsPrice;
+        $order_total_products = $order_total;
 
         if ($type == Cart::ONLY_DISCOUNTS) {
             $order_total = 0;
@@ -3825,26 +3823,6 @@ class CartCore extends ObjectModel
         $total_discounts = $this->getOrderTotal(true, Cart::ONLY_DISCOUNTS);
         $total_discounts_tax_exc = $this->getOrderTotal(false, Cart::ONLY_DISCOUNTS);
         $objCartBookingData = new HotelCartBookingData();
-        $total_demands_wt = $objCartBookingData->getCartExtraDemands(
-            $this->id,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1
-        );
-        $total_demands = $objCartBookingData->getCartExtraDemands(
-            $this->id,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0
-        );
         // The cart content is altered for display
         foreach ($cart_rules as &$cart_rule) {
             // If the cart rule is automatic (wihtout any code) and include free shipping, it should not be displayed as a cart rule but only set the shipping cost to 0
@@ -3931,8 +3909,8 @@ class CartCore extends ObjectModel
         }
 
         $objHotelAdvancedPayment = new HotelAdvancedPayment();
-        $total_rooms_with_services_without_discount_te = $total_rooms + $total_demands + $total_additional_services + $total_additional_services_auto_add + $total_standalone_service_products;
-        $total_rooms_with_services_without_discount_ti = $total_rooms_wt + $total_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt + $total_standalone_service_products_wt;
+        $total_rooms_with_services_without_discount_te = $total_rooms + $total_additional_services + $total_additional_services_auto_add + $total_standalone_service_products;
+        $total_rooms_with_services_without_discount_ti = $total_rooms_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt + $total_standalone_service_products_wt;
 
         $cart_total_without_discount_te = $total_rooms_with_services_without_discount_te + $convenience_fee;
         $cart_total_without_discount_ti = $total_rooms_with_services_without_discount_ti + $convenience_fee_wt;
@@ -3970,8 +3948,6 @@ class CartCore extends ObjectModel
             'convenience_fee_tax' => $convenience_fee_tax,
             'total_standalone_service_products_wt' => $total_standalone_service_products_wt,
             'total_standalone_service_products' => $total_standalone_service_products,
-            'total_extra_demands_wt' => $total_demands_wt,
-            'total_extra_demands' => $total_demands,
             'total_price' => $base_total_tax_inc,
             'total_tax' => $total_tax,
             'total_price_without_tax' => $base_total_tax_exc,

@@ -144,7 +144,6 @@ class OrderConfirmationControllerCore extends FrontController
                 $obj_rm_type = new HotelRoomType();
                 $orderTotalInfo['total_order_amount'] = 0;
                 $hotelCartBookingData = new HotelCartBookingData();
-                $objBookingDemand = new HotelBookingDemands();
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                 $cart_standalone_service_products = array();
                 $cart_hotel_service_products = array();
@@ -235,43 +234,7 @@ class OrderConfirmationControllerCore extends FrontController
                                     }
                                     // $orderTotalInfo['total_rooms_te'] += $data_v['total_price_tax_excl'];
                                     // $orderTotalInfo['total_rooms_ti'] += $data_v['total_price_tax_incl'];
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                        $idOrder,
-                                        $type_value['product_id'],
-                                        0,
-                                        $data_v['date_from'],
-                                        $data_v['date_to']
-                                    );
-                                    if (empty($cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'])) {
-                                        $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = 0;
-                                    }
-                                    $extraDemandPriceTI = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                        $idOrder,
-                                        $type_value['product_id'],
-                                        $data_v['id_room'],
-                                        $data_v['date_from'],
-                                        $data_v['date_to'],
-                                        0,
-                                        1,
-                                        1
-                                    );
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] += $extraDemandPriceTI;
-                                    if (empty($cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'])) {
-                                        $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = 0;
-                                    }
-                                    $extraDemandPriceTE = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                        $idOrder,
-                                        $type_value['product_id'],
-                                        $data_v['id_room'],
-                                        $data_v['date_from'],
-                                        $data_v['date_to'],
-                                        0,
-                                        1,
-                                        0
-                                    );
-                                    $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] += $extraDemandPriceTE;
-                                    $orderTotalInfo['total_demands_price_ti'] += $extraDemandPriceTI;
-                                    $orderTotalInfo['total_demands_price_te'] += $extraDemandPriceTE;
+
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_tax_excl'] = $order_details_obj->unit_price_tax_excl;
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_tax_incl'] = $order_details_obj->unit_price_tax_incl;
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['product_price_without_reduction_tax_excl'] = $order_details_obj->unit_price_tax_excl + $order_details_obj->reduction_amount_tax_excl;
