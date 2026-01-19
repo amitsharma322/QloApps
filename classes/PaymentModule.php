@@ -1179,8 +1179,8 @@ abstract class PaymentModuleCore extends Module
                         $room_tax = ($room_price_tax_incl - $room_price_tax_excl);
 
                         // extra services
-                        $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 0) + $cart_booking_data['total_extra_demands_te']);
-                        $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 0) + $cart_booking_data['total_extra_demands_ti']);
+                        $additional_service_price_tax_excl = ($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 0));
+                        $additional_service_price_tax_incl = ($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 0));
                         $additional_service_tax = ($additional_service_price_tax_incl - $additional_service_price_tax_excl);
 
                         // convenience fee price
@@ -1246,16 +1246,6 @@ abstract class PaymentModuleCore extends Module
                             '{normal_products_data_txt}' => $normal_products_data_txt,
                             '{order_total_info_html}' => $order_total_info_html,
                             '{order_total_info_txt}' => $order_total_info_txt,
-                            '{total_extra_demands_te}' => Tools::displayPrice(
-                                $cart_booking_data['total_extra_demands_te'],
-                                $this->context->currency,
-                                false
-                            ),
-                            '{extra_demands_tax}' => Tools::displayPrice(
-                                ($cart_booking_data['total_extra_demands_ti']-$cart_booking_data['total_extra_demands_te']),
-                                $this->context->currency,
-                                false
-                            ),
                             '{delivery_company}' => $delivery->company,
                             '{delivery_firstname}' => $delivery->firstname,
                             '{delivery_lastname}' => $delivery->lastname,

@@ -125,13 +125,13 @@
 									</div>
 								</td>
 								<td>
-                                    {displayPrice price=($data.demand_price + $data.additional_service_price + $data.additional_services_auto_add_price)|escape:'html':'UTF-8'}
+                                    {displayPrice price=($data.additional_service_price + $data.additional_services_auto_add_price)|escape:'html':'UTF-8'}
 								</td>
 								{* <td class="cart_line_total_rooms_price" id="cart_detail_data_price_{$data.id|escape:'html':'UTF-8'}">
 									{displayPrice price=$data.amt_with_qty}</td> *}
 								<td class="cart_line_total_price">
-									{if (isset($data.extra_demands) && $data.extra_demands) || (isset($data.additional_service) && $data.additional_service)}
-										{displayPrice price=($data.amt_with_qty + $data.additional_services_auto_add_price + $data.demand_price +  $data.additional_service_price)|escape:'html':'UTF-8'}
+									{if isset($data.additional_service) && $data.additional_service}
+										{displayPrice price=($data.amt_with_qty + $data.additional_services_auto_add_price +  $data.additional_service_price)|escape:'html':'UTF-8'}
 									{else}
 										{displayPrice price=$data.amt_with_qty|escape:'html':'UTF-8'}
 									{/if}
