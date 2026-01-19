@@ -915,10 +915,6 @@
                                 {assign var=order_shipping_price value=$order->total_shipping_tax_incl}
                             {/if}
 
-                            {* total extra demands prices *}
-                            {* $totalDemandsPriceTE
-                            $totalDemandsPriceTI *}
-
                             {* Get total rooms prices *}
                             {assign var=total_rooms_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                             {assign var=total_rooms_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
@@ -928,8 +924,8 @@
                             {assign var=total_products_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE))}
 
                             {* Get total of extra services and extra demands prices(excluding convenience fee) *}
-                            {assign var=total_room_services_and_demands_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $totalDemandsPriceTE)}
-                            {assign var=total_room_services_and_demands_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $totalDemandsPriceTI)}
+                            {assign var=total_room_services_and_demands_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
+                            {assign var=total_room_services_and_demands_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
 
                             {* Get total of only convenience fees prices *}
                             {assign var=total_convenience_fee_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}

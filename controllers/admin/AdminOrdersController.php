@@ -937,36 +937,8 @@ class AdminOrdersControllerCore extends AdminController
 
                 $smartyVars['id_booking_detail'] = $productLineData['id'];
 
-                $objBookingDemand = new HotelBookingDemands();
-
                 // set context currency So that we can get prices in the order currency
                 $this->context->currency = $objCurrency;
-
-                if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                    $idOrder,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                    1,
-                    $productLineData['id']
-                )) {
-                    $smartyVars['extraDemands'] = $extraDemands;
-                }
-
-                // get room type additional demands
-                $objRoomDemands = new HotelRoomTypeDemand();
-                if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
-                    foreach ($roomTypeDemands as &$demand) {
-                        // if demand has advance options then set demand price as first advance option price.
-                        if (isset($demand['adv_option']) && $demand['adv_option']) {
-                            $demand['price'] = current($demand['adv_option'])['price'];
-                        }
-                    }
-                    $smartyVars['roomTypeDemands'] = $roomTypeDemands;
-                }
 
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                 if ($additionalServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
@@ -987,7 +959,7 @@ class AdminOrdersControllerCore extends AdminController
                     $smartyVars['additionalServices'] = $additionalServices[$productLineData['id']];
                 }
 
-                // get room type additional demands
+                // get room type additional services
                 if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                     // get all services
                     $objProduct = new Product();
@@ -1059,33 +1031,11 @@ class AdminOrdersControllerCore extends AdminController
             $objOrderReturn = new OrderReturn();
             $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1, 0, 1);
             if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
-                $objBookingDemand = new HotelBookingDemands();
                 foreach($bookingOrderInfo as $key => $booking) {
                     if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
                         unset($bookingOrderInfo[$key]);
                     } else {
-                        $bookingOrderInfo[$key]['total_price_tax_incl'] += $objBookingDemand->getRoomTypeBookingExtraDemands(
-                            $objOrder->id,
-                            $booking['id_product'],
-                            $booking['id_room'],
-                            $booking['date_from'],
-                            $booking['date_to'],
-                            0,
-                            1,
-                            1,
-                            $booking['id']
-                        );
-                        $bookingOrderInfo[$key]['total_price_tax_excl'] += $objBookingDemand->getRoomTypeBookingExtraDemands(
-                            $objOrder->id,
-                            $booking['id_product'],
-                            $booking['id_room'],
-                            $booking['date_from'],
-                            $booking['date_to'],
-                            0,
-                            1,
-                            0,
-                            $booking['id']
-                        );
+
                         $bookingOrderInfo[$key]['total_price_tax_incl'] += $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                             0,
                             0,
@@ -2324,44 +2274,6 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
-                    // update rooms bookings demands (htl_booking_demands)
-                    $objBookingDemand = new HotelBookingDemands();
-                    if ($orderBookingDemands = $objBookingDemand->getRoomTypeBookingExtraDemands($order->id, 0, 0, 0, 0, 0)) {
-                        $fields = array(
-                            'unit_price_tax_excl',
-                            'unit_price_tax_incl',
-                            'total_price_tax_excl',
-                            'total_price_tax_incl',
-                        );
-
-                        $vatAddress = new Address((int)$order->id_address_tax);
-                        $idLang = (int) $order->id_lang;
-                        foreach ($orderBookingDemands as $bookingDemand) {
-                            $objBookingDemand = new HotelBookingDemands($bookingDemand['id_booking_demand']);
-                            foreach ($fields as $field) {
-                                $objBookingDemand->{$field} = Tools::convertPriceFull(
-                                    $objBookingDemand->{$field},
-                                    $old_currency,
-                                    $currency
-                                );
-                            }
-
-                            // update Tax of bookings demands
-                            if ($objBookingDemand->save()) {
-                                $taxManager = TaxManagerFactory::getManager(
-                                    $vatAddress,
-                                    $objBookingDemand->id_tax_rules_group
-                                );
-                                $taxCalculator = $taxManager->getTaxCalculator();
-                                $objBookingDemand->tax_computation_method = (int)$taxCalculator->computation_method;
-                                $objBookingDemand->tax_calculator = $taxCalculator;
-
-                                // Now save tax details of the extra demand with replace = 1
-                                $objBookingDemand->setBookingDemandTaxDetails(1);
-                            }
-                        }
-                    }
-
                     $fields = array(
                         'unit_price_tax_excl',
                         'unit_price_tax_incl',
@@ -3298,52 +3210,13 @@ class AdminOrdersControllerCore extends AdminController
 
         $total_room_tax = 0;
         $totalRoomsCostTE = 0;
-        $totalDemandsPriceTE = 0;
-        $totalDemandsPriceTI = 0;
         $totalRefundedRooms = 0;
         $orderConvenienceFeeServices = array();
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
-            $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
             foreach ($order_detail_data as $key => $value) {
                 $order_detail_data[$key]['total_room_price_te'] = $value['total_price_tax_excl'];
                 $order_detail_data[$key]['total_room_price_ti'] = $value['total_price_tax_incl'];
-
-                $order_detail_data[$key]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                    $order->id,
-                    $value['id_product'],
-                    $value['id_room'],
-                    $value['date_from'],
-                    $value['date_to'],
-                    1,
-                    0,
-                    1,
-                    $value['id']
-                );
-                $order_detail_data[$key]['total_room_price_ti'] += $order_detail_data[$key]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                    $order->id,
-                    $value['id_product'],
-                    $value['id_room'],
-                    $value['date_from'],
-                    $value['date_to'],
-                    0,
-                    1,
-                    1,
-                    $value['id']
-                );
-                $totalDemandsPriceTI += $order_detail_data[$key]['extra_demands_price_ti'];
-                $order_detail_data[$key]['total_room_price_te'] += $order_detail_data[$key]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                    $order->id,
-                    $value['id_product'],
-                    $value['id_room'],
-                    $value['date_from'],
-                    $value['date_to'],
-                    0,
-                    1,
-                    0,
-                    $value['id']
-                );
-                $totalDemandsPriceTE += $order_detail_data[$key]['extra_demands_price_te'];
 
                 $order_detail_data[$key]['additional_services'] = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                     0,
@@ -3619,8 +3492,6 @@ class AdminOrdersControllerCore extends AdminController
             'refundReqBookings' => $refundReqBookings,
             'refundReqProducts' => $refundReqProducts,
             'refundedAmount' => $refundedAmount,
-            'totalDemandsPriceTI' => $totalDemandsPriceTI,
-            'totalDemandsPriceTE' => $totalDemandsPriceTE,
             'totalRoomsCostTE' => $totalRoomsCostTE,
             'total_room_tax' => $total_room_tax,
             'htl_booking_order_data' => $bookingOrderInfo,
@@ -6027,8 +5898,7 @@ class AdminOrdersControllerCore extends AdminController
             )));
         }
 
-        // get extra demands of the room before changing in the booking table
-        $objBookingDemand = new HotelBookingDemands();
+
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
         $orderServiceProducts = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
             $id_order,
@@ -6046,17 +5916,6 @@ class AdminOrdersControllerCore extends AdminController
             $obj_booking_detail->id
         );
 
-        $extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
-            $id_order,
-            0,
-            $id_room,
-            $old_date_from,
-            $old_date_to,
-            1,
-            0,
-            1,
-            $obj_booking_detail->id
-        );
 
         // set occupancy details
         $occupancy = array(
@@ -6082,46 +5941,6 @@ class AdminOrdersControllerCore extends AdminController
             $new_total_price,
             $obj_booking_detail->id
         )) {
-            // update extra demands total prices if dates are changes (price calc method for each day)
-            if ($extraDemands) {
-                foreach ($extraDemands as $demand) {
-                    if (isset($demand['extra_demands']) && $demand['extra_demands']) {
-                        foreach ($demand['extra_demands'] as $rDemand) {
-                            if ($rDemand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
-                                $objBookingDemand = new HotelBookingDemands($rDemand['id_booking_demand']);
-
-                                $numDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
-                                $demandPriceTE = Tools::processPriceRounding(
-                                    ($objBookingDemand->unit_price_tax_excl * $numDays),
-                                    1,
-                                    $order->round_type,
-                                    $order->round_mode
-                                );
-                                $demandPriceTI = Tools::processPriceRounding(
-                                    ($objBookingDemand->unit_price_tax_incl * $numDays),
-                                    1,
-                                    $order->round_type,
-                                    $order->round_mode
-                                );
-
-                                $objBookingDemand->total_price_tax_excl = $demandPriceTE;
-                                $objBookingDemand->total_price_tax_incl = $demandPriceTI;
-
-                                $objBookingDemand->save();
-
-                                if (isset($order_invoice)) {
-                                    $order_invoice->total_paid_tax_excl -= $rDemand['total_price_tax_excl'];
-                                    $order_invoice->total_paid_tax_incl -= $rDemand['total_price_tax_incl'];
-
-                                    $order_invoice->total_paid_tax_excl += (float)$objBookingDemand->total_price_tax_excl;
-                                    $order_invoice->total_paid_tax_incl += (float)$objBookingDemand->total_price_tax_incl;
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
 
             if (isset($orderServiceProducts)
                 && is_array($orderServiceProducts)
@@ -6396,30 +6215,6 @@ class AdminOrdersControllerCore extends AdminController
         $bookingPriceTaxIncl = Tools::processPriceRounding($objBookingDetail->total_price_tax_incl, 1, $order->round_type, $order->round_mode);
         $bookingPriceTaxExcl = Tools::processPriceRounding($objBookingDetail->total_price_tax_excl, 1, $order->round_type, $order->round_mode);
 
-        $objBookingDemand = new HotelBookingDemands();
-        $roomExtraDemandTI = $objBookingDemand->getRoomTypeBookingExtraDemands(
-            $id_order,
-            $objBookingDetail->id_product,
-            $objBookingDetail->id_room,
-            $objBookingDetail->date_from,
-            $objBookingDetail->date_to,
-            0,
-            1,
-            1,
-            $objBookingDetail->id
-        );
-        $roomExtraDemandTE = $objBookingDemand->getRoomTypeBookingExtraDemands(
-            $id_order,
-            $objBookingDetail->id_product,
-            $objBookingDetail->id_room,
-            $objBookingDetail->date_from,
-            $objBookingDetail->date_to,
-            0,
-            1,
-            0,
-            $objBookingDetail->id
-        );
-
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
         $additionlServicesTI = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
             0,
@@ -6560,10 +6355,10 @@ class AdminOrdersControllerCore extends AdminController
         if ($order_detail->id_order_invoice != 0) {
             // values changes as values are calculated accoding to the quantity of the product by webkul
             $order_invoice = new OrderInvoice($order_detail->id_order_invoice);
-            $order_invoice->total_paid_tax_excl -= ($diff_products_tax_excl + $roomExtraDemandTE + $additionlServicesTE);
+            $order_invoice->total_paid_tax_excl -= ($diff_products_tax_excl + $additionlServicesTE);
             $order_invoice->total_paid_tax_excl = $order_invoice->total_paid_tax_excl > 0 ? $order_invoice->total_paid_tax_excl : 0;
 
-            $order_invoice->total_paid_tax_incl -= ($diff_products_tax_incl + $roomExtraDemandTI + $additionlServicesTI);
+            $order_invoice->total_paid_tax_incl -= ($diff_products_tax_incl + $additionlServicesTI);
             $order_invoice->total_paid_tax_incl = $order_invoice->total_paid_tax_incl > 0 ? $order_invoice->total_paid_tax_incl : 0;
 
             $order_invoice->total_products -= $diff_products_tax_excl;
@@ -6581,8 +6376,8 @@ class AdminOrdersControllerCore extends AdminController
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
         $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
-        $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal() - $roomExtraDemandTI, _PS_PRICE_COMPUTE_PRECISION_);
-        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false) - $roomExtraDemandTE, _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
         $order->total_products -= ($diff_products_tax_excl + $additionlServicesTE);
         $order->total_products = $order->total_products > 0 ? $order->total_products : 0;
@@ -6619,8 +6414,6 @@ class AdminOrdersControllerCore extends AdminController
             $invoice_array[] = $invoice;
         }
 
-        // delete the demands od this booking
-        $objBookingDemand->deleteBookingDemands($idHotelBooking);
 
         $objServiceProductOrderDetail->deleteSeviceProducts(0, $idHotelBooking);
 
@@ -7269,9 +7062,6 @@ class AdminOrdersControllerCore extends AdminController
             $smartyVars['link'] = $this->context->link;
 
             $smartyVars['id_booking_detail'] = $idHtlBooking;
-
-            $objBookingDemand = new HotelBookingDemands();
-
             // set context currency So that we can get prices in the order currency
             $this->context->currency = $objCurrency;
 
@@ -7400,60 +7190,6 @@ class AdminOrdersControllerCore extends AdminController
         return $servicesTpl;
     }
 
-    public function processRenderFacilitiesBlock($idOrder, $idProduct, $dateFrom, $dateTo, $idRoom, $idHtlBookingDetail, $orderEdit)
-    {
-        $smartyVars = array();
-        $objOrder = new Order($idOrder);
-        $objCurrency = new Currency($objOrder->id_currency);
-        $smartyVars['orderCurrency'] = $objOrder->id_currency;
-        $smartyVars['currencySign'] = $objCurrency->sign;
-        $smartyVars['link'] = $this->context->link;
-        $smartyVars['id_booking_detail'] = $idHtlBookingDetail;
-
-        // set context currency So that we can get prices in the order currency
-        $this->context->currency = new Currency($objOrder->id_currency);
-
-        $objBookingDemand = new HotelBookingDemands();
-
-        if ($extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
-            $idOrder,
-            $idProduct,
-            $idRoom,
-            $dateFrom,
-            $dateTo,
-            1,
-            0,
-            1,
-            $idHtlBookingDetail
-        )) {
-            $smartyVars['extraDemands'] = $extraDemands;
-        }
-
-        // if admin is editing order
-        if ($orderEdit) {
-            $smartyVars['orderEdit'] = $orderEdit;
-
-            // get room type additional demands
-            $objRoomDemands = new HotelRoomTypeDemand();
-            if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
-                foreach ($roomTypeDemands as &$demand) {
-                    // if demand has advance options then set demand price as first advance option price.
-                    if (isset($demand['adv_option']) && $demand['adv_option']) {
-                        $demand['price'] = current($demand['adv_option'])['price'];
-                    }
-                }
-                $smartyVars['roomTypeDemands'] = $roomTypeDemands;
-            }
-        }
-
-        $smartyVars['show_active'] = true;
-        $this->context->smarty->assign($smartyVars);
-
-        $servicesTpl = $this->context->smarty->fetch(
-            _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/modals/_extra_services_facilities_tab_content.tpl'
-        );
-        return $servicesTpl;
-    }
 
     public function ajaxProcessUpdateSelectedRoomServices()
     {
@@ -8306,23 +8042,6 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $this->ajaxDie(json_encode($response));
-    }
-
-    // Process when admin changes extra demands of any room while order creation process form.tpl
-    public function ajaxProcessChangeRoomDemands()
-    {
-        if ($idCartBooking = Tools::getValue('id_cart_booking')) {
-            if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
-                $roomDemands = Tools::getValue('room_demands');
-                $roomDemands = json_decode($roomDemands, true);
-                $roomDemands = json_encode($roomDemands);
-                $objCartbookingCata->extra_demands = $roomDemands;
-                if ($objCartbookingCata->save()) {
-                    die('1');
-                }
-            }
-        }
-        die('0');
     }
 
 

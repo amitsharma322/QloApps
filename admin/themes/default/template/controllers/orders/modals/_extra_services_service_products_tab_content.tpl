@@ -20,7 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div id="room_type_service_product_desc" class="tab-pane active extra-services-container">
+<div id="room_type_service_product_desc" class="tab-pane {if isset($orderEdit) && !$orderEdit}active{/if}  extra-services-container">
 	{if isset($orderEdit) && $orderEdit}
 
 		<div class="col-sm-12 facility_nav_btn">
