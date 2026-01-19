@@ -20,7 +20,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{include file='controllers/orders/modals/_extra_services_facilities_tab_content.tpl'}
 {include file='controllers/orders/modals/_extra_services_service_products_tab_content.tpl'}
 
 {* Css for handling extra demands changes *}
