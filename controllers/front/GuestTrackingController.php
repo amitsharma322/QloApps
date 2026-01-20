@@ -108,32 +108,16 @@ class GuestTrackingControllerCore extends FrontController
 
     public function displayAjaxgetRoomTypeBookingServices()
     {
-        $response = array('extra_demands' => false);
+        $response = array('extra_services' => false);
 
         if (($idProduct = Tools::getValue('id_product'))
             && ($idOrder = Tools::getValue('id_order'))
             && ($dateFrom = Tools::getValue('date_from'))
             && ($dateTo = Tools::getValue('date_to'))
         ) {
-            $objHotelBookingDemands = new HotelBookingDemands();
             $useTax = 0;
             if (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) {
                 $useTax = 1;
-            }
-            if ($extraDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
-                $idOrder,
-                $idProduct,
-                0,
-                $dateFrom,
-                $dateTo,
-                1,
-                0,
-                $useTax
-            )) {
-                $this->context->smarty->assign(array(
-                    'useTax' => $useTax,
-                    'extraDemands' => $extraDemands,
-                ));
             }
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
             if ($additionalServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
@@ -158,7 +142,7 @@ class GuestTrackingControllerCore extends FrontController
                 'objOrder' => new Order($idOrder),
             ));
 
-            $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
+            $response['extra_services'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
         }
 
         $this->ajaxDie(json_encode($response));

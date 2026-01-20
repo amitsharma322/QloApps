@@ -7043,7 +7043,7 @@ class AdminOrdersControllerCore extends AdminController
         }
     }
 
-    // To show rooms extra demands in the modal box in order details view page
+    // To show rooms extra services in the modal box in order details view page
     public function ajaxProcessgetRoomTypeBookingServices()
     {
         $orderEdit = Tools::getValue('orderEdit');

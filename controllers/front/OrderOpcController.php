@@ -966,8 +966,8 @@ class OrderOpcControllerCore extends ParentOrderController
                 ));
             }
         }
-        $response['extra_demands'] = $this->context->smarty->fetch(
-            _PS_THEME_DIR_.'_partials/cart_booking_demands.tpl'
+        $response['extra_services'] = $this->context->smarty->fetch(
+            _PS_THEME_DIR_.'_partials/cart_booking_services.tpl'
         );
 
         return json_encode($response);

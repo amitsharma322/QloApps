@@ -479,7 +479,7 @@ class OrderDetailControllerCore extends FrontController
 
     public function displayAjaxgetRoomTypeBookingServices()
     {
-        $response = array('extra_demands' => false);
+        $response = array('extra_services' => false);
 
         if (($idProduct = Tools::getValue('id_product'))
             && ($idOrder = Tools::getValue('id_order'))
@@ -514,7 +514,7 @@ class OrderDetailControllerCore extends FrontController
                 'objOrder' => new Order($idOrder),
             ));
 
-            $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
+            $response['extra_services'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
         }
 
         $this->ajaxDie(json_encode($response));
