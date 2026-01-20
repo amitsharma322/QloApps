@@ -7090,7 +7090,7 @@ class AdminOrdersControllerCore extends AdminController
             $this->context->smarty->assign($smartyVars);
 
             $modal = array(
-                'modal_id' => 'room-extra-demands',
+                'modal_id' => 'room-extra-services',
                 'modal_class' => 'modal-lg order_detail_modal',
                 'modal_title' => '<i class="icon icon-file-text"></i> &nbsp'.$this->l('Extra Services'),
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_extra_services.tpl'),

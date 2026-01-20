@@ -156,12 +156,12 @@
 </div>
 
 {* Modal for extra demands *}
-{* <div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_demands">
+{* <div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_services">
 
 </div> *}
 
 {strip}
-	{addJsDefL name=txtExtraDemandSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
+	{addJsDefL name=txtExtraServiceSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
 	{addJsDefL name=txtExtraDemandErr}{l s='Some error occurred while updating demands' js=1}{/addJsDefL}
 {/strip}
 
@@ -175,12 +175,6 @@
 		text-decoration: line-through;
 		color:#979797;
 		font-size:12px;}
-	/*Extra demands CSS*/
-	#rooms_extra_demands .rooms_extra_demands_head {
-		margin-bottom: 18px;}
-	#rooms_extra_demands .room_demand_block {
-		margin-bottom: 15px;
-		color: #333;}
     #room_type_service_product_desc #back_to_service_btn {
 		display: none;}
     #add_new_room_services_block {

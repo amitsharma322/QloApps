@@ -110,7 +110,7 @@
 						<td>{displayWtPriceWithCurrency price=$room['feature_price_tax_excl'] currency=$currency}</td>
 						<td>
 							{if (isset($room['selected_demands']) && $room['selected_demands']) || (isset($room['selected_services']) && $room['selected_services'])}
-								<a href="#" data-toggle="modal" data-target="#rooms_type_extra_demands_{$room['id']}">
+								<a href="#" data-toggle="modal" data-target="#rooms_type_extra_services_{$room['id']}">
 									{displayWtPriceWithCurrency price=($room['demand_price'] + $room['additional_service_price'] + $room['additional_services_auto_add_price'])|escape:'html':'UTF-8' currency=$currency}
 								</a>
 							{else}
@@ -125,7 +125,7 @@
 							{/if}
 						</td>
 					</tr>
-					<div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_demands_{$room['id']}">
+					<div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_services_{$room['id']}">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
 								<div class="modal-body" id="rooms_extra_demands">
@@ -133,61 +133,11 @@
 										<span aria-hidden="true">&times;</span>
 									</button>
 									<ul class="nav nav-tabs" role="tablist">
-										{if isset($room['selected_demands']) && $room['selected_demands']}
-											<li role="presentation" class="active"><a href="#room_type_demands_desc_{$room['id']}" aria-controls="facilities" role="tab" data-toggle="tab">{l s='Facilities'}</a></li>
-										{/if}
-										{if isset($room['selected_services']) && $room['selected_services']}
-											<li role="presentation" {if !isset($room['selected_demands']) || !$room['selected_demands']}class="active"{/if}><a href="#room_type_service_product_desc_{$room['id']}" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
-										{/if}
+										<li role="presentation" class="active" ><a href="#room_type_service_product_desc_{$room['id']}" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
 									</ul>
 									<div class="tab-content panel">
-										{if isset($room['selected_demands']) && $room['selected_demands']}
-											<div id="room_type_demands_desc_{$room['id']}" class="tab-pane active">
-												<div id="room_type_demands_desc">
-													{if isset($room['selected_demands']) && $room['selected_demands']}
-														{assign var=roomCount value=1}
-														{foreach $room['selected_demands'] as $demand}
-															<div class="row room_demands_container">
-																<div class="col-sm-12 room_demand_detail">
-																	{if isset($room['selected_demands']) && $room['selected_demands']}
-																		{foreach $room['extra_demands'] as $idGlobalDemand => $roomDemand}
-																			{if $demand.id_global_demand == $idGlobalDemand}
-																				<div class="row room_demand_block">
-																					<div class="col-xs-6">
-																						<div class="row">
-																							<div class="col-xs-10 demand_adv_option_block">
-																								<p>
-																									{$roomDemand['name']|escape:'html':'UTF-8'}<br>
-																									{if isset($roomDemand['adv_option']) && $roomDemand['adv_option']}
-																										{$roomDemand['adv_option'][$demand['id_option']]['name']}
-																									{/if}
-																								</p>
-																							</div>
-																						</div>
-																					</div>
-																					<div class="col-xs-6">
-																						<p><span class="pull-right extra_demand_option_price">
-																							{if isset($roomDemand['adv_option']) && $roomDemand['adv_option']}
-																								{convertPrice price = $roomDemand['adv_option'][$demand['id_option']]['price_tax_excl']|escape:'html':'UTF-8'}
-																							{else}
-																								{convertPrice price = $roomDemand['price_tax_excl']|escape:'html':'UTF-8'}
-																							{/if}
-																						</span></p>
-																					</div>
-																				</div>
-																			{/if}
-																		{/foreach}
-																	{/if}
-																</div>
-															</div>
-															{assign var=roomCount value=$roomCount+1}
-														{/foreach}
-													{/if}
-												</div>
-											</div>
-										{/if}
 										{if isset($room['selected_services']) && $room['selected_services']}
-											<div id="room_type_service_product_desc_{$room['id']}" class="tab-pane{if !isset($room['selected_demands']) || !$room['selected_demands']} active{/if}">
+											<div id="room_type_service_product_desc_{$room['id']}" class="tab-pane active">
 												<div id="room_type_services_desc">
 													{assign var=roomCount value=1}
 													<div class="row room_demands_container">

@@ -539,7 +539,7 @@
 	{* Fancybox for extra demands*}
 	{block name='order_confirmation_room_extra_services'}
 		<div style="display:none;" id="rooms_extra_services">
-			{* <div id="rooms_type_extra_demands">
+			{* <div id="rooms_type_extra_services">
 				<div class="panel">
 					<div class="rooms_extra_demands_head">
 						<h3>{l s='Additional Facilities'}</h3>

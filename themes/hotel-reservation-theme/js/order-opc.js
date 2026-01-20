@@ -698,7 +698,7 @@ $(document).ready(function()
 			},
 			success: function(jsonData) {
 				if (!jsonData.hasError) {
-					showSuccessMessage(txtExtraDemandSucc);
+					showSuccessMessage(txtExtraServiceSucc);
 				} else {
 					showErrorMessage(jsonData.errors);
 

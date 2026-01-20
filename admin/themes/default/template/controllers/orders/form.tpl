@@ -1587,9 +1587,9 @@
                         showErrorMessage(errorHtml);
                     } else {
                         $('#customer_cart_details').after(response.html_exta_demands);
-						// $('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
-						// $('#rooms_type_extra_demands').find('#room_type_demands_desc').append(response.html_exta_demands);
-						$('#rooms_type_extra_demands').modal('show');
+						// $('#rooms_type_extra_services').find('#room_type_demands_desc').html('');
+						// $('#rooms_type_extra_services').find('#room_type_demands_desc').append(response.html_exta_demands);
+						$('#rooms_type_extra_services').modal('show');
                     }
 				},
                 complete: function() {
@@ -1597,7 +1597,7 @@
                 }
 			});
 		});
-		$(document).on('hidden.bs.modal', '#rooms_type_extra_demands', function (e) {
+		$(document).on('hidden.bs.modal', '#rooms_type_extra_services', function (e) {
 			// reload to make changes reflect everywhere
 			location.reload();
 		});
@@ -1714,7 +1714,7 @@
 						if (jsonData.service_panel) {
 							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
 						}
-						showSuccessMessage(txtExtraDemandSucc);
+						showSuccessMessage(txtExtraServiceSucc);
 					} else {
 						var errorHtml = error_found_txt + ':<br>';
 						errorHtml += '<ol>';
@@ -1762,7 +1762,7 @@
                         if (jsonData.service_panel) {
                             $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
                         }
-                        showSuccessMessage(txtExtraDemandSucc);
+                        showSuccessMessage(txtExtraServiceSucc);
                     } else {
                         if (jsonData.errors != 'undefined' && jsonData.errors.length) {
                             var errorHtml = error_found_txt + ':<br>';

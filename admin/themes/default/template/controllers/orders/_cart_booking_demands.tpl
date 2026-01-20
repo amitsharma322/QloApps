@@ -20,16 +20,16 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_demands">
+<div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_services">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
                 <h4 class="modal-title"><i class="icon icon-bed"></i> &nbsp;{l s='Room Services'}</h4>
             </div>
-			<div class="modal-body" id="rooms_extra_demands">
+			<div class="modal-body" id="rooms_extra_services">
                 <ul class="nav nav-tabs" role="tablist">
-						<li role="presentation" class="active"><a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
+                    <li role="presentation" class="active"><a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
 				</ul>
 				<div class="tab-content">
                     {include file='controllers/orders/modals/_add_order_extra_services_tab_content.tpl'}
