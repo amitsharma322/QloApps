@@ -2579,28 +2579,6 @@ class AdminImportControllerCore extends AdminController
                                 }
                             }
 
-                            if (isset($orderProduct['id_additional_facilities']) && count($orderProduct['id_additional_facilities'])) {
-                                foreach ($orderProduct['id_additional_facilities'] as $globalDemandKey =>  $globalDemand) {
-                                    $globalDemand = explode(':', $globalDemand);
-                                    $objGlobalDemand = new HotelRoomTypeGlobalDemand($globalDemand[0], $this->context->language->id);
-                                    if (Validate::isLoadedObject($objGlobalDemand)) {
-                                        $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
-                                        // incase no option is provided or if the provided id is not valid or the id is not connected to the diffrent option, we will set the first option as default.
-                                        if ((!isset($globalDemand[1])
-                                            || !Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($globalDemand[1])
-                                            || $objAdvOption->id_global_demand != $globalDemand[0]))
-                                            && ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($objGlobalDemand->id))
-                                        ) {
-                                            $globalDemand[1] = $advOptions[0]['id'];
-                                        }
-
-                                        $globalDemands[$globalDemandKey]['id_global_demand'] = $globalDemand[0];
-                                        $globalDemands[$globalDemandKey]['id_option'] = isset($globalDemand[1]) ? $globalDemand[1] : 0;
-                                    }
-                                }
-                            }
-
-                            $globalDemands = json_encode($globalDemands);
                             $objCartBooking->updateCartBooking(
                                 $orderProduct['id_product'],
                                 $occupancy,
@@ -2609,7 +2587,6 @@ class AdminImportControllerCore extends AdminController
                                 0,
                                 date('Y-m-d', strtotime($dateFrom)),
                                 date('Y-m-d', strtotime($dateTo)),
-                                $globalDemands,
                                 $serviceProducts,
                                 $this->context->cart->id,
                                 $this->context->cart->id_guest

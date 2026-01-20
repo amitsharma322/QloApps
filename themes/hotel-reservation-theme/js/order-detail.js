@@ -354,7 +354,7 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
             date_to: dateTo,
             id_product: idProduct,
             id_order: idOrder,
-            action: 'getRoomTypeBookingDemands',
+            action: 'getRoomTypeBookingServices',
             ajax: true,
             token: static_token,
         },

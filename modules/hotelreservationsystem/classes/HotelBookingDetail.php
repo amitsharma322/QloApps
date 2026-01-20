@@ -3394,35 +3394,12 @@ class HotelBookingDetail extends ObjectModel
 
             // things to do if order is not paid
             if (!$hasOrderDiscountOrPayment) {
-                $objHotelBookingDemands = new HotelBookingDemands();
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
 
                 $reduction_amount['total_price_tax_excl'] = (float) $this->total_price_tax_excl;
                 $reduction_amount['total_products_tax_excl'] = (float) $this->total_price_tax_excl;
                 $reduction_amount['total_price_tax_incl'] = (float) $this->total_price_tax_incl;
                 $reduction_amount['total_products_tax_incl'] = (float) $this->total_price_tax_incl;
-
-                // reduce facilities amount from order and services_detail
-                if ($roomDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
-                    $this->id_order,
-                    $this->id_product,
-                    $this->id_room,
-                    $this->date_from,
-                    $this->date_to,
-                    0,
-                    0,
-                    1,
-                    $this->id
-                )) {
-                    foreach ($roomDemands as $roomDemand) {
-                        $objHotelBookingDemands = new HotelBookingDemands($roomDemand['id_booking_demand']);
-                        $reduction_amount['total_price_tax_excl'] += (float) $objHotelBookingDemands->total_price_tax_excl;
-                        $reduction_amount['total_price_tax_incl'] += (float) $objHotelBookingDemands->total_price_tax_incl;
-                        $objHotelBookingDemands->total_price_tax_excl = 0;
-                        $objHotelBookingDemands->total_price_tax_incl = 0;
-                        $objHotelBookingDemands->save();
-                    }
-                }
 
                 // reduce services amount from order and services_detail
                 if ($roomServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(

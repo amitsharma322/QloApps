@@ -1573,7 +1573,7 @@
 					id_cart: idCart,
 					id_product: idProduct,
 					id_hotel_cart_booking: idHotelCartBooking,
-					action: 'getRoomTypeCartDemands',
+					action: 'getRoomTypeCartServices',
 					ajax: true
 				},
 				success: function(response) {
@@ -1586,9 +1586,7 @@
                         errorHtml += '</ol>';
                         showErrorMessage(errorHtml);
                     } else {
-                        $('#customer_cart_details').after(response.html_exta_demands);
-						// $('#rooms_type_extra_services').find('#room_type_demands_desc').html('');
-						// $('#rooms_type_extra_services').find('#room_type_demands_desc').append(response.html_exta_demands);
+                        $('#customer_cart_details').after(response.html_exta_services);
 						$('#rooms_type_extra_services').modal('show');
                     }
 				},

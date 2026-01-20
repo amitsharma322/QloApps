@@ -44,9 +44,9 @@
                                                 {l s='Room'} {$roomCount|string_format:'%02d'}&nbsp;
                                                 <span>({if {$roomAdditionalService['adults']} <= 9}0{$roomAdditionalService['adults']}{else}{$roomAdditionalService['adults']}{/if} {if $roomAdditionalService['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $roomAdditionalService['children'] > 0}, {if {$roomAdditionalService['children']} <= 9}0{$roomAdditionalService['children']}{else}{$roomAdditionalService['children']}{/if} {if $roomAdditionalService['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
                                             </div>
-                                            <div class="room_demand_detail">
+                                            <div class="room_service_detail">
                                                 {foreach $roomAdditionalService['additional_services'] as $additionalService}
-                                                    <div class="room_demand_block">
+                                                    <div class="room_service_block">
                                                         <div class="">
                                                             <div class="">
                                                                 {$additionalService['name']|escape:'html':'UTF-8'}

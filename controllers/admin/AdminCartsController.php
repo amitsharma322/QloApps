@@ -1145,8 +1145,8 @@ class AdminCartsControllerCore extends AdminController
         }
     }
 
-    // Process to get extra demands of any room while order creation process form.tpl
-    public function ajaxProcessGetRoomTypeCartDemands()
+    // Process to get extra services of any room while order creation process form.tpl
+    public function ajaxProcessGetRoomTypeCartServices()
     {
         $response['hasError'] = false;
         $response['errors'] = [];
@@ -1228,8 +1228,8 @@ class AdminCartsControllerCore extends AdminController
                 'loaderImg' => $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif')
             ));
 
-            $response['html_exta_demands'] = $this->context->smarty->fetch(
-                _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_demands.tpl'
+            $response['html_exta_services'] = $this->context->smarty->fetch(
+                _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_services.tpl'
             );
         } else {
             $response['hasError'] = true;

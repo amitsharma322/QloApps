@@ -32,7 +32,7 @@
 				<div class="tab-content">
 					{block name='cart_booking_services_tab_content'}
 						{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
-							<div id="room_type_service_product_desc" class="tab-pane{if !isset($selectedRoomDemands) || !$selectedRoomDemands} active{/if}">
+							<div id="room_type_service_product_desc" class="tab-pane active">
 								<div class="rooms_extra_demands_head">
 									<p class="rooms_extra_demands_text">{l s='Add below services to the rooms for better hotel experience'}</p>
 								</div>
@@ -46,7 +46,7 @@
 													<span>({if {$cartRoom['adults']} <= 9}0{$cartRoom['adults']}{else}{$cartRoom['adults']}{/if} {if $cartRoom['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if {$cartRoom['children']} <= 9}0{$cartRoom['children']}{else}{$cartRoom['children']}{/if} {if $cartRoom['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if})</span>
 												</a>
 											</div>
-											<div id="accordion_service_{$key|escape:'html':'UTF-8'}" class=" col-sm-12 room_demand_detail accordion-section-content {if $roomCount == 1}open{/if}" {if $roomCount == 1}style="display: block;"{/if}>
+											<div id="accordion_service_{$key|escape:'html':'UTF-8'}" class=" col-sm-12 room_service_detail accordion-section-content {if $roomCount == 1}open{/if}" {if $roomCount == 1}style="display: block;"{/if}>
 												{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
 													{foreach $roomTypeServiceProducts as $product}
 														{if isset($cartRoom['selected_service']) && $cartRoom['selected_service'] && ($product['id_product']|array_key_exists:$cartRoom['selected_service'])}
@@ -56,7 +56,7 @@
 														{else}
 															{assign var='serviceSelected' value=false}
 														{/if}
-														<div class="row room_demand_block">
+														<div class="row room_service_block">
 															<div class="col-xs-8">
 																<div class="row">
 																	<div class="col-xs-2">

@@ -25,7 +25,7 @@
 {* Css for handling extra demands changes *}
 <style type="text/css">
 	/*Extra demands CSS*/
-	#edit_product .extra-services-container .room_demands_container,
+	#edit_product .extra-services-container .room_service_container,
 	#edit_product .extra-services-container .room_services_container {
 		display: none;}
 	#edit_product .extra-services-container #save_room_demands,

@@ -601,8 +601,8 @@ $(document).ready(function()
 		if ($(this).data('max_quantity') && $(this).data('max_quantity') < qty_wntd) {
             $(this).val(qtyfield.data('max_quantity'));
         }
-		if ($(this).closest('.room_demand_block').find('.change_room_type_service_product').is(':checked')) {
-			updateServiceProducts($(this).closest('.room_demand_block').find('.change_room_type_service_product'));
+		if ($(this).closest('.room_service_block').find('.change_room_type_service_product').is(':checked')) {
+			updateServiceProducts($(this).closest('.room_service_block').find('.change_room_type_service_product'));
 		}
     });
 
@@ -625,7 +625,7 @@ $(document).ready(function()
 				date_to: dateTo,
 				id_product: idProduct,
 				id_order: idOrder,
-				method: 'getRoomTypeBookingDemands',
+				method: 'getRoomTypeBookingServices',
 				ajax: true,
 				token: static_token
 			},
@@ -656,12 +656,12 @@ $(document).ready(function()
 	{
 		var id_product = $(element).val();
 		var id_cart_booking = $(element).data('id_cart_booking');
-		var qty = $(element).closest('.room_demand_block').find('input.qty');
+		var qty = $(element).closest('.room_service_block').find('input.qty');
 
 		if (qty.length == 0) {
 			update_qty = 1;
 		} else {
-            var qty_hidden = $(element).closest('.room_demand_block').find('input.qty_hidden');
+            var qty_hidden = $(element).closest('.room_service_block').find('input.qty_hidden');
             var update_qty = parseInt($(qty).val()) - parseInt($(qty_hidden).val());
         }
 		var checked = $(element).is(':checked');

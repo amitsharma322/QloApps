@@ -403,9 +403,6 @@ var ajaxCart = {
             } else {
                 req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
             }
-
-            var roomDemands = getRoomsExtraDemands();
-            req.append('roomDemands', JSON.stringify(roomDemands) );
             req.append('serviceProducts', JSON.stringify(getRoomsServiceProducts()) );
         } else {
             req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
@@ -426,12 +423,7 @@ var ajaxCart = {
             processData: false,
             success: function(jsonData, textStatus, jqXHR) {
                 if (pagename == 'product') {
-                    if (jsonData.avail_rooms == 0) {
-                        disableRoomTypeDemands(1);
-                    }
-
                     resetRoomtypeServices();
-
                     if (parseInt($('#product_page_booking_product').val()) == 0) {
                         $('#service_product_qty').val(1);
                     }
@@ -565,9 +557,6 @@ var ajaxCart = {
                     var product_page_id_product = $('#product_page_product_id').val();
                     if (idProduct == product_page_id_product && dateFrom < date_checkOut && dateTo >= date_checkIn) {
                         $(".max_avail_type_qty").val(jsonData.avail_rooms);
-                        if (jsonData.avail_rooms == 0) {
-                            disableRoomTypeDemands(1);
-                        }
                     }
                     BookingForm.refresh();
                 }
@@ -632,7 +621,6 @@ var ajaxCart = {
             data: 'controller=cart&delete=1&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&id_product=' + idProduct + '&id_hotel=' + idHotel + '&id_product_option=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
             success: function(jsonData) {
                 if (pagename == 'product') {
-                    disableRoomTypeDemands(0);
                     BookingForm.refresh();
                 }
 
@@ -1389,7 +1377,6 @@ function crossselling_serialScroll() {
 }
 
 function resetRoomtypeServices(refresh = true) {
-    $('.room_demands_container').find('input.id_room_type_demand:checked').prop('checked', false).uniform();
     $('#additional_products').empty();
     $('#additional_products div')
     $('.remove_roomtype_product').text(select_txt).removeClass('btn-danger remove_roomtype_product').addClass('btn-success add_roomtype_product');
@@ -1398,18 +1385,6 @@ function resetRoomtypeServices(refresh = true) {
     }
 }
 
-function disableRoomTypeDemands(show) {
-    if (show) {
-        $('.room_demands_container_overlay').show();
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').prop('checked', false);
-        $('.room_demand_block').find('.id_room_type_demand').prop('checked', false).parent().removeClass('checked');
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').attr('disabled', 'disabled');
-    } else {
-        $('.room_demands_container_overlay').hide();
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').removeAttr('disabled');
-        $('.room_demands_container').find('.checker').removeClass('disabled');
-    }
-}
 
 function disableRoomTypeServices(disable) {
     if (disable) {
@@ -1422,19 +1397,6 @@ function disableRoomTypeServices(disable) {
     }
 }
 
-function getRoomsExtraDemands()
-{
-    var roomDemands = [];
-
-    $('input:checkbox.id_room_type_demand:checked').each(function () {
-        roomDemands.push({
-            'id_global_demand':$(this).val(),
-            'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
-        });
-    });
-
-    return roomDemands;
-}
 
 function getRoomsServiceProducts()
 {

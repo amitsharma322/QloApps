@@ -106,7 +106,7 @@ class GuestTrackingControllerCore extends FrontController
         }
     }
 
-    public function displayAjaxGetRoomTypeBookingDemands()
+    public function displayAjaxgetRoomTypeBookingServices()
     {
         $response = array('extra_demands' => false);
 

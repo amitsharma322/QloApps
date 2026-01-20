@@ -376,7 +376,7 @@ class OrderOpcControllerCore extends ParentOrderController
                             $this->context->cart->setNoMultishipping();
                             $this->ajaxDie();
                             break;
-                        case 'getRoomTypeBookingDemands':
+                        case 'getRoomTypeBookingServices':
                             $this->ajaxDie($this->getRoomTypeBookingServices());
                             exit;
                             break;

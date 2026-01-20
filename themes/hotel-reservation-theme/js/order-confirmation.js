@@ -40,8 +40,8 @@ $(document).ready(function(){
                 date_to: dateTo,
                 id_product: idProduct,
                 id_order: idOrder,
-                action: 'getRoomTypeBookingDemands',
-                method: 'getRoomTypeBookingDemands',
+                action: 'getRoomTypeBookingServices',
+                method: 'getRoomTypeBookingServices',
                 ajax: true,
                 token: static_token
             },

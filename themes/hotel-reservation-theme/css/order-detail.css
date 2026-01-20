@@ -1065,17 +1065,17 @@
     margin-bottom: 10px;
 }
 
-#popup-view-extra-services .tab-content .room_demand_detail {
+#popup-view-extra-services .tab-content .room_service_detail {
     font-size: 14px;
     font-weight: 500;
 }
 
-#popup-view-extra-services .tab-content .room_demand_block {
+#popup-view-extra-services .tab-content .room_service_block {
     display: flex;
     justify-content: space-between;
 }
 
-#popup-view-extra-services .tab-content .room_demand_block:not(:last-of-type) {
+#popup-view-extra-services .tab-content .room_service_block:not(:last-of-type) {
     margin-bottom: 12px;
 }
 .payment-summary tr, .guest-details tr {

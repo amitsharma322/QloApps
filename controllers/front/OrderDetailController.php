@@ -477,7 +477,7 @@ class OrderDetailControllerCore extends FrontController
         $this->setTemplate(_PS_THEME_DIR_.'order-detail.tpl');
     }
 
-    public function displayAjaxGetRoomTypeBookingDemands()
+    public function displayAjaxgetRoomTypeBookingServices()
     {
         $response = array('extra_demands' => false);
 

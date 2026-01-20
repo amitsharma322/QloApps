@@ -213,7 +213,7 @@
     margin-bottom: 10px;
 }
 
-#rooms_extra_services .tab-content .room_demand_detail {
+#rooms_extra_services .tab-content .room_service_detail {
     font-size: 14px;
     font-weight: 500;
     margin-top: 0;
@@ -221,12 +221,12 @@
     border-top: unset;
 }
 
-#rooms_extra_services .tab-content .room_demand_block {
+#rooms_extra_services .tab-content .room_service_block {
     display: flex;
     justify-content: space-between;
 }
 
-#rooms_extra_services .tab-content .room_demand_block:not(:last-of-type) {
+#rooms_extra_services .tab-content .room_service_block:not(:last-of-type) {
     margin-bottom: 12px;
 }
 

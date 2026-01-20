@@ -7044,7 +7044,7 @@ class AdminOrdersControllerCore extends AdminController
     }
 
     // To show rooms extra demands in the modal box in order details view page
-    public function ajaxProcessGetRoomTypeBookingDemands()
+    public function ajaxProcessgetRoomTypeBookingServices()
     {
         $orderEdit = Tools::getValue('orderEdit');
         if (($idProduct = Tools::getValue('id_product'))

@@ -140,11 +140,11 @@
 											<div id="room_type_service_product_desc_{$room['id']}" class="tab-pane active">
 												<div id="room_type_services_desc">
 													{assign var=roomCount value=1}
-													<div class="row room_demands_container">
-														<div class="col-sm-12 room_demand_detail">
+													<div class="row room_service_container">
+														<div class="col-sm-12 room_service_detail">
 															{if isset($room['selected_services']) && $room['selected_services']}
 																{foreach $room['selected_services'] as $service}
-																	<div class="row room_demand_block">
+																	<div class="row room_service_block">
 																		<div class="col-xs-5">
 																			<div class="row">
 																				<div class="col-xs-10">

@@ -1704,7 +1704,6 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     }
 
                     // since we cannot update them after ordering them and will have to replace them if orderd here. So, we will not add them for now.
-                    $roomDemands = json_encode(array());
 
                     if (isset($room['occupancy']) && count($room['occupancy'])) {
                         $occupancy = $room['occupancy'];
@@ -1727,7 +1726,6 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         $idRoom,
                         $dateFrom,
                         $dateTo,
-                        $roomDemands,
                         $roomServices,
                         $this->context->cart->id,
                         $this->context->cart->id_guest
@@ -1735,14 +1733,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         $objCartBookingData = new HotelCartBookingData((int) $idHtlCartBookingData);
                         $dateRoomJoinKey = strtotime($dateFrom).strtotime($dateTo).$objCartBookingData->id_room;
                         // To update the price after valiate order is called.
-                        if (isset($room['facilities'])
-                            && $room['facilities']
-                        ) {
-                            $roomDemands = json_encode($room['facilities']);
-                        }
 
                         $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'] = $roomServices;
-                        $this->wsRequestedRoomTypes[$dateRoomJoinKey]['demands'] = $roomDemands;
                         $this->wsRequestedRoomTypes[$dateRoomJoinKey]['room'] = $room;
                         if (isset($room['id_tax_rules_group']) && Validate::isLoadedObject(new TaxRulesGroup((int) $room['id_tax_rules_group']))) {
                             $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'] = $room['id_tax_rules_group'];
@@ -1780,7 +1772,6 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     $roomWiseOccupancy = count($roomWiseOccupancy);
                 }
 
-                $roomDemands = json_encode(array());
                 $roomServices = array();
                 $objHotelCartBookingData->updateCartBooking(
                     $roomType['id_room_type'],
@@ -1790,7 +1781,6 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     0,
                     $dateFrom,
                     $dateTo,
-                    $roomDemands,
                     $roomServices,
                     $this->context->cart->id,
                     $this->context->cart->id_guest
