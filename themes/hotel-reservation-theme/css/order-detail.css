@@ -1044,12 +1044,12 @@
     padding-bottom: 15px;
 }
 
-#popup-view-extra-services .tab-content .rooms_extra_demands_head {
+#popup-view-extra-services .tab-content .rooms_extra_services_head {
     padding: 10px 18px;
     border-bottom: 1px solid #F0F0F0;
 }
 
-#popup-view-extra-services .tab-content .rooms_extra_demands_text {
+#popup-view-extra-services .tab-content .rooms_extra_services_text {
     font-size: 12px;
     margin-bottom: 0;
 }

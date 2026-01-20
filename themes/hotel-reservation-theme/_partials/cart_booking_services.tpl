@@ -33,8 +33,8 @@
 					{block name='cart_booking_services_tab_content'}
 						{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
 							<div id="room_type_service_product_desc" class="tab-pane active">
-								<div class="rooms_extra_demands_head">
-									<p class="rooms_extra_demands_text">{l s='Add below services to the rooms for better hotel experience'}</p>
+								<div class="rooms_extra_services_head">
+									<p class="rooms_extra_services_text">{l s='Add below services to the rooms for better hotel experience'}</p>
 								</div>
 								{assign var=roomCount value=1}
 								{foreach $cartRooms as $key => $cartRoom}

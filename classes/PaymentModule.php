@@ -1166,9 +1166,8 @@ abstract class PaymentModuleCore extends Module
                         $cart_booking_data_text = $this->getEmailTemplateContent('hotel_booking_cart_data_text.tpl', Mail::TYPE_TEXT, $cart_booking_data['cart_htl_data']);
                         $cart_booking_data_html = $this->getEmailTemplateContent('hotel_booking_cart_data.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
 
-                        $extra_demands_details_html = $this->getEmailTemplateContent('booking_extra_demands.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
-                        $extra_demands_details_text = $this->getEmailTemplateContent('booking_extra_demands_text.tpl', Mail::TYPE_TEXT, $cart_booking_data['cart_htl_data']);
-
+                        $extra_services_details_html = $this->getEmailTemplateContent('booking_extra_services.tpl', Mail::TYPE_HTML, $cart_booking_data['cart_htl_data']);
+                        $extra_services_details_text = $this->getEmailTemplateContent('booking_extra_services_text.tpl', Mail::TYPE_TEXT, $cart_booking_data['cart_htl_data']);
                         $normal_products_data_html = $this->getEmailTemplateContent('service_product_data.tpl', Mail::TYPE_HTML, $orderServiceProducts);
                         $normal_products_data_txt = $this->getEmailTemplateContent('service_product_data_text.tpl', Mail::TYPE_TEXT, $orderServiceProducts);
 
@@ -1240,8 +1239,8 @@ abstract class PaymentModuleCore extends Module
                         $data = array(
                             '{cart_booking_data_html}' => $cart_booking_data_html,
                             '{cart_booking_data_text}' => $cart_booking_data_text,
-                            '{extra_demands_details_html}' => $extra_demands_details_html,
-                            '{extra_demands_details_text}' => $extra_demands_details_text,
+                            '{extra_services_details_html}' => $extra_services_details_html,
+                            '{extra_services_details_text}' => $extra_services_details_text,
                             '{normal_products_data_html}' => $normal_products_data_html,
                             '{normal_products_data_txt}' => $normal_products_data_txt,
                             '{order_total_info_html}' => $order_total_info_html,

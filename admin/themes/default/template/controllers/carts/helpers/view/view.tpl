@@ -109,17 +109,17 @@
 						</td>
 						<td>{displayWtPriceWithCurrency price=$room['feature_price_tax_excl'] currency=$currency}</td>
 						<td>
-							{if (isset($room['selected_demands']) && $room['selected_demands']) || (isset($room['selected_services']) && $room['selected_services'])}
+							{if isset($room['selected_services']) && $room['selected_services']}
 								<a href="#" data-toggle="modal" data-target="#rooms_type_extra_services_{$room['id']}">
-									{displayWtPriceWithCurrency price=($room['demand_price'] + $room['additional_service_price'] + $room['additional_services_auto_add_price'])|escape:'html':'UTF-8' currency=$currency}
+									{displayWtPriceWithCurrency price=($room['additional_service_price'] + $room['additional_services_auto_add_price'])|escape:'html':'UTF-8' currency=$currency}
 								</a>
 							{else}
 								{displayWtPriceWithCurrency price=0 currency=$currency}
 							{/if}
 						</td>
 						<td class="text-right">
-							{if (isset($room['selected_demands']) && $room['selected_demands']) || (isset($room['selected_services']) && $room['selected_services'])}
-								{displayWtPriceWithCurrency price=($room['amt_with_qty'] + $room['additional_services_auto_add_price'] + $room['demand_price'] +  $room['additional_service_price'])|escape:'html':'UTF-8' currency=$currency}
+							{if isset($room['selected_services']) && $room['selected_services']}
+								{displayWtPriceWithCurrency price=($room['amt_with_qty'] + $room['additional_services_auto_add_price'] + $room['additional_service_price'])|escape:'html':'UTF-8' currency=$currency}
 							{else}
 								{displayWtPriceWithCurrency price=$room['amt_with_qty']|escape:'html':'UTF-8' currency=$currency}
 							{/if}
@@ -128,7 +128,7 @@
 					<div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_services_{$room['id']}">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
-								<div class="modal-body" id="rooms_extra_demands">
+								<div class="modal-body" id="rooms_extra_services">
 									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 										<span aria-hidden="true">&times;</span>
 									</button>

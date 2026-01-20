@@ -980,27 +980,6 @@ class AdminSearchControllerCore extends AdminController
                 $this->tpl_view_vars['groups'] = $view;
             }
 
-            if (isset($this->_list['global_demands']) && count($this->_list['global_demands'])) {
-                $view = '';
-                $this->initGlobalDemandList();
-                $helper = new HelperList();
-                $helper->shopLinkType = '';
-                $helper->simple_header = true;
-                $helper->identifier = 'id_global_demand';
-                $helper->actions = array('edit');
-                $helper->show_toolbar = false;
-                $helper->table = 'htl_room_type_global_demand';
-                $helper->currentIndex = $this->context->link->getAdminLink('AdminRoomTypeGlobalDemand', false);
-                $helper->token = Tools::getAdminTokenLite('AdminRoomTypeGlobalDemand');
-
-                if ($this->_list['global_demands']) {
-                    $view = $helper->generateList($this->_list['global_demands'], $this->fields_list['global_demands']);
-                }
-
-                $this->tpl_view_vars['num_global_demands'] = count($this->_list['global_demands']);
-                $this->tpl_view_vars['global_demands'] = $view;
-            }
-
             if (isset($this->_list['refund_rules']) && count($this->_list['refund_rules'])) {
                 $view = '';
                 $this->initRefundRuleList();

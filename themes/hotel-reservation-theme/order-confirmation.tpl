@@ -541,9 +541,9 @@
 		<div style="display:none;" id="rooms_extra_services">
 			{* <div id="rooms_type_extra_services">
 				<div class="panel">
-					<div class="rooms_extra_demands_head">
+					<div class="rooms_extra_services_head">
 						<h3>{l s='Additional Facilities'}</h3>
-						<p class="rooms_extra_demands_text">{l s='Below are the additional facilities chosen by you in this booking'}</p>
+						<p class="rooms_extra_services_text">{l s='Below are the additional facilities chosen by you in this booking'}</p>
 					</div>
 					<div id="room_type_demands_desc"></div>
 				</div>
