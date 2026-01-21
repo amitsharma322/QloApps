@@ -155,20 +155,17 @@
 {if !isset($ajax) || !$ajax}
 </div>
 
-{* Modal for extra demands *}
+{* Modal for extra *}
 {* <div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_services">
 
 </div> *}
 
 {strip}
 	{addJsDefL name=txtExtraServiceSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
-	{addJsDefL name=txtExtraDemandErr}{l s='Some error occurred while updating demands' js=1}{/addJsDefL}
 {/strip}
 
-{* Css for handling extra demands changes *}
+{* Css for handling extra changes *}
 <style type="text/css">
-	#customer_cart_details .extra-demand-list {
-		padding-left:15px;}
 	#customer_cart_details .delete_hotel_cart_data {
 		margin-bottom:2px !important;}
 	#customer_cart_details .room_type_old_price {

@@ -312,7 +312,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
         $cart_htl_data = array();
         $service_product_data = array();
-        $room_extra_demands = array();
         $room_additinal_services = array();
         $formattedHotelAddress = '';
         if (Module::isInstalled('hotelreservationsystem')) {
@@ -335,8 +334,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             }
             if (!empty($order_details)) {
                 $processed_product = array();
-                $totalDemandsPriceTE = 0;
-                $totalDemandsPriceTI = 0;
                 foreach ($order_details as $type_key => $type_value) {
                     $processProductKey = $type_value['product_id'].'_'.$type_value['selling_preference_type'].'_'.$type_value['id_order_detail'];
                     if (isset($processed_product[$processProductKey])) {
@@ -631,7 +628,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'summary_tab' => $this->smarty->fetch($this->getTemplate('invoice.summary-tab')),
             'product_tab' => $this->smarty->fetch($this->getTemplate('invoice.product-tab')),
             'service_product_tab' => $this->smarty->fetch($this->getTemplate('invoice.service-product-tab')),
-            'extra_demands_tab' => $this->smarty->fetch($this->getTemplate('invoice.extra-demands-tab')),
+            'additinal_services_tab' => $this->smarty->fetch($this->getTemplate('invoice.additinal-services-tab')),
             'tax_tab' => $this->getTaxTabContent(),
             'payment_tab' => $this->smarty->fetch($this->getTemplate('invoice.payment-tab')),
             'note_tab' => $this->smarty->fetch($this->getTemplate('invoice.note-tab')),
@@ -740,12 +737,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
 
         if (isset($breakdowns['room_tax'])) {
             foreach ($breakdowns['room_tax'] as &$bd) {
-                $bd['total_tax_excl'] = $bd['total_price_tax_excl'];
-            }
-        }
-
-        if (isset($breakdowns['extra_demands_tax'])) {
-            foreach ($breakdowns['extra_demands_tax'] as &$bd) {
                 $bd['total_tax_excl'] = $bd['total_price_tax_excl'];
             }
         }

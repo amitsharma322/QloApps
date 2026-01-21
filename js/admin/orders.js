@@ -990,22 +990,7 @@ $(document).ready(function() {
 			actualizeRefundVoucher();
 	});
 
-    // when choose to add new facilities while additional facilities edit
-    $(document).on('click', '#btn_new_room_demand', function() {
-        $('.room_service_container').show();
-        $('#save_room_demands').show();
-        $('#back_to_demands_btn').show();
-        $('.room_ordered_demands').hide();
-        $('#btn_new_room_demand').hide();
-    });
-    // click on back button on created facilities while additional facilities edit
-    $(document).on('click', '#back_to_demands_btn', function() {
-        $('.room_ordered_demands').show();
-        $('#btn_new_room_demand').show();
-        $('.room_service_container').hide();
-        $('#save_room_demands').hide();
-        $('#back_to_demands_btn').hide();
-    });
+
 
     // click on back button on created facilities while additional facilities edit
     $(document).on('click', '#back_to_service_btn', function() {
@@ -1238,15 +1223,6 @@ $(document).ready(function() {
             }
         }
 
-    });
-
-    // change advance option of extra demand
-    $(document).on('change', '.demand_adv_option_block .id_option', function(e) {
-        var option_selected = $(this).find('option:selected');
-        var extra_demand_price = option_selected.attr("optionPrice")
-        extra_demand_price = parseFloat(extra_demand_price);
-        // extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
-        $(this).closest('.room_service_block').find('.unit_price').val(extra_demand_price);
     });
 
     $(".textarea-autosize").autosize();

@@ -665,7 +665,7 @@ class AdminOrdersControllerCore extends AdminController
                     $payment_methods[] = $module->displayName;
                 }
             }
-
+    
             // Set the order currency at first element of currencies
             if ($currencies = Currency::getCurrenciesByIdShop($objOrder->id_shop)) {
                 foreach ($currencies as $key => $currency) {
@@ -682,6 +682,7 @@ class AdminOrdersControllerCore extends AdminController
                     'current_index' => self::$currentIndex,
                     'order' => $objOrder,
                     'currencies' => $currencies,
+                    'currency' => new Currency($objOrder->id_currency),
                     'payment_methods' => $payment_methods,
                     'payment_types' => $this->getPaymentsTypes(),
                     'invoices_collection' => $objOrder->getInvoicesCollection(),

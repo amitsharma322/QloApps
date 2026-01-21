@@ -1546,10 +1546,10 @@
 		});
 	}
 
-	{* JS for handling extra demands changes *}
+	{* JS for handling extra services changes *}
 	$(document).ready(function() {
-		// modalbox for extra demands
-		$('body').on('click', '.open_rooms_extra_demands', function() {
+		// modalbox for extra services
+		$('body').on('click', '.open_rooms_extra_services', function() {
 			var idProduct = $(this).attr('id_product');
 			var idCart = $(this).attr('id_cart');
 			var idRoom = $(this).attr('id_room');

@@ -1311,7 +1311,7 @@
 
         {addJsDefL name=txtSomeErr}{l s='Some error occurred. Please try again.' js=1}{/addJsDefL}
         {addJsDefL name=txtDeleteSucc}{l s='Deleted successfully' js=1}{/addJsDefL}
-        {addJsDefL name=txtInvalidServiceVal}{l s='Invalid demand value found' js=1}{/addJsDefL}
+        {addJsDefL name=txtInvalidServiceVal}{l s='Invalid service value found' js=1}{/addJsDefL}
         {addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
         {addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
         {addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
