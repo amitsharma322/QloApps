@@ -1054,11 +1054,11 @@
     margin-bottom: 0;
 }
 
-#popup-view-extra-services .tab-content .room_demands {
+#popup-view-extra-services .tab-content .room_additional_services {
     margin-top: 20px;
 }
 
-#popup-view-extra-services .tab-content .demand_header {
+#popup-view-extra-services .tab-content .additional_service_header {
     font-size: 16px;
     font-weight: bold;
     line-height: 24px;

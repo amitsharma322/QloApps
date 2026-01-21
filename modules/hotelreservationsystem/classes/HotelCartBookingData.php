@@ -1614,7 +1614,7 @@ class HotelCartBookingData extends ObjectModel
                                 );
                                 if (isset($cartHotelData[$prodKey]['date_diff'][$dateJoin])) {
                                     $numDays = HotelHelper::getNumberOfDays($data_v['date_from'], $data_v['date_to']);
-                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['demand_price'] += $totalAdditionalServicePrice;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['additional_price'] += $totalAdditionalServicePrice;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'] += 1;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_days'] = $numDays;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['adults'] += $data_v['adults'];
@@ -1669,7 +1669,7 @@ class HotelCartBookingData extends ObjectModel
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['total_price_without_discount'] += $totalPriceWithoutDiscount;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] += $amountWithoutAutoAdd;
                                 } else {
-                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['demand_price'] = $totalAdditionalServicePrice;
+                                    $cartHotelData[$prodKey]['date_diff'][$dateJoin]['additional_price'] = $totalAdditionalServicePrice;
                                     $numDays = HotelHelper::getNumberOfDays($data_v['date_from'], $data_v['date_to']);
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'] = 1;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['data_form'] = date(

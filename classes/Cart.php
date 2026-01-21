@@ -186,7 +186,7 @@ class CartCore extends ObjectModel
     const ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE = 17;
     const ONLY_CONVENIENCE_FEE = 18;
 
-    const ONLY_PRODUCTS_WITH_DEMANDS = 19;
+    const ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE = 19;
 
     public function __construct($id = null, $id_lang = null)
     {
@@ -368,8 +368,8 @@ class CartCore extends ObjectModel
      */
     public function getAverageProductsTaxRate(&$cart_amount_te = null, &$cart_amount_ti = null)
     {
-        $cart_amount_ti = $this->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
-        $cart_amount_te = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+        $cart_amount_ti = $this->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
+        $cart_amount_te = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
 
         $cart_vat_amount = $cart_amount_ti - $cart_amount_te;
 
@@ -1571,7 +1571,7 @@ class CartCore extends ObjectModel
             Cart::ONLY_PHYSICAL_PRODUCTS_WITHOUT_SHIPPING,
             Cart::ADVANCE_PAYMENT,
             Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS,
-            Cart::ONLY_PRODUCTS_WITH_DEMANDS,
+            Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE,
         );
 
         // Define virtual context to prevent case where the cart is not the in the global context
@@ -1638,7 +1638,6 @@ class CartCore extends ObjectModel
         }
         $products_total = array();
         $ecotax_total = 0;
-        $totalDemandsPrice = 0;
         $objCartBookingData = new HotelCartBookingData();
         $objServiceProductCartDetail = new ServiceProductCartDetail();
         $objAdvPayment = new HotelAdvancedPayment();
@@ -1937,15 +1936,6 @@ class CartCore extends ObjectModel
             return $wrapping_fees;
         }
 
-        // price of extra demands on room type in the cart
-        if ($type == Cart::BOTH
-            || $type == Cart::BOTH_WITHOUT_SHIPPING
-            || $type == Cart::ADVANCE_PAYMENT
-            || $type == Cart::ONLY_PRODUCTS_WITH_DEMANDS
-        ) {
-            $order_total += $totalDemandsPrice;
-        }
-
         $order_total_discount = 0;
         $order_shipping_discount = 0;
         $advance_payment_products_discount = 0;
@@ -1960,7 +1950,7 @@ class CartCore extends ObjectModel
             Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD,
             Cart::ONLY_ROOM_SERVICES_WITHOUT_CONVENIENCE_FEE,
             Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE,
-            Cart::ONLY_PRODUCTS_WITH_DEMANDS)
+            Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE)
             ) && CartRule::isFeatureActive()
         ) {
             // First, retrieve the cart rules associated to this "getOrderTotal"
@@ -4881,21 +4871,11 @@ class CartCore extends ObjectModel
             $idCustomer = $objCart->id_customer;
             $idCurrency = $objCart->id_currency;
 
-            $extraDemands = null;
-
             // We have to check the alreadt entered rooms for booking parameters with this variable as Also is sending all the rooms everytime
             // because id_guest is not managed in the API call
             $roomsAddedToCart = [];
             foreach ($bookingRows as $booking) {
                 $booking = json_decode(json_encode($booking, true), true);
-                if (isset($booking['extra_demands']['extra_demand'])) {
-                    $extraDemands = $booking['extra_demands']['extra_demand'];
-                    if (isset($extraDemands['id_global_demand'])) {
-                        $extraDemands = array($extraDemands);
-                    }
-                    $extraDemands = json_encode($extraDemands);
-                }
-
                 // get room booking info
                 $idProduct = $booking['id_product'];
                 $dateFrom = $booking['date_from'];
@@ -5001,7 +4981,6 @@ class CartCore extends ObjectModel
                                 $objCartBooking->id_hotel = $val_hotel_room_info['id_hotel'];
                                 $objCartBooking->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
                                 $objCartBooking->quantity = $numDays;
-                                $objCartBooking->extra_demands = $extraDemands;
                                 $objCartBooking->date_from = $dateFrom;
                                 $objCartBooking->date_to = $dateTo;
                                 $objCartBooking->save();

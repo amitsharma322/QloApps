@@ -8999,7 +8999,7 @@ a.open_rooms_extra_services_panel {
 #rooms_extra_services .tab-content {
   padding: 0 15px;
 }
-#rooms_extra_services .demand_header a {
+#rooms_extra_services .additional_service_header a {
   text-decoration: none;
   color: #444444;}
 #rooms_extra_services .room_service_detail {

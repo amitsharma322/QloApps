@@ -1352,7 +1352,7 @@ Quick View Styles
 #booking_action_loader.active {
   display: block;
 }
-/* room type extra demands container */
+/* room type extra service container */
 .room_service_container_overlay {
   display: none;
   position: absolute;
@@ -1415,7 +1415,7 @@ Quick View Styles
 .price_desc_block .total_price_block {
   color: #333;
 }
-.price_desc_block .extra_demands_price_block {
+.price_desc_block .extra_services_price_block {
   color: #299DFF;
 }
 .price_desc_block .plus-sign {
@@ -1469,15 +1469,15 @@ Quick View Styles
 /* end */
 
 
-/* extra demands Css */
+/* extra services Css */
 #rooms_extra_services {
   position: relative;
   font-size: 16px;}
-.room_extra_demands .open_rooms_extra_services {
+.rooms_extra_services .open_rooms_extra_services {
 	font-size:12px;
 	font-weight: 600;
 	color: #0000FF;}
-#rooms_extra_services .demand_header {
+#rooms_extra_services .additional_service_header {
 	padding-bottom: 15px;}
 #rooms_extra_services .room_service_detail .demand_detail_price_block {
 	font-size: 14px;

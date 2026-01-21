@@ -39,8 +39,8 @@
                                 <div id="room_type_service_product_desc" class="tab-pane {if isset($additionalServices) && $additionalServices}active{/if}">
                                     {assign var=roomCount value=1}
                                     {foreach $additionalServices as $key => $roomAdditionalService}
-                                        <div class="room_demands">
-                                            <div class="demand_header">
+                                        <div class="room_additional_services">
+                                            <div class="additional_service_header">
                                                 {l s='Room'} {$roomCount|string_format:'%02d'}&nbsp;
                                                 <span>({if {$roomAdditionalService['adults']} <= 9}0{$roomAdditionalService['adults']}{else}{$roomAdditionalService['adults']}{/if} {if $roomAdditionalService['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $roomAdditionalService['children'] > 0}, {if {$roomAdditionalService['children']} <= 9}0{$roomAdditionalService['children']}{else}{$roomAdditionalService['children']}{/if} {if $roomAdditionalService['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
                                             </div>

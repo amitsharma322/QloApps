@@ -55,7 +55,7 @@
 		</td>
 	</tr>
 
-	<!-- Extra demands -->
+	<!-- Additional Services -->
 	<tr>
 		<td colspan="12">
 			{$additinal_services_tab}

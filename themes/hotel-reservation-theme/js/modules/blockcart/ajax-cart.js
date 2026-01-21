@@ -392,7 +392,7 @@ var ajaxCart = {
         req.append('id_hotel', idHotel);
 
         if (parseInt(booking_product)) {
-            // get the selected extra demands by customer
+            // get the selected extra services by customer
             if (typeof dateFrom != 'undefined')
                 req.append('dateFrom', dateFrom);
             if (typeof dateTo != 'undefined')
@@ -941,7 +941,7 @@ var ajaxCart = {
                         content += '<tr class="rooms_remove_container">';
                         content += '<td>' + moment(new Date(date_diff_v.data_form)).format(dateFormatToUse) + '&nbsp;-&nbsp;' + moment(new Date(date_diff_v.data_to)).format(dateFormatToUse) + '</td>';
                         content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
-                        content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
+                        content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.additional_price), currency_format, currency_sign, currency_blank) + '</td>';
                         content += '<td>';
                         content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v.amount + ' id_product=' + productId + ' date_from=' + date_diff_v.data_form + ' date_to=' + date_diff_v.data_to + ' num_rooms=' + date_diff_v.num_rm + ' title="' + remove_rm_title + '"></a>';
                         content += '</td>';
@@ -1019,7 +1019,7 @@ var ajaxCart = {
                         booking_dates_content += '<tr class="rooms_remove_container">';
                         booking_dates_content += '<td>' + moment(new Date(date_diff_v1.data_form)).format(dateFormatToUse) + '&nbsp;-&nbsp;' + moment(new Date(date_diff_v1.data_to)).format(dateFormatToUse) + '</td>';
                         booking_dates_content += '<td class="num_rooms_in_date">' + date_diff_v1.num_rm + '</td>';
-                        booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount) + parseFloat(date_diff_v1.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
+                        booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount) + parseFloat(date_diff_v1.additional_price), currency_format, currency_sign, currency_blank) + '</td>';
                         booking_dates_content += '<td>';
                         booking_dates_content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v1.amount + ' id_product=' + productId + ' date_from=' + date_diff_v1.data_form + ' date_to=' + date_diff_v1.data_to + ' num_rooms=' + date_diff_v1.num_rm + ' title="' + remove_rm_title + '"></a>';
                         booking_dates_content += '</td>';

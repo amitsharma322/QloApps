@@ -20,15 +20,15 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{block name='cart_booking_demands'}
+{block name='cart_booking_services'}
 	<section>
 		{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
-			{block name='cart_booking_demands_tabs'}
+			{block name='cart_booking_services_tabs'}
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
 				</ul>
 			{/block}
-			{block name='cart_booking_demands_tabs_content'}
+			{block name='cart_booking_services_tabs_content'}
 				<div class="tab-content">
 					{block name='cart_booking_services_tab_content'}
 						{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
@@ -40,7 +40,7 @@
 								{foreach $cartRooms as $key => $cartRoom}
 									<div class="card accordion">
 										<div class="row accordion-section">
-											<div class="col-sm-12 demand_header">
+											<div class="col-sm-12 additional_service_header">
 												<a class="accordion-section-title {if $roomCount == 1}active{/if}" href="#accordion_service_{$key|escape:'html':'UTF-8'}">
 													{l s='Room'} {$roomCount|escape:'html':'UTF-8'}&nbsp;
 													<span>({if {$cartRoom['adults']} <= 9}0{$cartRoom['adults']}{else}{$cartRoom['adults']}{/if} {if $cartRoom['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if {$cartRoom['children']} <= 9}0{$cartRoom['children']}{else}{$cartRoom['children']}{/if} {if $cartRoom['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if})</span>

@@ -87,7 +87,7 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <label class="control-label">{l s='Extra Services'}</label>
-                                                <p class="extra_demands_price_block">
+                                                <p class="extra_services_price_block">
                                                     {if isset($service_product_price)}{convertPrice price=$service_product_price}{else}{convertPrice price=0}{/if}
                                                     {if isset($selected_service_product) && $selected_service_product}
                                                         <span class="services-info">

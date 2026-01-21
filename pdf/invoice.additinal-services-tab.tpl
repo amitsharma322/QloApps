@@ -25,7 +25,7 @@
 
 
 {if isset($room_additinal_services) && $room_additinal_services}
-	<table id="demands-table" class="bordered-table" width="100%" cellpadding="4" cellspacing="0">
+	<table id="additional-services-table" class="bordered-table" width="100%" cellpadding="4" cellspacing="0">
 		<thead>
 			<tr>
 				<th colspan="5" class="header">{l s='Room Extra Services Detail' pdf='true'}</th>
