@@ -7233,7 +7233,11 @@ class AdminOrdersControllerCore extends AdminController
                     $result = true;
                     foreach ($selectedServicesOrderDetails as $idRoomTypeServiceProductOrderDetail) {
                         $objServiceProductOrderDetail = new ServiceProductOrderDetail($idRoomTypeServiceProductOrderDetail);
-                        $quantity = $serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        if(is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail])) {
+                            $quantity = (int)$serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        } else {
+                            $quantity = 1;
+                        }                        
                         $unitPrice = $serviceUnitPrices[$idRoomTypeServiceProductOrderDetail];
 
                         $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);
