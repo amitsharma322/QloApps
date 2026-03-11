@@ -827,7 +827,7 @@ class CartCore extends ObjectModel
         $serviceProducts = array();
         $context = Context::getContext();
         foreach ($productList as $key => $product) {
-            if (!$product['booking_product'] && Product::isSellableAsStandalone($product['selling_preference_type'])) {
+            if (!$product['booking_product'] && Product::isSellableAsStandalone($product['selling_preference_type']) && !Product::isSellableWithRoomType($product['selling_preference_type'])) {
                 if (Validate::isLoadedObject(
                     $objProduct = new Product($product['id_product'], false, $this->id_lang)
                 )) {
