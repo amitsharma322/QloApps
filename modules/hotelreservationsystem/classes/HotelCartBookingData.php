@@ -462,7 +462,8 @@ class HotelCartBookingData extends ObjectModel
         if (defined('_PS_ADMIN_DIR_')) {
             $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE');
         } else {
-            $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE');
+            $objRoomTypeBookingType = new HotelRoomTypeBookingType();
+            $PS_ROOM_UNIT_SELECTION_TYPE = $objRoomTypeBookingType->getHotelRoomTypeBookingSelectedType($id_product);
         }
         if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             $roomsRequired = count($occupancy);
@@ -597,7 +598,8 @@ class HotelCartBookingData extends ObjectModel
             if (defined('_PS_ADMIN_DIR_')) {
                 $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE');
             } else {
-                $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE');
+                $objRoomTypeBookingType = new HotelRoomTypeBookingType();
+                $PS_ROOM_UNIT_SELECTION_TYPE = $objRoomTypeBookingType->getHotelRoomTypeBookingSelectedType($id_product);
             }
             if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                 $roomsRequired = count($occupancy);

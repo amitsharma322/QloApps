@@ -512,6 +512,12 @@ class HotelReservationSystemDb
                 `id_bed_type` INT(11) NOT NULL,
                 PRIMARY KEY (`id_room_type_bed_type`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_booking_type` (
+                `id_room_type_booking_type` INT(11) NOT NULL AUTO_INCREMENT,
+                `id_product` INT(11) NOT NULL,
+                `id_booking_type` INT(11) NOT NULL,
+                PRIMARY KEY (`id_room_type_booking_type`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "INSERT INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
             (1, 'icon-cogs', 'index.php?controller=AdminHotelGeneralSettings', 0, 0, 1, 1, NOW(), NOW()),

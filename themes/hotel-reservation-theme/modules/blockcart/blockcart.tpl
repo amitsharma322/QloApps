@@ -223,7 +223,9 @@
 										<span id="layer_cart_product_unit_price"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt" {$occupancy_required_for_booking} data-label-occupancy="{l s='Room occupancy' mod='blockcart'}" data-label-quantity="{l s='Rooms quantity added' mod='blockcart'}">
+											<span class="layer_cart_room_label">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if}</span> &nbsp;-&nbsp;
+										</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Quantity' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_quantity"></span>
 									</div>

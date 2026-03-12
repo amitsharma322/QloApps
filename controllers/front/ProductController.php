@@ -460,8 +460,12 @@ class ProductControllerCore extends FrontController
                         )
                     );
 
+                    $objRoomTypeBookingType = new HotelRoomTypeBookingType();
+                    $roomBookingSelectedType = $objRoomTypeBookingType->getHotelRoomTypeBookingSelectedType($this->product->id);
+                    $isOccupancyType = ($roomBookingSelectedType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
+                    $this->context->smarty->assign('occupancy_required_for_booking',$isOccupancyType);
                     $occupancy_value = Tools::getValue('occupancy', array());
-                    if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY) {
+                    if ($roomBookingSelectedType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY) {
                         $occupancy_value = 1;
                     } else {
                         $useDefaultOccupancy = true;
@@ -655,6 +659,8 @@ class ProductControllerCore extends FrontController
         $hotel = $objHotel->hotelBranchesInfo(false, 2, 1, $idHotel);
         $hotelLocation = $hotel['city'].', '.(isset($hotel['state_name']) ? ' '.$hotel['state_name'].', ' : '').
         ' '.$hotel['country_name'];
+        $objRoomTypeBookingType = new HotelRoomTypeBookingType();
+        $roomBookingSelectedType = $objRoomTypeBookingType->getHotelRoomTypeBookingSelectedType($idProduct);
 
         $orderDateRestrict = false;
         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
@@ -676,7 +682,7 @@ class ProductControllerCore extends FrontController
             'id_cart' => $idCart,
             'id_guest' => $idGuest,
         );
-        if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+        if ($roomBookingSelectedType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             $bookingParams['occupancy'] = $occupancy;
             $quantity = count($occupancy);
         } else {
@@ -1416,10 +1422,15 @@ class ProductControllerCore extends FrontController
             $dateFrom = Tools::getValue('room_check_in');
             $dateTo = Tools::getValue('room_check_out');
             $occupancy = Tools::getValue('occupancy');
-            if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
-                if (!Validate::isOccupancy($occupancy)) {
-                    $occupancy = array();
-                }
+            $objRoomTypeBookingType = new HotelRoomTypeBookingType();
+            $roomBookingSelectedType = $objRoomTypeBookingType->getHotelRoomTypeBookingSelectedType($idProduct);
+            $isOccupancyType = $roomBookingSelectedType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
+            // $this->context->smarty->assign(
+            //     'occupancy_required_for_booking',
+            //     $isOccupancyType
+            // );
+            if ($isOccupancyType) {
+                $occupancy = Validate::isOccupancy($occupancy) ? $occupancy : array();
             } else {
                 $occupancy = Tools::getValue('qty', 1);
             }

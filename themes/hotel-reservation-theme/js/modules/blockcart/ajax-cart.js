@@ -378,6 +378,9 @@ var ajaxCart = {
         if ($('.cart_block_list').hasClass('collapsed'))
             this.expand();
 
+        var isOccupancyBooking = getOccupancyRequiredForBooking($(callerElement).closest('.booking_room_fields'));
+        ajaxCart.lastOccupancyRequiredForBooking = isOccupancyBooking;
+
         // create from data in order to manage adding different type of products
         var req = new FormData();
         req.append('controller', 'cart');
@@ -398,7 +401,7 @@ var ajaxCart = {
             if (typeof dateTo != 'undefined')
                 req.append('dateTo', dateTo);
 
-            if (occupancy_required_for_booking) {
+            if (isOccupancyBooking) {
                 req.append('occupancy', JSON.stringify(occupancy));
             } else {
                 req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
@@ -425,6 +428,7 @@ var ajaxCart = {
             contentType: false,
             processData: false,
             success: function(jsonData, textStatus, jqXHR) {
+                console.log(jsonData);                
                 if (pagename == 'product') {
                     if (jsonData.avail_rooms == 0) {
                         disableRoomTypeDemands(1);
@@ -1206,7 +1210,16 @@ var ajaxCart = {
             let rooms = 0;
             let adults = 0;
             let children = 0;
-            if (occupancy_required_for_booking) {
+            var isOccupancyBooking = (typeof ajaxCart.lastOccupancyRequiredForBooking !== 'undefined') ? ajaxCart.lastOccupancyRequiredForBooking : occupancy_required_for_booking;
+            var $roomLabel = $('#layer_cart .layer_cart_room_txt .layer_cart_room_label');
+            if ($roomLabel.length) {
+                var $labelContainer = $roomLabel.closest('.layer_cart_room_txt');
+                var label = isOccupancyBooking ? $labelContainer.data('label-occupancy') : $labelContainer.data('label-quantity');
+                if (label) {
+                    $roomLabel.text(label);
+                }
+            }
+            if (isOccupancyBooking) {
                 $.each(product.occupancy, function(index, val) {
                     rooms++;
                     adults += parseInt(val.adults);
@@ -1454,7 +1467,8 @@ function getBookingOccupancyDetails(bookingform, booking_product)
 {
     let occupancy;
     if (booking_product) {
-        if (occupancy_required_for_booking) {
+        var isOccupancyBooking = getOccupancyRequiredForBooking(bookingform);
+        if (isOccupancyBooking) {
             $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
             let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
             if (selected_occupancy.length) {
@@ -1495,4 +1509,18 @@ function getBookingOccupancyDetails(bookingform, booking_product)
     }
 
     return occupancy;
+}
+
+function getOccupancyRequiredForBooking(bookingform) {
+    var value = occupancy_required_for_booking;
+    var $form = bookingform ? $(bookingform) : $('#booking-form').closest('.booking_room_fields');
+
+    if ($form.length) {
+        var dataVal = $form.data('occupancy-required');
+        if (dataVal !== undefined) {
+            value = parseInt(dataVal) === 1;
+        }
+    }
+
+    return value;
 }

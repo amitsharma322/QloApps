@@ -465,6 +465,21 @@
 		</div>
 	{/if}
 
+	<div class="form-group" id="booking_types_selection">
+		<label class="control-label col-sm-3">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all booking types available for this room type.'}">
+				{l s='Booking Type'}
+			</span>
+		</label>
+		<div class="col-sm-5">
+			<select name="id_booking_type" id="id_booking_type" class="form-control">
+				{foreach from=$booking_types_info item=booking_type_info}
+					<option value="{$booking_type_info['id']}" {if isset($selected_booking_types) && in_array($booking_type_info['id'], $selected_booking_types)}selected{/if}>{$booking_type_info['name']}</option>
+				{/foreach}
+			</select>
+		</div>
+	</div>
+
 	<div class="form-group" id="bed_types_selection">
 		<label class="control-label col-sm-3">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all bed types available for this room type.'}">

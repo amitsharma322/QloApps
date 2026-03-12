@@ -21,7 +21,7 @@
 *}
 
 <div class="booking-form card">
-    <div class="booking_room_fields">
+    <div class="booking_room_fields" data-occupancy-required="{$occupancy_required_for_booking|intval}">
         {block name='booking_form_content'}
             <form id="booking-form" action="" method="post">
                 {block name='product_hidden_fields'}

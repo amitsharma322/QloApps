@@ -950,6 +950,12 @@ class AdminProductsControllerCore extends AdminController
                         $objHotelRoomTypeBedType->updateRoomTypeBedTypes($roomTypeBedTypes, $product->id);
                     }
 
+                    $objHotelRoomTypeBookingType = new HotelRoomTypeBookingType();
+                    if ($roomTypeBookingTypes = $objHotelRoomTypeBookingType->getRoomTypeBookingTypeByProduct($id_product_old)) {
+                        $roomTypeBookingTypes = array_column($roomTypeBookingTypes, 'id_booking_type');
+                        $objHotelRoomTypeBookingType->updateRoomTypeBookingType($roomTypeBookingTypes, $product->id);
+                    }
+
                     if ($product->hasAttributes()) {
                         Product::updateDefaultAttribute($product->id);
                     } else {
@@ -1926,6 +1932,8 @@ class AdminProductsControllerCore extends AdminController
         if ($this->object->add()) {
             $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
             $objHotelRoomTypeBedType->updateRoomTypeBedTypes(Tools::getValue('id_bed_types'), $this->object->id);
+            $objHotelRoomTypeBookingType = new HotelRoomTypeBookingType();
+            $objHotelRoomTypeBookingType->updateRoomTypeBookingType(Tools::getValue('id_booking_type'), $this->object->id);
             // associateroom type to hotel
             // if ($this->object->is_virtual) {
 
@@ -2111,6 +2119,8 @@ class AdminProductsControllerCore extends AdminController
                 if ($object->update()) {
                     $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
                     $objHotelRoomTypeBedType->updateRoomTypeBedTypes(Tools::getValue('id_bed_types'), $object->id);
+                    $objHotelRoomTypeBookingType = new HotelRoomTypeBookingType();
+                    $objHotelRoomTypeBookingType->updateRoomTypeBookingType(Tools::getValue('id_booking_type'), $object->id);
 
                     // update position in category
                     $object->setPositionInCategory(Tools::getValue('category_position'));
@@ -4537,10 +4547,18 @@ class AdminProductsControllerCore extends AdminController
         $objHotelBedType = new HotelBedType();
         $bedTypes = $objHotelBedType->getAllBedTypes($this->context->language->id);
         $data->assign('bed_types_info', $bedTypes);
+        $objBookingTypes = new HotelRoomTypeBookingType();
+        $bookingTypes = $objBookingTypes->getRoomTypeBookingTypes();
+        $data->assign('booking_types_info', $bookingTypes);
         $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($product->id)) {
             $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
             $data->assign('selected_bed_types', $selectedBedTypes);
+        }
+
+        if ($selectedBookingTypes = $objBookingTypes->getRoomTypeBookingTypeByProduct($product->id)) {
+            $selectedBookingTypes = array_column($selectedBookingTypes, 'id_booking_type');
+            $data->assign('selected_booking_types', $selectedBookingTypes);
         }
 
         $this->tpl_form_vars['product'] = $product;

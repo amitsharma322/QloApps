@@ -220,6 +220,17 @@ class CategoryControllerCore extends FrontController
 
                     array_multisort($indi_arr, $direction, $booking_data['rm_data']);
                 }
+
+                $objRoomTypeBookingType = new HotelRoomTypeBookingType();
+                foreach ($booking_data['rm_data'] as $roomKey => $roomData) {
+                    if (isset($roomData['id_product'])) {
+                        $bookingType = $objRoomTypeBookingType->getHotelRoomTypeBookingSelectedType(
+                            (int) $roomData['id_product']
+                        );
+                        $booking_data['rm_data'][$roomKey]['occupancy_required_for_booking'] = 
+                            ($bookingType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) ? 1 : 0;
+                    }
+                }
             }
 
             $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);

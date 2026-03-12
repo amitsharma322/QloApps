@@ -310,7 +310,9 @@ class CartControllerCore extends FrontController
 
         if ($product->booking_product) {
             $occupancyRequiredForBooking = false;
-            if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $objRoomTypeBookingType = new HotelRoomTypeBookingType();
+            $roomUnitSelectionType = $objRoomTypeBookingType->getHotelRoomTypeBookingSelectedType($this->id_product);
+            if ($roomUnitSelectionType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                 $occupancyRequiredForBooking = true;
             }
 
