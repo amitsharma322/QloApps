@@ -827,7 +827,7 @@ class CartCore extends ObjectModel
         $serviceProducts = array();
         $context = Context::getContext();
         foreach ($productList as $key => $product) {
-            if (!$product['booking_product'] && Product::isSellableAsStandalone($product['selling_preference_type'])) {
+            if (!$product['booking_product'] && Product::isSellableAsStandalone($product['selling_preference_type'] && !Product::isSellableWithRoomType($product['selling_preference_type']))) {
                 if (Validate::isLoadedObject(
                     $objProduct = new Product($product['id_product'], false, $this->id_lang)
                 )) {
@@ -2495,16 +2495,12 @@ class CartCore extends ObjectModel
                                             'id_hotel_cart_booking' => $selectedProduct['id_hotel_cart_booking'],
                                         );
                                     }
-                                    if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $selectedProduct['price_calculation_method']) {
-                                        $numDays = HotelHelper::getNumberOfDays(
-                                            $selectedProduct['date_from'],
-                                            $selectedProduct['date_to']
-                                        );
-                                        $array[$selectedProduct['id_room_type_hotel']]['quantity'] += ($selectedProduct['quantity'] * $numDays);
-                                    } else {
-                                        $array[$selectedProduct['id_room_type_hotel']]['quantity'] += $selectedProduct['quantity'];
-
-                                    }
+                                    $numDays = Product::getPriceCalculationApplicableDays(
+                                        $selectedProduct['price_calculation_method'],
+                                        $selectedProduct['date_from'],
+                                        $selectedProduct['date_to']
+                                    );
+                                    $array[$selectedProduct['id_room_type_hotel']]['quantity'] += ($selectedProduct['quantity'] * $numDays);
                                 }
                                 
                                 if ($array) {
