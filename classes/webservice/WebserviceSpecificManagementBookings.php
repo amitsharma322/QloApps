@@ -158,6 +158,23 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         )
     );
 
+    public $allowedFilters = array(
+        'id_property' => 'hbd.id_hotel',
+        'customer' => 'customer',
+        'id_order' => 'o.id_order',
+        'booking_status' => 'hbd.id_status',
+        'order_status' => 'o.current_state',
+        'source' => 'o.source',
+        'booking_date' => 'o.date_add',
+        'checkin_date' => 'hbd.date_from',
+        'checkout_date' => 'hbd.date_to',
+        'id_room_type' => 'hbd.id_product',
+        'payment_type' => 'op.payment_type',
+        'payment_method' => 'op.payment_method',
+    );
+
+    public $resourceConfiguration;
+
     /**
      * @param WebserviceOutputBuilderCore $obj
      * @return WebserviceSpecificManagementInterface
@@ -251,7 +268,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                 'facilities' => 'facility',
                 'services' => 'service',
                 'cart_rules' => 'cart_rule',
-                'remarks' => 'remark'
+                'remarks' => 'remark',
+                'bookings' => 'booking'
             );
             $this->output = $this->renderXmlOutputUsingArray($this->output, array(), $parentKeys);
         }
@@ -301,19 +319,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
                     $this->renderResponse();
                 } else {
-                    // @todo: add filters for the booking webservice
-                    // $filters = $this->manageFilters();
-                    $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('bookings', array());
-                    $bookings = Db::getInstance()->executeS('SELECT `id_order` FROM `'._DB_PREFIX_.'orders` WHERE 1');
-                    foreach ($bookings as $booking) {
-                        $more_attr = array(
-                            'xlink_resource' => $this->wsObject->wsUrl.$this->wsObject->urlSegment[0].'/'.$booking['id_order'],
-                            'id' => (int) $booking['id_order']
-                        );
-                        $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('booking', array('objectsNodeName' => 'bookings'), $more_attr, false);
-                    }
-                    $this->output .= $this->objOutput->getObjectRender()->renderNodeFooter('bookings', array());
-                    $this->output = $this->objOutput->getObjectRender()->overrideContent($this->output);
+                    $this->getBookingsList();
+                    $this->renderResponse();
                 }
 
             break;
@@ -3241,6 +3248,325 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
     }
 
 
+
+    private function manageBookingFilter($filters) 
+    {
+        $ret = '';
+        $allowedFilters = $this->allowedFilters;
+        foreach ($filters as $field => $raw) {
+            preg_match('/^(.*)\[(.*)\](.*)$/', $raw, $matches);
+            if (!array_key_exists($field, $allowedFilters)) {
+                $this->wsObject->setErrorDidYouMean(400, 'This filter does not exist', $field, array_keys($allowedFilters), 32);
+                return false;
+            } else if ($field === 'customer') {
+                $ret .= ' AND (c.`firstname` LIKE "%' . pSQL($raw). '%" 
+                        OR c.`email` LIKE "%' . pSQL($raw). '%")' . "\n";
+                continue;
+            } else if(count($matches) > 1) {
+                if ($matches[1] == '%' || $matches[3] == '%') {
+                    $ret .= ' AND '.$allowedFilters[$field].' LIKE "'.pSQL($matches[1].$matches[2].$matches[3])."\"\n";
+                } elseif ($matches[1] == '' && $matches[3] == '') {
+                    if (strpos($matches[2], '|') > 0) {
+                        $values = explode('|', $matches[2]);
+                        $ret .= ' AND '.$allowedFilters[$field].' IN (' . implode(',', $values) . ')';
+                    } elseif (preg_match('/^([\d\.:\-\s]+),([\d\.:\-\s]+)$/', $matches[2], $matches3)) {
+                        unset($matches3[0]);
+                        if (count($matches3) > 0) {
+                            sort($matches3);
+                            $ret .= ' AND '.$allowedFilters[$field].' BETWEEN "'.pSQL($matches3[0]).'" AND "'.pSQL($matches3[1])."\"\n";
+                        }
+                    } else {
+                        $ret .= ' AND '.$allowedFilters[$field].'="'.pSQL($matches[2]).'"'."\n";
+                    }
+                } elseif ($matches[1] == '>') {
+                    $ret .= ' AND '.$allowedFilters[$field].' > "'.pSQL($matches[2])."\"\n";
+                } elseif ($matches[1] == '<') {
+                    $ret .= ' AND '.$allowedFilters[$field].' < "'.pSQL($matches[2])."\"\n";
+                } elseif ($matches[1] == '!') {
+                    $multiple_values = explode('|', $matches[2]);
+                    foreach ($multiple_values as $value) {
+                        $ret .= ' AND '.$allowedFilters[$field].' != "'.pSQL($value)."\"\n";
+                    }
+                }
+            } else {
+                $ret .= ' AND '.$allowedFilters[$field].' '.(Validate::isFloat(pSQL($raw)) ? 'LIKE' : '=').' "'.pSQL($raw)."\"\n";
+            }
+        }
+    
+        return $ret;
+    }
+
+    private function manageBookingOrderBySort($sorts)
+    {
+        $sqlSort = '';
+
+        if ($sorts) {
+            preg_match('#^\[(.*)\]$#Ui', $sorts, $matches);
+            $sorts = count($matches) > 1 ? explode(',', $matches[1]) : array($sorts);
+
+            $sqlSort .= ' ORDER BY ';
+
+            foreach ($sorts as $sort) {
+                $delimiterPosition = strrpos($sort, '_');
+                if ($delimiterPosition === false) {
+                    $this->wsObject->setError(400, 'The "sort" value has to be formed as this example: "field_ASC" or \'[field_1_DESC,field_2_ASC]\'', 37);
+                    return false;
+                }
+
+                $fieldName = substr($sort, 0, $delimiterPosition);
+                $direction = strtoupper(substr($sort, $delimiterPosition + 1));
+
+                if (!in_array($direction, array('ASC', 'DESC'))) {
+                    $this->wsObject->setError(400, 'The "sort" value has to be formed as this example: "field_ASC" or \'[field_1_DESC,field_2_ASC]\'', 37);
+                    return false;
+                }
+
+                if (!array_key_exists($fieldName, $this->allowedFilters)) {
+                    $this->wsObject->setErrorDidYouMean(
+                        400,
+                        'This sort field does not exist',
+                        $fieldName,
+                        array_keys($this->allowedFilters),
+                        38
+                    );
+                    return false;
+                }
+
+                $sqlSort .= $this->allowedFilters[$fieldName].' '.$direction.', ';
+            }
+
+            $sqlSort = rtrim($sqlSort, ', ');
+        }
+
+        return $sqlSort;
+    }
+
+    public function getBookingsList()
+    {
+        $selectColumns = ['o.`id_order`'];
+        $fragments = $this->wsObject->urlFragments;
+        if (!empty($fragments['display'])) {
+            if ($fragments['display'] === 'full') {
+                $selectColumns = array(
+                    'o.`id_order`','o.`id_currency`', 'o.`source`','o.`date_add`','o.`id_lang`','o.`current_state`','o.`total_paid_real`','o.`total_paid_tax_incl`','o.`total_paid_tax_excl`',
+                    'hbd.`id_product`','hbd.`date_from`','hbd.`date_to`','hbd.`total_price_tax_incl`','hbd.`total_price_tax_excl`','hbd.`id_room`','hbd.`id`','hbd.`adults`','hbd.`children`','hbd.`id_hotel`','hbd.`room_type_name`',
+                    'c.`id_customer`','c.`firstname`','c.`lastname`','c.`email`','c.`phone`','c.`id_default_group`',
+                    'CONCAT(c.`firstname`, " ", c.`lastname`) AS `customer`',
+                    'crncy.`iso_code`',
+                    'ocr.`id_order_invoice`', 'ocr.`name` as cart_rule_name', 'ocr.`value` as cart_rule_value', '`ocr`.`id_cart_rule`',
+                );
+            }
+        }
+
+        $whereSql = '';
+        $limitSql = '';
+        $orderSql = '';
+        if (!empty($fragments['filter']) && is_array($fragments['filter'])) {
+            $whereSql = $this->manageBookingFilter($fragments['filter']);
+        }
+        if (!empty($fragments['sort'])) {
+            $orderSql = $this->manageBookingOrderBySort($fragments['sort']);
+        }
+        if (isset($fragments['limit'])) {
+            $limitArgs = explode(',', $fragments['limit']);
+            if(count($limitArgs) != 2) {
+                $this->wsObject->setError(400, 'The "limit" value has to be formed as this example: "5,25" or "10"', 39);
+            }
+            $limitSql = ' LIMIT ' . (int) $limitArgs[0] . ', ' . (int) $limitArgs[1];
+        }
+        $id_lang = Configuration::get('PS_LANG_DEFAULT') ; 
+
+        $sql = '
+            SELECT ' . implode(', ', $selectColumns) . '
+            FROM ' . _DB_PREFIX_ . 'orders o
+            INNER JOIN ' . _DB_PREFIX_ . 'htl_booking_detail hbd
+                ON o.id_order = hbd.id_order
+            INNER JOIN ' . _DB_PREFIX_ . 'customer c
+                ON o.id_customer = c.id_customer
+            INNER JOIN ' . _DB_PREFIX_ . 'currency crncy
+                ON o.id_currency = crncy.id_currency
+            LEFT JOIN ' . _DB_PREFIX_ . 'order_payment_detail opd
+                ON o.id_order = opd.id_order
+            LEFT JOIN ' . _DB_PREFIX_ . 'order_payment op
+                ON opd.id_order_payment = op.id_order_payment
+            LEFT JOIN ' . _DB_PREFIX_ . 'order_cart_rule ocr
+                ON o.id_order = ocr.id_order
+            WHERE 1
+            ' . $whereSql . '
+            ' . $orderSql . '
+            ' . $limitSql;
+        try {
+
+            $results = Db::getInstance()->executeS($sql);
+            $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+            $objOrder = new Order();
+            $resultData = array();
+
+            foreach ($results as $result) {
+                $orderId = (int) $result['id_order'];
+                if( isset($fragments['display']) && $fragments['display'] === 'full'){
+                    if (!isset($resultData[$orderId])) {
+                        $params = array();
+                        $params['id_order'] = $orderId;
+                        $params['id_property'] = (int) $result['id_hotel'];
+                        $params['currency'] = strtoupper($result['iso_code']);
+                        $params['order_status'] = $result['current_state'];
+                        $params['source'] = $result['source'];
+                        $params['booking_date'] = $result['date_add'];
+                        $params['id_language'] = (int) $result['id_lang'];
+                        $params['associations'] = array();
+                        $params['associations']['customer_detail'] = array(
+                            'id_customer' => (int) $result['id_customer'],
+                            'firstname' => $result['firstname'],
+                            'lastname'  => $result['lastname'],
+                            'email'     => $result['email'],
+                            'phone'     => isset($result['phone']) ? $result['phone'] : ''
+                        );
+
+                        $params['associations']['price_details'] = array(
+                            'total_paid' => Tools::ps_round($result['total_paid_real'], _PS_PRICE_COMPUTE_PRECISION_),
+                            'total_price_without_tax' => Tools::ps_round($result['total_paid_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_),
+                            'total_tax' => Tools::ps_round(
+                                $result['total_paid_tax_incl'] - $result['total_paid_tax_excl'],
+                                _PS_PRICE_COMPUTE_PRECISION_
+                            )
+                        );
+
+                        $params['associations']['cart_rules'] = array(
+                            'code' => $result['cart_rule_name'],
+                            'value' => Tools::ps_round($result['cart_rule_value'], _PS_PRICE_COMPUTE_PRECISION_),
+                            'id_order_invoice' => $result['id_order_invoice'],
+                        );
+                        
+                        $params['associations']['remarks'] = array();
+                        if ($customerMessages = Message::getMessagesByOrderId($orderId)) {
+                            foreach ($customerMessages as $customerMessage) {
+                                $params['associations']['remarks'][] = $customerMessage['message'];
+                            }
+                        }
+                        $params['associations']['room_types'] = array();
+                        $resultData[$orderId] = $params;
+                    }
+
+                    $dateJoin = $result['id_product'] . '_' . strtotime($result['date_from']) . strtotime($result['date_to']);
+
+                    if (!isset($resultData[$orderId]['associations']['room_types'][$dateJoin])) {
+                        $resultData[$orderId]['associations']['room_types'][$dateJoin] = array(
+                            'id_room_type'    => (int) $result['id_product'],
+                            'checkin_date'    => $result['date_from'],
+                            'checkout_date'   => $result['date_to'],
+                            'total_tax'       => ($result['total_price_tax_incl'] - $result['total_price_tax_excl']),
+                            'number_of_rooms' => 1,
+                            'name'            => $result['room_type_name'],
+                        );
+                    } else {
+                        $resultData[$orderId]['associations']['room_types'][$dateJoin]['total_tax'] +=
+                            ($result['total_price_tax_incl'] - $result['total_price_tax_excl']);
+                        $resultData[$orderId]['associations']['room_types'][$dateJoin]['number_of_rooms']++;
+                    }
+
+                    $resultData[$orderId]['associations']['room_types'][$dateJoin]['total_tax'] =
+                        Tools::ps_round(
+                            $resultData[$orderId]['associations']['room_types'][$dateJoin]['total_tax'],
+                            _PS_PRICE_COMPUTE_PRECISION_
+                        );
+                    $roomInfo = array();
+                    $roomInfo['id_room'] = (int) $result['id_room'];
+                    $roomInfo['id_hotel_booking'] = (int) $result['id'];
+                    $roomInfo['adults'] = (int) $result['adults'];
+                    $roomInfo['child'] = (int) $result['children'];
+                    $roomInfo['unit_price_without_tax'] = Tools::ps_round($result['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_);
+                    $roomInfo['total_tax'] = Tools::ps_round(($result['total_price_tax_incl'] - $result['total_price_tax_excl']), _PS_PRICE_COMPUTE_PRECISION_);
+                    if(isset($roomInfo['services'])) {
+                        unset($roomInfo['services']);
+                    }
+                    
+                    if (Group::getPriceDisplayMethod($result['id_default_group']) == PS_TAX_INC) {
+                        $useTax = 1;
+                    }
+
+                    if ($additionalServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
+                        $result['id_order'],
+                        0,
+                        0,
+                        $result['id_product'],
+                        $result['date_from'],
+                        $result['date_to'],
+                        $result['id_room'],
+                        0,
+                        $useTax,
+                        null
+                    )) {
+                        $roomInfo['services'] = array();
+                        foreach ($additionalServices as $additionalService) {
+                            foreach ($additionalService['additional_services'] as $service) {
+                                $services = array();
+                                $services['id_service'] = (int) $service['id_product'];
+                                $services['name'] = $service['name'];
+                                $services['quantity'] = (int) $service['quantity'];
+                                $services['unit_price_without_tax'] = Tools::ps_round(($service['total_price_tax_excl'] / $services['quantity']), _PS_PRICE_COMPUTE_PRECISION_);
+                                $services['total_price_without_tax'] = Tools::ps_round(($service['total_price_tax_excl']), _PS_PRICE_COMPUTE_PRECISION_);
+                                $services['total_tax'] = Tools::ps_round(($service['total_price_tax_incl'] - $service['total_price_tax_excl']), _PS_PRICE_COMPUTE_PRECISION_);
+
+                                $objProduct = new Product($service['id_product']);
+                                $services['per_night'] = 0;
+                                if ($objProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                    $services['per_night'] = 1;
+                                }
+
+                                $services['price_mode'] = (int) $objProduct->price_calculation_method;
+                                $roomInfo['services'][] = $services;
+                            }
+                        }
+                    }
+
+                    $resultData[$orderId]['associations']['room_types'][$dateJoin]['rooms'][] = $roomInfo;
+
+                }else{
+                    $params['id_order'] = $orderId;
+                    $resultData[$orderId] = $params;
+                }
+            }
+            
+            if (isset($fragments['display']) && $fragments['display'] === 'full') {
+                $responseData = [];
+                foreach ($resultData as $order) {
+                    if (isset($order['associations']['room_types'])) {
+                        $order['associations']['room_types'] = array_values(
+                            $order['associations']['room_types']
+                        );
+                    }
+
+                    $responseData[] = $order;
+                }
+
+                $this->output['bookings'] = $responseData;
+                return;
+            }
+            $this->output .= $this->objOutput->getObjectRender()
+                ->renderNodeHeader('bookings', []);
+
+            foreach ($resultData as $order) {
+                $more_attr = array( 
+                    'xlink_resource' => $this->wsObject->wsUrl.$this->wsObject->urlSegment[0].'/'.$order['id_order'], 
+                    'id' => (int) $order['id_order'] 
+                ); 
+                $this->output .= $this->objOutput->getObjectRender()->renderNodeHeader('booking', array('objectsNodeName' => 'bookings'), $more_attr, false);
+            }
+
+            $this->output .= $this->objOutput->getObjectRender()
+                ->renderNodeFooter('bookings', []);
+
+            $this->output = $this->objOutput->getObjectRender()
+                ->overrideContent($this->output);
+   
+
+        } catch (\Throwable $th) {
+            $this->wsObject->setError(400, $th->getMessage(), 39);
+        }
+    }
+
+
     /**
      * Used to get the booking details for the  GET, POST and PUT request.
      */
@@ -3378,7 +3704,6 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     $roomTypeInfo[$dateJoin]['rooms'][] = $roomInfo;
                 }
             }
-
             $params['associations']['room_types'] = array_values($roomTypeInfo);
             $this->output['booking'] = $params;
         }
@@ -3422,6 +3747,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
      */
     public function renderXmlOutputUsingArray($response, $keyToIgnore = array(), $parentKeys = array(), $parentKey = '', $useEmpty = false)
     {
+      //  ddd($response);
         $output = '';
         foreach ($response as $key => $res) {
             if (in_array($key, $keyToIgnore) && $key) {
