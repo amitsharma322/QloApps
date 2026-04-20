@@ -875,7 +875,15 @@ class AdminControllerCore extends Controller
         $prefix = $this->getCookieFilterPrefix();
         $filters = array();
         if (isset($this->list_id)) {
+            $postPrefixPattern = '#^('.
+                $this->list_id.'Filter_|'.
+                'submitFilter'.
+            ')#i';
             foreach ($_POST as $key => $value) {
+                // only process the filter fields.
+                if (!preg_match($postPrefixPattern, $key)) {
+                    continue;
+                }
 
                 if (is_array($value)) {
                     if (isset($value[0], $value[1]) && $value[0] === '' && $value[1] === '') {
@@ -894,7 +902,17 @@ class AdminControllerCore extends Controller
                 }
             }
 
+            $getPrefixPattern = '#^(' .
+                'submitFilter|'.
+                $this->list_id.'Filter_|'.
+                $this->list_id.'Orderby|'.
+                $this->list_id.'Orderway'.
+            ')#i';
             foreach ($_GET as $key => $value) {
+                // only process the filter and order by, order way fields.
+                if (!preg_match($getPrefixPattern, $key)) {
+                    continue;
+                }
 
                 if (is_array($value)) {
                     if (isset($value[0], $value[1]) && $value[0] === '' && $value[1] === '') {

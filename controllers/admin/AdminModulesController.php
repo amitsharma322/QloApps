@@ -1305,6 +1305,13 @@ class AdminModulesControllerCore extends AdminController
             if (Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee)) {
                 $filter_categories = explode('|', Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee));
             }
+            if (count($filter_categories) > 0) {
+                foreach ($filter_categories as $fc) {
+                    if (!empty($fc)) {
+                        $category_filtered[$fc] = 1;
+                    }
+                }
+            }
             if (count($category_filtered) > 0 && !isset($category_filtered[$module->tab])) {
                 return true;
             }
