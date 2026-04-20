@@ -542,6 +542,8 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         Hook::exec('actionObjectAddAfter', array('object' => $this));
         Hook::exec('actionObject'.get_class($this).'AddAfter', array('object' => $this));
 
+        $this->createLog('%s addition');
+
         return $result;
     }
 
@@ -745,6 +747,8 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         Hook::exec('actionObjectUpdateAfter', array('object' => $this));
         Hook::exec('actionObject'.get_class($this).'UpdateAfter', array('object' => $this));
 
+        $this->createLog('%s modification');
+
         return $result;
     }
 
@@ -791,7 +795,43 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
         Hook::exec('actionObjectDeleteAfter', array('object' => $this));
         Hook::exec('actionObject'.get_class($this).'DeleteAfter', array('object' => $this));
 
+        $this->createLog('%s deletion');
+
         return $result;
+    }
+
+    protected function createLog($message)
+    {
+        if ($this->def['table'] === 'log') {
+            return;
+        }
+
+        if (defined('PS_INSTALLATION_IN_PROGRESS') && PS_INSTALLATION_IN_PROGRESS) {
+            return;
+        }
+
+        $context = Context::getContext();
+        if (!$context || !isset($context->language) || !is_object($context->language) || empty($context->language->iso_code)) {
+            return;
+        }
+
+        $id_employee = (isset($context->employee) && Validate::isLoadedObject($context->employee)) ? (int)$context->employee->id : 0;
+        $translated = $message;
+        if (class_exists('Translate')) {
+            $translated = Translate::getAdminTranslation($message, 'AdminTab', false, false);
+        } elseif (class_exists('TranslateCore')) {
+            $translated = TranslateCore::getAdminTranslation($message, 'AdminTab', false, false);
+        }
+
+        PrestaShopLogger::addLog(
+            sprintf($translated, get_class($this)),
+            1,
+            null,
+            get_class($this),
+            (int)$this->id,
+            true,
+            $id_employee
+        );
     }
 
     /**
