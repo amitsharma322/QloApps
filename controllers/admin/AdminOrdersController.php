@@ -485,6 +485,7 @@ class AdminOrdersControllerCore extends AdminController
                     'advance_payment_amount_without_tax' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
                     'advance_payment_amount_with_tax' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                     'cart' => $cart,
+                    'customer' => $cart->id_customer ? new Customer($cart->id_customer): null ,
                     'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
                     'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
                     'payment_modules' => $payment_modules,
@@ -8167,10 +8168,19 @@ class AdminOrdersControllerCore extends AdminController
 
                 $id_order = $objHotelBookingDetail->id_order;
                 $order = new Order($id_order);
-                $activeRooms = $objHotelBookingDetail->getActiveRoomsCountByOrder($id_order);
+                $remainingCheckoutRooms = 0;
+                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                    $orderBookings = $objHotelBookingDetail->getOrderCurrentDataByOrderId(
+                        $id_order,
+                        array(HotelBookingDetail::STATUS_ALLOTED, HotelBookingDetail::STATUS_CHECKED_IN),
+                        0,
+                        0
+                    );
+                    $remainingCheckoutRooms = count($orderBookings);
+                }
                 $hasPendingBills = $order->getTotalPaid() < $order->getOrderTotal();
 
-                if ($activeRooms == 1 && $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT && $hasPendingBills) {
+                if ($remainingCheckoutRooms == 1 && $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT && $hasPendingBills) {
                     $this->errors[] = Tools::displayError('You cannot checkout the last room while there are pending bills for this order.');
                 } else {
                     $objHotelBookingDetail->id_status = $newStatus;
