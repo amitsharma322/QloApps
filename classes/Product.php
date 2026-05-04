@@ -6907,23 +6907,31 @@ class ProductCore extends ObjectModel
             return (int) $defaultDays;
         }
 
+        $checkin = 1;
+        $checkout = 1;
+        $duringStay = max($numNights - 1, 0);
+
         switch ((int) $priceCalculationMethod) {
             case self::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY:
+                return $checkin;
+
             case self::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY:
-                return 1;
+                return $checkout;
 
             case self::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY:
-                return max($numNights, 1);
+                return $numNights;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY:
-                return 2;
+                return $checkin + $checkout;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY:
+                return $checkin + $duringStay;
+
             case self::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY:
-                return $numNights + 1;
+                return $checkout + $duringStay;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY:
-                return $numNights + 2;
+                return $checkin + $checkout + $duringStay;
 
             default:
                 return $numNights;
