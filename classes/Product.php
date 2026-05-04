@@ -6913,17 +6913,17 @@ class ProductCore extends ObjectModel
                 return 1;
 
             case self::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY:
-                return max($numNights - 1, 1);
+                return max($numNights, 1);
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY:
                 return 2;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY:
             case self::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY:
-                return $numNights;
+                return $numNights + 1;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY:
-                return $numNights + 1;
+                return $numNights + 2;
 
             default:
                 return $numNights;

@@ -232,9 +232,9 @@
     {* Code For Standard product working *}
 	<div class="form-group" id="global_product_type_container">
 		<label class="control-label col-lg-3" for="selling_preference_type">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether this product will be sold with room type or as an standalone product'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select how this product will be sold: with room types, with hotels, as a standalone product, or in a combination of these options.'}">
 				{l s='Product selling preference'}
-			<span>
+			</span>
 		</label>
 		<div class="col-lg-4">
 			<select name="selling_preference_type" id="selling_preference_type">
