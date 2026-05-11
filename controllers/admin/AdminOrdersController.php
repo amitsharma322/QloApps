@@ -1000,6 +1000,12 @@ class AdminOrdersControllerCore extends AdminController
                     
                     if($serviceProducts) {
                         foreach ($serviceProducts as $key => $servProduct) {
+                            if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
+                                && Product::getQuantity((int)$servProduct['id_product']) <= 0
+                            ) {
+                                unset($serviceProducts[$key]);
+                                continue;
+                            }
                             if (!empty($additionalServices[$productLineData['id']])
                                 && in_array($servProduct['id_product'], array_column($additionalServices[$productLineData['id']]['additional_services'], 'id_product'))
                             ) {
@@ -7503,6 +7509,12 @@ class AdminOrdersControllerCore extends AdminController
                 );
                 if ($serviceProducts) {
                     foreach ($serviceProducts as $key => $servProduct) {
+                        if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
+                            && Product::getQuantity((int)$servProduct['id_product']) <= 0
+                        ) {
+                            unset($serviceProducts[$key]);
+                            continue;
+                        }
                         if (!empty($additionalServices[$idHtlBookingDetail])
                             && in_array($servProduct['id_product'], array_column($additionalServices[$idHtlBookingDetail]['additional_services'], 'id_product'))
                         ) {
@@ -7807,6 +7819,25 @@ class AdminOrdersControllerCore extends AdminController
                             $response['hasError'] = true;
                             $response['errors'][] = sprintf($this->l('Invalid unit price for %s.'), $objProduct->name);
                         }
+
+                        if ($objProduct->allow_multiple_quantity && Validate::isUnsignedInt($qty[$service])) {
+                            $finalQty = (int)$qty[$service];
+                            $numDays = Product::getPriceCalculationApplicableDays(
+                                Product::getProductPriceCalculation($service),
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
+                            $stockQty = $finalQty * $numDays;
+
+                            if ($objProduct->max_quantity && $finalQty > $objProduct->max_quantity) {
+                                $response['hasError'] = true;
+                                $response['errors'][] = sprintf($this->l('Cannot add more than %d quantity.'), $objProduct->max_quantity).': '.$objProduct->name;
+                            } elseif (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$service)) && !$objProduct->checkQty($stockQty)) {
+                                $response['hasError'] = true;
+                                $response['errors'][] = $this->l('There isn\'t enough product in stock.').': '.$objProduct->name;
+                            }
+                        }
+
                         $selectedServices[$key] = array(
                             'id' => $service,
                             'qty' => $qty[$service],

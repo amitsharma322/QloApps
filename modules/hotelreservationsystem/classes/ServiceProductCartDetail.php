@@ -461,9 +461,9 @@ class ServiceProductCartDetail extends ObjectModel
                     $objHotelCartBooking->date_from,
                     $objHotelCartBooking->date_to
                 );
-                $quantity = $objServiceProductCartDetail->quantity * $numDays;
+                $quantity = $quantity * $numDays;
             }
-
+        
             $objCart = new Cart($idCart);
             return $objCart->updateQty($quantity, $idProduct);
         }
@@ -514,6 +514,16 @@ class ServiceProductCartDetail extends ObjectModel
                     $updateQunatity = $objServiceProductCartDetail->delete();
                 }
                 if ($updateQunatity) {
+                    if (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($product['id_hotel_cart_booking']))) {
+                        $objProduct = new Product((int) $product['id_product']);
+                        $numDays = Product::getPriceCalculationApplicableDays(
+                            $objProduct->price_calculation_method,
+                            $objHotelCartBooking->date_from,
+                            $objHotelCartBooking->date_to
+                        );
+                        $removedQuantity = $removedQuantity * $numDays;
+                    }
+
                     $objCart = new Cart($idCart);
                     if (isset(Context::getContext()->controller->controller_type)) {
                         $controllerType = Context::getContext()->controller->controller_type;

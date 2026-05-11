@@ -1211,9 +1211,14 @@ class AdminCartsControllerCore extends AdminController
                     $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
                     $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
                 );
-                
                 if ($serviceProducts) {
                     foreach ($serviceProducts as $key => $servProduct) {
+                        if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
+                            && Product::getQuantity((int)$servProduct['id_product']) <= 0
+                        ) {
+                            unset($serviceProducts[$key]);
+                            continue;
+                        }
                         $numDays = Product::getPriceCalculationApplicableDays(
                             $servProduct['price_calculation_method'],
                             $dateFrom,
@@ -1654,6 +1659,27 @@ class AdminCartsControllerCore extends AdminController
                             ) {
                                 $response['hasError'] = true;
                                 $response['errors'][] = Tools::displayError('Invalid unit price for service').': '.$objProduct->name;
+                            }
+
+                            if ($selected && $objProduct->allow_multiple_quantity
+                                && isset($serviceQuantities[$idServiceProduct])
+                                && Validate::isUnsignedInt($serviceQuantities[$idServiceProduct])
+                            ) {
+                                $finalQty = (int)$serviceQuantities[$idServiceProduct];
+                                $numDays = Product::getPriceCalculationApplicableDays(
+                                    $objProduct->price_calculation_method,
+                                    $objHotelCartBookingData->date_from,
+                                    $objHotelCartBookingData->date_to
+                                );
+                                $stockQty = $finalQty * $numDays;
+
+                                if ($objProduct->max_quantity && $finalQty > $objProduct->max_quantity) {
+                                    $response['hasError'] = true;
+                                    $response['errors'][] = Tools::displayError(sprintf('Cannot add more than %d quantity.', $objProduct->max_quantity)).': '.$objProduct->name;
+                                } elseif (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$idServiceProduct)) && !$objProduct->checkQty($stockQty)) {
+                                    $response['hasError'] = true;
+                                    $response['errors'][] = Tools::displayError('There isn\'t enough product in stock.').': '.$objProduct->name;
+                                }
                             }
                         } else {
                             $response['errors'][] = Tools::displayError('Some services not found. please try after refreshing the page');

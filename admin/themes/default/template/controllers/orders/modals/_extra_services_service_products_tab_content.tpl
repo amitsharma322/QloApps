@@ -87,7 +87,7 @@
                                                 $additionalServices['date_from'],
                                                 $additionalServices['date_to']
                                             ) > 1}
-                                                <span class="input-group-addon">{l s='/ night'}</span>
+                                                <span class="input-group-addon">{l s='/ day'}</span>
                                             {/if}
                                         </div>
                                     </td>
@@ -161,7 +161,7 @@
                                                     $additionalServices['date_from'],
                                                     $additionalServices['date_to']
                                                 ) > 1}
-													<span class="input-group-addon">{l s='/ night'}</span>
+													<span class="input-group-addon">{l s='/ day'}</span>
 												{/if}
 										</div>
 									</td>
@@ -304,7 +304,7 @@
                                     $additionalServices['date_from'],
                                     $additionalServices['date_to']
                                 ) > 1}
-									{l s='/ night'}
+									{l s='/ day'}
 								{/if}
 						</td>
 						<td>
