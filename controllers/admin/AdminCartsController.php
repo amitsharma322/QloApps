@@ -1665,18 +1665,30 @@ class AdminCartsControllerCore extends AdminController
                                 && isset($serviceQuantities[$idServiceProduct])
                                 && Validate::isUnsignedInt($serviceQuantities[$idServiceProduct])
                             ) {
-                                $finalQty = (int)$serviceQuantities[$idServiceProduct];
+                                $cartTotalQty = Cart::getProductQtyInCart($objCart->id, $idServiceProduct);
+
+                                $qty = (int)$serviceQuantities[$idServiceProduct];
                                 $numDays = Product::getPriceCalculationApplicableDays(
                                     $objProduct->price_calculation_method,
                                     $objHotelCartBookingData->date_from,
                                     $objHotelCartBookingData->date_to
                                 );
-                                $stockQty = $finalQty * $numDays;
 
+                                $existingQty = 0;
+                                $objSpCartDetail = new ServiceProductCartDetail();
+                                if ($idExistingDetail = $objSpCartDetail->alreadyExists(
+                                    $objCart->id,
+                                    $idServiceProduct,
+                                    $idCartBooking
+                                )) {
+                                    $existingQty = (int)(new ServiceProductCartDetail($idExistingDetail))->quantity * $numDays;
+                                }
+
+                                $finalQty = (int)$cartTotalQty - $existingQty + ($qty * $numDays);
                                 if ($objProduct->max_quantity && $finalQty > $objProduct->max_quantity) {
                                     $response['hasError'] = true;
                                     $response['errors'][] = Tools::displayError(sprintf('Cannot add more than %d quantity.', $objProduct->max_quantity)).': '.$objProduct->name;
-                                } elseif (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$idServiceProduct)) && !$objProduct->checkQty($stockQty)) {
+                                } elseif (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$idServiceProduct)) && !$objProduct->checkQty($finalQty)) {
                                     $response['hasError'] = true;
                                     $response['errors'][] = Tools::displayError('There isn\'t enough product in stock.').': '.$objProduct->name;
                                 }
