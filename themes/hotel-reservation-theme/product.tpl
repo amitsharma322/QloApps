@@ -233,11 +233,7 @@
 													{block name='product_info_tab_room_description'}
 														<div class="row info_margin_div room_description">
 															<div class="col-sm-12">
-																	{if isset($product->booking_product) && $product->booking_product}
-																		{$product->description}
-																	{else}
-																		{$product->description_short}
-																	{/if}
+																{$product->description}
 															</div>
 														</div>
 													{/block}

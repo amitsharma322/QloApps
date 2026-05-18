@@ -959,7 +959,7 @@ var ajaxCart = {
 
                 if (product.booking_product) {
                     content += formatCurrency(parseFloat(product.bookingData.total_room_type_amount), currency_format, currency_sign, currency_blank);
-                } else if (typeof(hotel_wise_data) != 'undefined') {
+                } else if (ajaxCart.isSellableWithHotel(product.selling_preference_type) ||typeof(hotel_wise_data) != 'undefined') {
                     content += formatCurrency(parseFloat(hotel_wise_data.amount), currency_format, currency_sign, currency_blank);
                 } else {
                     content += formatCurrency(parseFloat(product.amount), currency_format, currency_sign, currency_blank);

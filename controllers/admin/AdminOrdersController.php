@@ -8115,6 +8115,15 @@ class AdminOrdersControllerCore extends AdminController
                             $response['errors'][] = Tools::displayError('Invalid service name');
                         }
 
+                        if (empty($priceCalcMethod)) {
+                            $response['hasError'] = true;
+                            $response['errors'][] = Tools::displayError('Please select at least one price calculation method.');
+                        } elseif (
+                            !Validate::isUnsignedInt($priceCalcMethod)) {
+                            $response['hasError'] = true;
+                            $response['errors'][] = Tools::displayError('Invalid price calculation method.');
+                        }
+
                         if (!isset($price)) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Service price is required');
@@ -8122,7 +8131,6 @@ class AdminOrdersControllerCore extends AdminController
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Invalid service price');
                         }
-
                         // if no validation errors then add service
                         if (!$response['hasError']) {
                             // ======= START: Create Service product  =========

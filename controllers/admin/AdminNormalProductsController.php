@@ -2360,6 +2360,14 @@ class AdminNormalProductsControllerCore extends AdminController
             $this->errors[] = $this->l('This product must be in the default category.');
         }
 
+        if (!Tools::getValue('selling_preference_type')) {
+            $this->errors[] = $this->l('Please select at least one buying option.');
+        }
+
+        if (!Tools::getValue('price_calculation_method')) {
+            $this->errors[] = $this->l('Please select at least one price calculation method.');
+        }
+
         // Tags
         foreach ($languages as $language) {
             if ($value = Tools::getValue('tags_'.$language['id_lang'])) {

@@ -1422,6 +1422,15 @@ class AdminCartsControllerCore extends AdminController
                         $response['hasError'] = true;
                         $response['errors'][] = Tools::displayError('Invalid service name');
                     }
+                    
+                    if (empty($priceCalcMethod)) {
+                        $response['hasError'] = true;
+                        $response['errors'][] = Tools::displayError('Please select at least one price calculation method.');
+                    } elseif (
+                        !Validate::isUnsignedInt($priceCalcMethod)) {
+                        $response['hasError'] = true;
+                        $response['errors'][] = Tools::displayError('Invalid price calculation method.');
+                    }
 
                     if (!isset($price)) {
                         $response['hasError'] = true;
