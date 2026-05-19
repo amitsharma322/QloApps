@@ -269,7 +269,7 @@ class ServiceProductCartDetail extends ObjectModel
                             1,
                             null,
                             $product['htl_cart_booking_id']
-                        )/$numDays;
+                        ) / max($numDays, 1);
                         $priceTaxExcl = Product::getServiceProductPrice(
                             $objProduct->id,
                             $product['id_product_option'],
@@ -284,7 +284,7 @@ class ServiceProductCartDetail extends ObjectModel
                             1,
                             null,
                             $product['htl_cart_booking_id']
-                        )/$numDays;
+                        ) / max($numDays, 1);
 
                         $optionDetails = false;
                         if (ServiceProductOption::productHasOptions($product['id_product'])) {
@@ -461,7 +461,9 @@ class ServiceProductCartDetail extends ObjectModel
                     $objHotelCartBooking->date_from,
                     $objHotelCartBooking->date_to
                 );
-                $quantity = $quantity * $numDays;
+                if($numDays){
+                    $quantity = $quantity * $numDays;
+                }
             }
         
             $objCart = new Cart($idCart);

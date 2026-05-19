@@ -1235,7 +1235,7 @@ class AdminCartsControllerCore extends AdminController
                             $dateFrom,
                             $dateTo,
                             $idCart
-                        )/$numDays;
+                        ) / max($numDays, 1);
                     }
                 }
 

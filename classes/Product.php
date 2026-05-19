@@ -6919,7 +6919,7 @@ class ProductCore extends ObjectModel
                 return $checkout;
 
             case self::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY:
-                return $numNights;
+                return $duringStay;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY:
                 return $checkin + $checkout;

@@ -1026,7 +1026,7 @@ class AdminOrdersControllerCore extends AdminController
                                     1,
                                     $dateFrom,
                                     $dateTo
-                                )/$numDays;
+                                ) / max($numDays, 1);
                             }
                         }
                     }
@@ -5500,7 +5500,7 @@ class AdminOrdersControllerCore extends AdminController
                                 1,
                                 $objBookingDetail->date_from,
                                 $objBookingDetail->date_to
-                            ) / $numDays;
+                            ) / max($numDays, 1);
                             $unitPriceTaxExcl = Product::getServiceProductPrice(
                                 (int) $service['id_product'],
                                 0,
@@ -5510,7 +5510,7 @@ class AdminOrdersControllerCore extends AdminController
                                 1,
                                 $objBookingDetail->date_from,
                                 $objBookingDetail->date_to
-                            ) / $numDays;
+                            ) / max($numDays, 1);
 
                             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                             $objServiceProductOrderDetail->id_product = $service['id_product'];
@@ -7536,7 +7536,7 @@ class AdminOrdersControllerCore extends AdminController
                                 1,
                                 $dateFrom,
                                 $dateTo
-                            )/$numDays;
+                            ) / max($numDays, 1);
                         }
                     }
                 }
@@ -7730,8 +7730,8 @@ class AdminOrdersControllerCore extends AdminController
                             $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
                             $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
 
-                            $objOrderDetail->unit_price_tax_excl = ($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity);
-                            $objOrderDetail->unit_price_tax_incl = ($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity);
+                            $objOrderDetail->unit_price_tax_excl = ($objOrderDetail->total_price_tax_excl / max($objOrderDetail->product_quantity, 1));
+                            $objOrderDetail->unit_price_tax_incl = ($objOrderDetail->total_price_tax_incl / max($objOrderDetail->product_quantity, 1));
 
                             $result &= $objOrderDetail->updateTaxAmount($objOrder);
 
@@ -7894,7 +7894,7 @@ class AdminOrdersControllerCore extends AdminController
                                 1,
                                 $objHotelBookingDetail->date_from,
                                 $objHotelBookingDetail->date_to
-                            ) / $numDays;
+                            ) / max($numDays, 1);
 
                             if ($initialServicePrice != $service['price']) {
                                 $specific_price = new SpecificPrice();
@@ -7955,7 +7955,7 @@ class AdminOrdersControllerCore extends AdminController
                                         1,
                                         null,
                                         $roomHtlCartInfo['id']
-                                    ) / $numDays;
+                                    ) / max($numDays, 1);
                                     $unitPriceTaxIncl = Product::getServiceProductPrice(
                                         (int) $product['id_product'],
                                         0,
@@ -7970,7 +7970,7 @@ class AdminOrdersControllerCore extends AdminController
                                         1,
                                         null,
                                         $roomHtlCartInfo['id']
-                                    ) / $numDays;
+                                    ) / max($numDays, 1);
 
                                     $totalPriceChangeTaxExcl += $totalPriceTaxExcl = Tools::processPriceRounding(
                                         ($unitPriceTaxExcl * $numDays),
@@ -8240,7 +8240,7 @@ class AdminOrdersControllerCore extends AdminController
                                                                 $objHotelBookingDetail->date_from,
                                                                 $objHotelBookingDetail->date_to,
                                                                 $objCart->id
-                                                            ) / $numDays;
+                                                            ) / max($numDays, 1);
                                                             $unitPriceTaxIncl = Product::getServiceProductPrice(
                                                                 (int)$product['id_product'],
                                                                 0,
@@ -8251,7 +8251,7 @@ class AdminOrdersControllerCore extends AdminController
                                                                 $objHotelBookingDetail->date_from,
                                                                 $objHotelBookingDetail->date_to,
                                                                 $objCart->id
-                                                            ) / $numDays;
+                                                            ) / max($numDays, 1);
 
                                                             $totalPriceChangeTaxExcl += $totalPriceTaxExcl = Tools::processPriceRounding(
                                                                 ($unitPriceTaxExcl * $numDays),
