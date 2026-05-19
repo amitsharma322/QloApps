@@ -95,7 +95,9 @@ class ServiceProductCartDetail extends ObjectModel
                         $objHotelCartBookingData->date_from,
                         $objHotelCartBookingData->date_to
                     );
-                    $updateQty *= $numdays;
+                    if($numdays){
+                        $updateQty *= $numdays;
+                    }
                     if ($objServiceProductCartDetail->delete()) {
                         $objCart = new Cart($product['id_cart']);
                         if (isset(Context::getContext()->controller->controller_type)) {
