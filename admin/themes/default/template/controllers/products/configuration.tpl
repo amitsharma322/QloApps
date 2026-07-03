@@ -27,148 +27,171 @@
 
 		<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
 
-		<div class="from-group table-responsive-row clearfix">
-			<table class="table hotel-room">
-				<thead>
-					<tr class="nodrag nodrop">
-                        <th class="center"></th>
-						<th class="col-sm-2 center">
-							<label class="control-label required">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter room number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}'}">
-									{l s='Room No.'}
-								</span>
-							</label>
-						</th>
-						<th class="col-sm-2 center">
-							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter floor of the room. For eg. First, Second etc. Invalid characters <>;=#{}'}">
-									{l s='Floor'}
-								</span>
-							</label>
-						</th>
-						<th class="col-sm-2 center">
-							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select status of the room.'}">
-									{l s='Status'}
-								</span>
-							</label>
-						</th>
-						<th class="col-sm-3 center">
-							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this room. Leave empty if not required.'}">
-									{l s='Extra Information'}
-								</span>
-							</label>
-						</th>
-						<th class="col-sm-2 center">
-							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set date ranges when room is set to Temporarily Inactive.'}">
-									{l s='Disable Dates'}
-								</span>
-							</label>
-						</th>
-                        {hook h='displayHotelRoomListTableHeaderColumn'}
-                        <th class="col-sm-1 center">
-                            {l s='--'}
-                        </th>
-					</tr>
-				</thead>
-				<tbody>
-					{if isset($smarty.post.rooms_info) && is_array($smarty.post.rooms_info) && count($smarty.post.rooms_info) && !isset($bulk_delete_rooms)}
-						{assign var="rooms_info" value=$smarty.post.rooms_info}
-					{elseif isset($htl_room_info) && is_array($htl_room_info) && count($htl_room_info)}
-						{assign var="rooms_info" value=$htl_room_info}
-					{/if}
-					{if isset($rooms_info) && is_array($rooms_info) && count($rooms_info)}
-						{foreach from=$rooms_info key=key item=room_info}
-							{assign var="var_name_room_info" value="rooms_info[`$key`]"}
-							<tr class="room_data_values" data-row-index="{$key}">
-                                <td class="center">
-                                    <input type="checkbox" {if isset($room_info['id'])}value="{$room_info['id']}"{else}disabled{/if} name="selected_room_ids[]">
-								</td>
-								<td class="col-sm-1 center">
-									<input class="form-control" type="text" value="{$room_info['room_num']}" name="{$var_name_room_info|cat:'[room_num]'}">
-								</td>
-								<td class="col-sm-2 center">
-									<input class="form-control" type="text" value="{$room_info['floor']}" name="{$var_name_room_info|cat:'[floor]'}">
-								</td>
-								<td class="col-sm-2 center">
-									<select class="form-control room_status" name="{$var_name_room_info|cat:'[id_status]'}">
-										{foreach from=$rm_status item=room_stauts}
-											<option value="{$room_stauts['id']}" {if $room_info['id_status'] == {$room_stauts['id']}}selected="selected"{/if}>{$room_stauts['status']}</option>
-										{/foreach}
-									</select>
-								</td>
-								<td class="col-sm-3 center">
-									<input type="text" class="form-control room_comment" value="{if isset($room_info['comment'])}{$room_info['comment']}{/if}" name="{$var_name_room_info|cat:'[comment]'}">
-								</td>
-								<td class="col-sm-2 center">
-									<a class="btn btn-default deactiveDatesModal {if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }disabled{/if}" data-toggle="modal" data-target="#deactiveDatesModal" data-id-room="{if isset($room_info['id'])}{$room_info['id']}{/if}">{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
-									</a>
-									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" {if $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$room_info['disable_dates_json']|escape:'html':'UTF-8'}"{/if}>
-								</td>
-                                {* Since the data can also be used from post incase of errors, which will cause issues with the id index *}
-                                {if isset($room_info['id'])}
-                                    {hook h='displayHotelRoomListTableRowColumn' index=$key id_room=$room_info['id']}
-                                {else}
-                                    {hook h='displayHotelRoomListTableRowColumn' index=$key}
-                                {/if}
-								<td class="col-sm-1 center">
+		<div class="from-group room-wrapper clearfix">
+			<div class="rooms-list-body">
+				{if isset($smarty.post.rooms_info) && is_array($smarty.post.rooms_info) && count($smarty.post.rooms_info) && !isset($bulk_delete_rooms)}
+					{assign var="rooms_info" value=$smarty.post.rooms_info}
+				{elseif isset($htl_room_info) && is_array($htl_room_info) && count($htl_room_info)}
+					{assign var="rooms_info" value=$htl_room_info}
+				{/if}
+				{if isset($rooms_info) && is_array($rooms_info) && count($rooms_info)}
+					{foreach from=$rooms_info key=key item=room_info}
+						{assign var="var_name_room_info" value="rooms_info[`$key`]"}
+						<div class="room-card room_data_values" data-row-index="{$key}" {if isset($room_info['id'])}data-id-room="{$room_info['id']}"{/if}>
+
+							{* booked-dates kept for View Bookings modal *}
+							{if isset($room_info['booked_dates']) && json_decode($room_info['booked_dates'])}
+								<input type="hidden" class="booked-dates" value='{$room_info['booked_dates']|escape:'html':'UTF-8'}'>
+							{/if}
+
+							<div class="card-row">
+								<div class="room-selection">
+									<input type="checkbox" {if isset($room_info['id'])}value="{$room_info['id']}"{else}disabled{/if} name="selected_room_ids[]">
+								</div>
+								<div class="room-cell-grid">
+
+									{* Room No — Housekeeping Status as extra-information *}
+									<div class="room-field-col">
+										<div class="padding-20">
+											<span class="room-field-label">{l s='Room No.'}</span>
+											<div class="room-field-value">{$room_info['room_num']|escape:'html':'UTF-8'}</div>
+										</div>
+										<div class="extra-information hook-column padding-20">
+											<span class="room-field-label">{l s='Housekeeping Status'}</span>
+											<div class="room-field-value room-status-badge
+												{if $room_info['id_status'] == $rm_status['STATUS_ACTIVE']['id']}status-active
+												{elseif $room_info['id_status'] == $rm_status['STATUS_INACTIVE']['id']}status-inactive
+												{elseif $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}status-temp-inactive
+												{/if}">
+												{foreach from=$rm_status item=rs}{if $room_info['id_status'] == $rs['id']}{$rs['status']|upper}{/if}{/foreach}
+											</div>
+											{if isset($room_info['id'])}
+												{hook h='displayHotelRoomListTableRowColumn' index=$key id_room=$room_info['id']}
+											{else}
+												{hook h='displayHotelRoomListTableRowColumn' index=$key}
+											{/if}
+										</div>
+									</div>
+
+									{* Room Name *}
+									<div class="room-field-col">
+										<div class="padding-20">
+											<span class="room-field-label">{l s='Room Name'}</span>
+											<div class="room-field-value">{$room_info['room_num']|escape:'html':'UTF-8'}</div>
+										</div>
+										<div class="extra-information padding-20">
+                                            <span class="room-field-label">{l s='Guest'}</span>
+											<div class="room-field-value room-status-badge">
+                                                {$room_info['adults']|intval} {l s='Adults'}, {$room_info['children']|intval} {l s='Children'}
+											</div>
+                                        </div>
+									</div>
+
+									{* Floor *}
+									<div class="room-field-col">
+										<div class="padding-20">
+											<span class="room-field-label">{l s='Floor'}</span>
+											<div class="room-field-value">{$room_info['floor']|escape:'html':'UTF-8'}</div>
+										</div>
+										<div class="extra-information padding-20"></div>
+									</div>
+
+									{* Status *}
+									<div class="room-field-col">
+										<div class="padding-20">
+											<span class="room-field-label">{l s='Status'}</span>
+											<div class="room-field-value room-status-badge
+												{if $room_info['id_status'] == $rm_status['STATUS_ACTIVE']['id']}status-active
+												{elseif $room_info['id_status'] == $rm_status['STATUS_INACTIVE']['id']}status-inactive
+												{elseif $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}status-temp-inactive
+												{/if}">
+												{foreach from=$rm_status item=rs}{if $room_info['id_status'] == $rs['id']}{$rs['status']|upper}{/if}{/foreach}
+											</div>
+										</div>
+										<div class="extra-information padding-20"></div>
+									</div>
+
+									{* Disable Dates *}
+									<div class="room-field-col">
+										<div class="padding-20">
+											<span class="room-field-label">{l s='Disable Dates'}</span>
+											<div class="dates-wrap">
+												<a class="btn btn-default btn-sm deactiveDatesModal "
+												   data-toggle="modal" data-target="#deactiveDatesModal"
+												   data-id-room="{if isset($room_info['id'])}{$room_info['id']}{/if}">
+													{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}{l s='Add Dates'}{else}{l s='View Dates'}{/if}
+												</a>
+
+											</div>
+										</div>
+										<div class="extra-information padding-20"></div>
+									</div>
+
+									{* Remarks *}
+									<div class="room-field-col">
+										<div class="padding-20">
+											<span class="room-field-label">{l s='Remarks'}</span>
+											<div class="room-field-value">
+												{if isset($room_info['comment']) && $room_info['comment'] != ''}{$room_info['comment']|escape:'html':'UTF-8'}{else}&mdash;{/if}
+											</div>
+										</div>
+										<div class="extra-information padding-20"></div>
+									</div>
+
+								</div>
+
+								{* Action *}
+								<div class="col-action">
+									<span class="room-field-label">{l s='Action'}</span>
 									{if isset($room_info['id'])}
-                                        {if isset($room_info['booked_dates']) && json_decode($room_info['booked_dates'])}
-                                            <input type="hidden" class="booked-dates" name="{$var_name_room_info|cat:'[booked_dates]'}" value='{$room_info['booked_dates']|escape:'html':'UTF-8'}'>
-                                            <a href="#" class="view_htl_room btn btn-default" data-toggle="modal" data-target="#room-dates-modal" data-id-room="{$room_info['id']}"><i class="icon-info"></i></a>
-                                        {/if}
-										<a href="#" class="rm_htl_room btn btn-default" data-id-htl-info="{$room_info['id']}"><i class="icon-trash"></i></a>
-										<input type="hidden" name="{$var_name_room_info|cat:'[id]'}" value="{$room_info['id']}">
+										<div class="btn-group">
+											<button type="button" class="btn btn-default btn-sm btn-edit-room">
+												<i class="icon-pencil"></i> {l s='Edit'}
+											</button>
+											<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu dropdown-menu-right">
+												{if isset($room_info['booked_dates']) && json_decode($room_info['booked_dates'])}
+													<li>
+														<a href="#" class="view_htl_room" data-toggle="modal" data-target="#room-dates-modal" data-id-room="{$room_info['id']}">
+															<i class="icon-info"></i> {l s='View Bookings'}
+														</a>
+													</li>
+												{/if}
+												<li>
+													<a href="#" class="rm_htl_room" data-id-htl-info="{$room_info['id']}">
+														<i class="icon-trash"></i> {l s='Delete'}
+													</a>
+												</li>
+											</ul>
+										</div>
 									{else}
-										<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>
+										<div class="btn-group">
+											<button type="button" class="btn btn-default btn-sm btn-edit-room">
+												<i class="icon-pencil"></i> {l s='Edit'}
+											</button>
+											<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu dropdown-menu-right">
+												<li>
+													<a href="#" class="remove-rooms-button">
+														<i class="icon-trash"></i> {l s='Delete'}
+													</a>
+												</li>
+											</ul>
+										</div>
 									{/if}
-								</td>
-							</tr>
-						{/foreach}
-					{else}
-						{for $k=0 to 1}
-							{assign var="var_name_room_info" value="rooms_info[`$k`]"}
-							<tr class="room_data_values" data-row-index="{$k}">
-                                <td class="center">
-                                    <input type="checkbox" value="" disabled name="selected_room_ids[]">
-                                </td>
-								<td class="col-sm-1 center">
-									<input class="form-control" type="text" name="{$var_name_room_info|cat:'[room_num]'}">
-								</td>
-								<td class="col-sm-2 center">
-									<input class="form-control" type="text" name="{$var_name_room_info|cat:'[floor]'}">
-								</td>
-								<td class="col-sm-2 center">
-									<select class="form-control room_status" name="{$var_name_room_info|cat:'[id_status]'}">
-										{foreach from=$rm_status item=room_stauts}
-											<option value="{$room_stauts['id']}">{$room_stauts['status']}</option>
-										{/foreach}
-									</select>
-								</td>
-                                <td class="center col-sm-3">
-									<input type="text" class="form-control room_comment" name="{$var_name_room_info|cat:'[comment]'}">
-                                </td>
-								<td class="center col-sm-2">
-									<a class="btn btn-default deactiveDatesModal disabled" data-toggle="modal" data-target="#deactiveDatesModal">
-										{l s='Add Dates'}
-									</a>
-									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" value="">
-								</td>
-                                {hook h='displayHotelRoomListTableRowColumn' index=$k}
-								<td class="center col-sm-1">
-								    {if $k == 1}
-										<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>
-                                    {else}
-                                        <a href="#" class="remove-rooms-button btn btn-default disabled"><i class="icon-trash"></i></a>
-								    {/if}
-                                </td>
-							</tr>
-						{/for}
-					{/if}
-				</tbody>
-			</table>
+								</div>
+							</div>
+
+						</div>
+					{/foreach}
+				{else}
+					<div class="alert alert-info">{l s='No rooms have been added yet.'}</div>
+				{/if}
+			</div>
 			<div class="form-group">
 				<div class="col-sm-12">
                     <div class="btn-group rooms_bulk_actions dropup">
@@ -318,8 +341,8 @@
 </div>
 {*END*}
 
-<div class="modal fade" id="bulkUpdateRoomModal" tabindex="-1" role="dialog" aria-labelledby="bulkUpdateRoomLabel">
-	<div class="modal-dialog" role="document">
+<div class="modal fade modal-right" id="bulkUpdateRoomModal" tabindex="-1" role="dialog" aria-labelledby="bulkUpdateRoomLabel">
+	<div class="modal-dialog modal-dialog-right" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
@@ -330,18 +353,18 @@
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
                 <div class="form-group">
-                    <label class="control-label col-lg-3">
+                    <label class="room-edit-label control-label col-xs-4">
                         <span>{l s='Floor'}</span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <input type="text" name="bulk_update_room_floor"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-lg-3">
+                    <label class="room-edit-label control-label col-xs-4">
                         <span>{l s='Status'}</span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <select class="form-control bulk_update_room_status" name="bulk_update_room_status">
                             {foreach from=$rm_status item=room_stauts}
                                 <option value="{$room_stauts['id']}">{$room_stauts['status']|escape:'htmlall':'UTF-8'}</option>
@@ -350,10 +373,10 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-lg-3">
-                        <span>{l s='Extra Information'}</span>
+                    <label class="room-edit-label control-label col-xs-4">
+                        <span>{l s='Remark'}</span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <input type="text" name="bulk_update_room_comment"/>
                     </div>
                 </div>
@@ -385,16 +408,19 @@
                         </div>
                     </div>
 			    </div>
-			    <div class="modal-footer">
-				    <button type="button" class="btn btn-default" name="submitBulkUpdateRooms">{l s='Submit'}</button>
-			    </div>
 		    </div>
+            <div class="modal-footer modal-footer-right">
+                <button type="button" class="btn btn-default" name="submitBulkUpdateRooms" id="saveRoomAndClose">
+                    <i class="process-icon-save"></i>
+                    {l s='Submit'}
+                </button>
+            </div>
 	    </div>
 	</div>
 </div>
 
-<div class="modal fade" id="bulkCreateRoomModal" tabindex="-1" role="dialog" aria-labelledby="bulkCreateRoomLabel">
-	<div class="modal-dialog" role="document">
+<div class="modal fade modal-right" id="bulkCreateRoomModal" tabindex="-1" role="dialog" aria-labelledby="bulkCreateRoomLabel">
+	<div class="modal-dialog modal-dialog-right" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
@@ -405,44 +431,44 @@
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
                 <div class="form-group">
-                    <label class="control-label col-lg-3">
+                    <label class="room-edit-label control-label col-xs-4">
                         <span>{l s='Room prefix'}</span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <input type="text" name="bulk_create_room_prefix"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-lg-3">
+                    <label class="room-edit-label control-label col-xs-4">
                         <span>{l s='Starting Room No.'}</span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <input type="text" name="bulk_create_room_num"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label required col-lg-3">
+                    <label class="room-edit-label control-label required col-xs-4">
                         <span>{l s='Number of Rooms'}</span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <input type="text" name="bulk_create_room_qty"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-lg-3">
+                    <label class="room-edit-label control-label col-xs-4">
                         <span>{l s='Floor'}</span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <input type="text" name="bulk_create_room_floor"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-lg-3">
+                    <label class="room-edit-label control-label col-xs-4">
                         <span>
                             {l s='Status'}
                         </span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <select class="form-control bulk_create_room_status" name="bulk_create_room_status">
                             {foreach from=$rm_status item=room_stauts}
                                 <option value="{$room_stauts['id']}">{$room_stauts['status']|escape:'htmlall':'UTF-8'}</option>
@@ -451,12 +477,12 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-lg-3">
+                    <label class="room-edit-label control-label col-xs-4">
                         <span>
-                            {l s='Extra Information'}
+                            {l s='Remarks'}
                         </span>
                     </label>
-                    <div class="col-lg-6">
+                    <div class="col-xs-8">
                         <input type="text" name="bulk_create_room_comment"/>
                     </div>
                 </div>
@@ -488,16 +514,19 @@
                         </div>
                     </div>
 			    </div>
-			    <div class="modal-footer">
-				    <button type="button" class="btn btn-default" name="submitBulkCreateRooms">{l s='Submit'}</button>
-			    </div>
 		    </div>
+            <div class="modal-footer modal-footer-right">
+                <button type="button" name="submitBulkCreateRooms"  id="saveRoomAndClose" class="btn btn-default pull-right checkConfigurationClick">
+                    <i class="process-icon-save"></i>
+                    {l s='Submit'}
+                </button>
+            </div>
 	    </div>
 	</div>
 </div>
 
-<div class="modal fade" id="room-dates-modal" tabindex="-1" role="dialog" aria-labelledby="">
-    <div class="modal-dialog" role="document">
+<div class="modal fade modal-right" id="room-dates-modal" tabindex="-1" role="dialog" aria-labelledby="">
+    <div class="modal-dialog modal-dialog-right" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
@@ -519,11 +548,86 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer modal-footer-right">
                 <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">{l s='Done'}</button>
             </div>
         </div>
     </div>
+</div>
+
+{* ── Room Add / Edit Modal ── *}
+<div class="modal fade modal-right" id="roomModal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-dialog-right" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="roomModalTitle"></h4>
+			</div>
+			<div class="modal-body">
+				<input type="hidden" id="rm_modal_row_index">
+				<input type="hidden" id="rm_modal_mode">
+				<input type="hidden" id="rm_id_room">
+				<input type="hidden" id="rm_id_product" value="{if isset($product->id)}{$product->id|intval}{/if}">
+				<div class="rm-modal-error alert alert-danger" style="display:none;"></div>
+				<div class="form-horizontal rm-form">
+					<div class="form-group room-edit-group">
+						<label class="room-edit-label required col-xs-4 control-label">{l s='Room No'}</label>
+						<div class="col-xs-8">
+							<input type="text" class="form-control" id="rm_num" placeholder="{l s='e.g. 101'}">
+						</div>
+					</div>
+					<div class="form-group room-edit-group rm-edit-only">
+						<label class="room-edit-label col-xs-4 control-label">{l s='Room Name'}</label>
+						<div class="col-xs-8">
+							<input type="text" class="form-control" id="rm_name" placeholder="{l s='Room name'}">
+						</div>
+					</div>
+					<div class="form-group room-edit-group">
+						<label class="room-edit-label col-xs-4 control-label">{l s='Floor'}</label>
+						<div class="col-xs-8">
+							<input type="text" class="form-control" id="rm_floor" placeholder="{l s='e.g. First Floor'}">
+						</div>
+					</div>
+					<div class="form-group room-edit-group">
+						<label class="room-edit-label col-xs-4 control-label">{l s='Status'}</label>
+						<div class="col-xs-8">
+							<select class="form-control" id="rm_status_sel">
+								{foreach from=$rm_status item=rs}
+									<option value="{$rs['id']}">{$rs['status']|escape:'html':'UTF-8'}</option>
+								{/foreach}
+							</select>
+						</div>
+					</div>
+					<div class="form-group room-edit-group rm-edit-only">
+						<label class="room-edit-label col-xs-4 control-label">{l s='Disable Dates'}</label>
+						<div class="col-xs-8">
+							<button type="button" class="btn btn-default btn-sm open-edit-disable-dates">
+								<i class="icon-calendar"></i> {l s='Manage Dates'}
+							</button>
+						</div>
+					</div>
+					<div class="form-group room-edit-group">
+						<label class="room-edit-label col-xs-4 control-label">{l s='Remarks'}</label>
+						<div class="col-xs-8">
+							<textarea class="form-control" id="rm_comment" rows="3" placeholder="{l s='Optional remarks'}"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer modal-footer-right">
+                <button type="button" name="submitAddproduct" id="saveRoomAndStay" class="btn btn-default pull-right checkConfigurationClick">
+                    <i class="process-icon-save"></i>
+                    {l s='Save'}
+                </button>
+                <button type="button" name="submitAddproductAndStay"  id="saveRoomAndClose" class="btn btn-default pull-right checkConfigurationClick">
+                    <i class="process-icon-save"></i>
+                    {l s='Save and stay'}
+                </button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="hidden">
@@ -539,7 +643,7 @@
                 </div>
                 <div class="row col-xs-6">
                     <div class="tooltip_label">{l s='Disabled on'} </div>
-                    <div<span class="tooltip_date_add"></span>
+                    <span class="tooltip_date_add"></span>
                 </div>
                 <div class="row col-xs-12 id_event"><div class="tooltip_label">{l s='Event Id'} </div><span class="tooltip_id_event"></span></div>
                 <div><div class="tooltip_label tooltip_reason_container col-xs-12">{l s='Reason'}</div><span class="tooltip_reason col-xs-12"></span></div>
@@ -574,10 +678,178 @@
 </div>
 
 <style>
-	.hotel-room {
-		border: 1px solid #f2f2f2;
-		margin-top: 10px;
+	/* Hotel Room Cards Layout */
+	.room-wrapper { margin-top: 10px; }
+	.rooms-list-body { margin-bottom: 10px; border: 1px solid #F2F2F2; }
+	.room-card {
+		background: #FFFFFF;
+		border-bottom: 1px solid #EAEDEF;
+		transition: box-shadow 0.15s ease;
 	}
+	.room-card:hover { box-shadow: 0 1px 5px rgba(0,0,0,0.08); }
+	.card-row {
+		display: flex;
+		align-items: stretch;
+		flex-wrap: nowrap;
+        padding: 12px 0px;
+	}
+	.room-selection {
+		width: 34px;
+		flex-shrink: 0;
+		display: flex;
+		align-items: flex-start;
+		padding: 18px 0 0 12px;
+	}
+	.room-cell-grid {
+		display: flex;
+		flex: 1;
+		flex-wrap: wrap;
+		align-items: stretch;
+	}
+	.room-field-col {
+		flex: 1;
+		min-width: 130px;
+		display: flex;
+		flex-direction: column;
+	}
+	.room-field-col:last-child { border-right: none; }
+	.padding-20 { padding: 10px 1px 6px 16px; }
+
+	.hook-column { min-height: 36px; }
+	.room-field-label {
+		display: block;
+		color: #555555;
+		margin-bottom: 5px;
+		font-family: Inter;
+		font-weight: 400;
+		font-size: 12px;
+		line-height: 100%;
+		letter-spacing: 0px;
+	}
+	.room-field-value {
+		font-family: Inter;
+		font-weight: 600;
+		font-size: 12px;
+		line-height: 24px;
+		letter-spacing: 0px;
+		color: #555555;
+	}
+	/* Status badge colors */
+	.room-status-badge {
+		display: inline-block;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.3px;
+	}
+	.room-status-badge.status-active   { color: #00a65a; }
+	.room-status-badge.status-inactive { color: #EF4444; }
+	.room-status-badge.status-temp-inactive { color: #f39c12; }
+	.col-action {
+		width: 130px;
+		flex-shrink: 0;
+		padding: 14px 10px;
+	}
+	.dates-wrap { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+	.dates-wrap .btn-sm { padding: 3px 8px; font-size: 12px; }
+	.dates-info-icon { color: #5bc0de; cursor: pointer; font-size: 15px; }
+	.col-action .btn-group .btn-sm { padding: 3px 8px; font-size: 12px; }
+	@media (max-width: 992px) {
+		.card-row { flex-wrap: wrap; }
+		.room-cell-grid { flex-direction: column; }
+		.room-field-col { min-width: 100%; border-right: none; border-bottom: 1px solid #F0F0F0; }
+		.col-action { width: 100%; border-left: none; border-top: 1px solid #F0F0F0; padding: 10px; }
+	}
+
+	.modal-right .modal-dialog.modal-dialog-right {
+		position: fixed;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		margin: 0;
+		width: 480px;
+		max-width: 100%;
+		height: 100%;
+		transform: translateX(100%);
+		transition: transform 0.25s ease-out;
+	}
+	.modal-right.in .modal-dialog.modal-dialog-right {
+		transform: translateX(0);
+	}
+	.modal-right .modal-content {
+		height: 100%;
+		border-radius: 0;
+		border: none;
+		box-shadow: -4px 0 20px rgba(0,0,0,0.12);
+		display: flex;
+		flex-direction: column;
+	}
+	.modal-right .modal-header {
+		border-bottom: 1px solid #EAEDEF;
+		padding: 16px 20px;
+		flex-shrink: 0;
+	}
+	.modal-right .modal-header .close {
+		margin-top: 0;
+		font-size: 20px;
+		opacity: 0.6;
+	}
+	.modal-right .modal-header .close:hover { opacity: 1; }
+	.modal-right .modal-title {
+		font-size: 15px;
+		font-weight: 600;
+		color: #333;
+	}
+	.modal-right .modal-body {
+		flex: 1;
+		overflow-y: auto;
+		padding: 20px;
+	}
+	.modal-right .modal-backdrop {
+		background: rgba(0,0,0,0.3);
+	}
+	.modal-right label.required:before {
+		content: none;
+	}
+	.modal-right label.required:after {
+		content: "*";
+		color: red;
+		font-size: 14px;
+		position: relative;
+		line-height: 12px;
+	}
+	.rm-form.form-horizontal { margin: 0; }
+	.room-edit-group { margin-bottom: 14px; }
+	.room-edit-group:last-child { margin-bottom: 0; }
+	.room-edit-label {
+        font-family: Inter;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 14px;
+        line-height: 100%;
+        letter-spacing: 0px;
+        text-align: left!important;
+	}
+	.room-edit-group .form-control {
+		border-radius: 4px;
+		border-color: #DCDFE6;
+		font-size: 13px;
+		color: #333;
+		height: 34px;
+	}
+	.room-edit-group textarea.form-control { height: auto; }
+	.room-edit-group .form-control:focus {
+		border-color: #5b9bd5;
+		box-shadow: 0 0 0 2px rgba(91,155,213,0.15);
+	}
+	.modal-footer-right {
+		border-top: 1px solid #EAEDEF;
+		padding: 12px 20px;
+		display: flex;
+		justify-content: flex-end;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+	.modal-footer-right .btn { min-width: 80px; }
 </style>
 
 <script>
@@ -595,7 +867,7 @@
         $('#room-dates-modal').on('show.bs.modal', function(e) {
             const triggerRoom = $(e.relatedTarget);
             $('#room-dates-modal tbody').html('');
-            var bookedDates = JSON.parse($(triggerRoom).closest('tr').find('.booked-dates').val());
+            var bookedDates = JSON.parse($(triggerRoom).closest('.room_data_values').find('.booked-dates').val());
             if (bookedDates.length) {
                 if (bookedDates.length) {
                     $('#room-dates-modal .room-booked-dates-table').show();
@@ -615,45 +887,6 @@
         });
         {/literal}
 
-        // Add new room detail
-        $('#add-more-rooms-button').on('click',function() {
-            var lengthRooms = parseInt($('.room_data_values').length);
-
-            var prefix = 'rooms_info['+lengthRooms+']';
-            html = '<tr class="room_data_values" data-row-index="'+lengthRooms+'">';
-                html += '<td class="center">';
-                    html += '<input type="checkbox" disabled name="selected_room_ids[]">';
-                html += '</td>';
-                html += '<td class="col-sm-1 center">';
-                    html += '<input class="form-control" type="text" name="'+prefix+'[room_num]">';
-                html += '</td>';
-                html += '<td class="col-sm-2 center">';
-                    html += '<input class="form-control" type="text" name="'+prefix+'[floor]">';
-                html += '</td>';
-                html += '<td class="col-sm-2 center">';
-                    html += '<select class="form-control room_status" name="'+prefix+'[id_status]">';
-                        $.each(rm_status, function(key, value) {
-                            html += '<option value="'+value.id+'">'+value.status+'</option>';
-                        });
-                    html += '</select>';
-                html += '</td>';
-                html += '<td class="col-sm-3 center">';
-                    html += '<input class="form-control" type="text" name="'+prefix+'[comment]">';
-                html += '</td>';
-                html += '<td class="center col-sm-2">';
-                    html += '<a class="btn btn-default deactiveDatesModal disabled" data-toggle="modal" data-target="#deactiveDatesModal">';
-                        html += "{l s='Add Dates'}";
-                    html += '</a>';
-                    html += '<input type="hidden" class="form-control disable_dates_json" name="'+prefix+'[disable_dates_json]">';
-                html += '</td>';
-                html += '{hook h='displayHotelRoomListTableRowColumn'}';
-                html += '<td class="center col-sm-1">';
-                    html += '<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>';
-                html += '</td>';
-            html += '</tr>';
-
-            $('table.hotel-room tbody').append(html);
-        });
 
         // delete room
         $('.rm_htl_room').on('click',function(e) {
@@ -693,9 +926,9 @@
         $(document).on('click', '.remove-rooms-button', function(e) {
             e.preventDefault();
             $(this).closest('.room_data_values').remove();
-            $('#product-configuration table.hotel-room tr.room_data_values').each(function(iOuter, tr) {
-                $(tr).attr('data-row-index', iOuter);
-                $(tr).find('input, select').each(function (iInner, inputField) {
+            $('#product-configuration .rooms-list-body .room_data_values').each(function(iOuter, card) {
+                $(card).attr('data-row-index', iOuter);
+                $(card).find('input, select').each(function (iInner, inputField) {
                     let fieldName = $(inputField).attr('name');
                     fieldName = fieldName.replace(/[0-9]+/, iOuter)
                     $(inputField).attr('name', fieldName);
@@ -1519,8 +1752,8 @@
             // called to initilize and set actions for the modal.
             init: function(triggerRoomRow) {
                 var idRoom = parseInt($(triggerRoomRow).attr('data-id-room'));
-                var roomRowIndex = parseInt($(triggerRoomRow).closest('tr').attr('data-row-index'));
-                var roomNum = $(triggerRoomRow).closest('tr').find('[name="rooms_info['+roomRowIndex+'][room_num]"]').val();
+                var roomRowIndex = parseInt($(triggerRoomRow).closest('.room_data_values').attr('data-row-index'));
+                var roomNum = $(triggerRoomRow).closest('.room_data_values').find('[name="rooms_info['+roomRowIndex+'][room_num]"]').val();
                 $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
                 $('#deactiveDatesModal').attr('data-id-room', idRoom);
                 if ($.trim(roomNum) != '') {
@@ -1886,6 +2119,122 @@
             }
         }
     });
+
+    /* ── Room Add / Edit Modal ── */
+    const RoomModal = {
+        init: function () {
+            $('#add-more-rooms-button').off('click').on('click', RoomModal.openAddMode);
+            $(document).on('click', '.btn-edit-room', RoomModal.openEditMode);
+            $(document).on('click', '.open-edit-disable-dates', RoomModal.openDisableDatesFromEdit);
+            $(document).on('click', '#saveRoomAndStay', function () { RoomModal.save($(this)); });
+            $(document).on('click', '#saveRoomAndClose', function () { RoomModal.save($(this)); });
+        },
+        resetForm: function () {
+            $('#rm_num, #rm_name, #rm_floor, #rm_comment').val('');
+            $('#rm_status_sel').prop('selectedIndex', 0);
+            $('#rm_id_room').val('');
+            RoomModal.hideError();
+        },
+        showError: function (msg) {
+            $('.rm-modal-error').html(msg).show();
+        },
+        hideError: function () {
+            $('.rm-modal-error').hide().html('');
+        },
+        openAddMode: function () {
+            RoomModal.resetForm();
+            $('#rm_modal_mode').val('add');
+            $('#roomModalTitle').text('{l s='Add Room'}');
+            $('.rm-edit-only').hide();
+            $('#roomModal').modal('show');
+        },
+        openEditMode: function () {
+            var idRoom = $(this).closest('.room_data_values').data('id-room');
+            if (!idRoom) return;
+
+            RoomModal.resetForm();
+            $('#rm_id_room').val(idRoom);
+            $('#rm_modal_mode').val('edit');
+            $('#roomModalTitle').text('{l s='Edit Details'}');
+            $('.rm-edit-only').show();
+            $('#roomModal').modal('show');
+
+            RoomModal.fetchRoomInfo(idRoom);
+        },
+        fetchRoomInfo: function (idRoom) {
+            $.ajax({
+                url: prod_link,
+                type: 'POST',
+                dataType: 'json',
+                data: { ajax: true, action: 'GetRoomInfo', id: idRoom },
+                success: function (resp) {
+                    if (resp.success && resp.room) {
+                        var r = resp.room;
+                        $('#rm_num').val(r.room_num);
+                        $('#rm_name').val(r.room_num);
+                        $('#rm_floor').val(r.floor);
+                        $('#rm_status_sel').val(r.id_status);
+                        $('#rm_comment').val(r.comment);
+                    } else {
+                        RoomModal.showError(resp.error || '{l s='Could not load room data.'}');
+                    }
+                },
+                error: function () {
+                    RoomModal.showError('{l s='Server error. Please try again.'}');
+                }
+            });
+        },
+        openDisableDatesFromEdit: function () {
+            var idRoom = $('#rm_id_room').val();
+            var $card  = $('.room_data_values[data-id-room="' + idRoom + '"]');
+            $('#roomModal').modal('hide');
+            $('#roomModal').one('hidden.bs.modal', function () {
+                $card.find('.deactiveDatesModal').trigger('click');
+            });
+        },
+        save: function ($btn) {
+            RoomModal.hideError();
+
+            $('#page-loader').show();
+            $btn.prop('disabled', false);
+
+            $.ajax({
+                url:      prod_link,
+                type:     'POST',
+                dataType: 'json',
+                data: {
+                    ajax:       true,
+                    action:     'SaveRoom',
+                    id_room:    $('#rm_id_room').val(),
+                    id_product: $('#rm_id_product').val(),
+                    room_num:   $('#rm_num').val().trim(),
+                    floor:      $('#rm_floor').val().trim(),
+                    id_status:  $('#rm_status_sel').val(),
+                    comment:    $('#rm_comment').val().trim()
+                },
+                success: function (resp) {
+                    if (resp.success && resp.href) {
+                        window.location.href = resp.href;
+                    } else {
+                        var msg = (resp.errors && resp.errors.length)
+                            ? resp.errors.join('<br>')
+                            : '{l s='Unable to save room. Please try again.'}';
+                        RoomModal.showError(msg);
+                    }
+                },
+                error: function () {
+                    RoomModal.showError('{l s='Server error. Please try again.'}');
+                    $btn.prop('disabled', false).text(origLabel);
+                },
+                complete: function () {
+                    $('#page-loader').hide();
+                    $btn.prop('disabled', false);
+                }
+            });
+        }
+    };
+
+    RoomModal.init();
 
 </script>
 {/if}

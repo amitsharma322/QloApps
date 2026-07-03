@@ -3159,8 +3159,10 @@ class AdminProductsControllerCore extends AdminController
                                     $disableDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
                                     $room['disable_dates_json'] = json_encode($disableDates);
                                 }
-                            }
 
+                                $room['adults'] = $hotelRoomType['adults'];
+                                $room['children'] = $hotelRoomType['children'];
+                            }
                             $data->assign('htl_room_info', $hotelRoomInfo);
                         }
                     }
@@ -3793,6 +3795,100 @@ class AdminProductsControllerCore extends AdminController
                 }
             }
         }
+        if (!empty($this->errors)) {
+            $response['errors'] = $this->errors;
+        }
+        die(json_encode($response));
+    }
+
+    public function ajaxProcessGetRoomInfo()
+    {
+        $response = array('success' => false);
+        $idRoom = (int) Tools::getValue('id');
+        if ($idRoom) {
+            $room = new HotelRoomInformation($idRoom);
+            if (Validate::isLoadedObject($room)) {
+                $response['success'] = true;
+                $response['room'] = array(
+                    'id'        => $room->id,
+                    'room_num'  => $room->room_num,
+                    'floor'     => $room->floor,
+                    'id_status' => $room->id_status,
+                    'comment'   => $room->comment,
+                );
+            } else {
+                $response['error'] = $this->l('Room not found.');
+            }
+        } else {
+            $response['error'] = $this->l('Invalid room ID.');
+        }
+        die(json_encode($response));
+    }
+
+    public function ajaxProcessSaveRoom()
+    {
+        $response = array('success' => false);
+
+        if ($this->tabAccess['edit'] !== 1) {
+            $response['errors'] = array($this->l('You do not have permission to perform this operation.'));
+            die(json_encode($response));
+        }
+
+        $idRoom   = (int) Tools::getValue('id_room');
+        $idProduct = (int) Tools::getValue('id_product');
+        $roomNum  = trim(Tools::getValue('room_num'));
+        $floor    = trim(Tools::getValue('floor'));
+        $idStatus = (int) Tools::getValue('id_status');
+        $comment  = trim(Tools::getValue('comment'));
+
+        if (!$roomNum) {
+            $this->errors[] = $this->l('Room No. is required.');
+        } elseif (!Validate::isGenericName($roomNum)) {
+            $this->errors[] = $this->l('Invalid room number.');
+        }
+        if ($floor && !Validate::isGenericName($floor)) {
+            $this->errors[] = $this->l('Invalid floor value.');
+        }
+
+        if (empty($this->errors)) {
+            if ($idRoom) {
+                $objRoom = new HotelRoomInformation($idRoom);
+                if (!Validate::isLoadedObject($objRoom)) {
+                    $this->errors[] = $this->l('Room not found.');
+                } else {
+                    $idProduct = $objRoom->id_product;
+                }
+            } else {
+                $objRoom = new HotelRoomInformation();
+                $objRoomType = new HotelRoomType();
+                $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
+                if (!$roomTypeInfo) {
+                    $this->errors[] = $this->l('Room type not found for this product.');
+                } else {
+                    $objRoom->id_product = $idProduct;
+                    $objRoom->id_hotel   = $roomTypeInfo['id_hotel'];
+                }
+            }
+        }
+
+        if (empty($this->errors)) {
+            $objRoom->room_num  = $roomNum;
+            $objRoom->floor     = $floor;
+            $objRoom->id_status = $idStatus;
+            $objRoom->comment   = $comment;
+
+            if ($objRoom->save()) {
+                $response['success'] = true;
+                $response['href'] = self::$currentIndex
+                    . '&update' . $this->table
+                    . '&id_product=' . (int) $idProduct
+                    . '&token=' . $this->token
+                    . '&conf=4&key_tab=Configuration';
+            } else {
+                $this->errors[] = $this->l('Unable to save room. Please try again.');
+            }
+        }
+
         if (!empty($this->errors)) {
             $response['errors'] = $this->errors;
         }
