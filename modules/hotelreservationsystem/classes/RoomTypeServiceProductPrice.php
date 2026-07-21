@@ -23,11 +23,17 @@
 
 class RoomTypeServiceProductPrice extends ObjectModel
 {
+    const PRICE_TYPE_FIXED = 1;
+    const PRICE_TYPE_PERCENTAGE = 2;
+
     /** @var int id_product */
     public $id_product;
 
     /** @var float price for specific room type */
     public $price;
+
+    /** @var int PRICE_TYPE_FIXED or PRICE_TYPE_PERCENTAGE */
+    public $price_type;
 
     public $id_tax_rules_group;
 
@@ -46,6 +52,7 @@ class RoomTypeServiceProductPrice extends ObjectModel
             // 'id_room_type_service_product' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_product' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'price' =>          array('type' => self::TYPE_FLOAT),
+            'price_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_tax_rules_group' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_element' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'element_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId')
@@ -76,7 +83,7 @@ class RoomTypeServiceProductPrice extends ObjectModel
         if (!Cache::isStored($cache_key)) {
             $objServiceProduct = new Product((int)$idProduct);
             if ($result = Db::getInstance()->getRow('
-                SELECT spp.`price`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
+                SELECT spp.`price`, spp.`price_type`, spp.`id_tax_rules_group`, p.`auto_add_to_cart`, p.`price_addition_type`
                 FROM `'._DB_PREFIX_.'product` p
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` sp
                 ON (sp.`id_product` = p.`id_product`)
@@ -118,6 +125,20 @@ class RoomTypeServiceProductPrice extends ObjectModel
             ' AND `id_element`='.(int)$idElement.
             ' AND `element_type`='.(int)$elementType
         );
+    }
+
+    public static function getRoomTypePriceExclTax($idProductRoomType)
+    {
+        $cacheKey = 'RoomTypeServiceProductPrice::getRoomTypePriceExclTax'.(int)$idProductRoomType;
+        if (Cache::isStored($cacheKey)) {
+            return Cache::retrieve($cacheKey);
+        }
+
+        $price = (float)Product::getPriceStatic((int)$idProductRoomType, false);
+
+        Cache::store($cacheKey, $price);
+
+        return $price;
     }
 
     public static function getPrice(

@@ -3262,10 +3262,15 @@ class AdminProductsControllerCore extends AdminController
                         $associationInfo['default_price'] = $objProduct->price;
                         $associationInfo['id_tax_rules_group'] = $objProduct->id_tax_rules_group;
 
+                        $associationInfo['price_type'] = RoomTypeServiceProductPrice::PRICE_TYPE_FIXED;
+
                         // assign custom price only if it is saved for service product
                         if ($serviceProductPriceInfo) {
                             $associationInfo['custom_price'] = $serviceProductPriceInfo['price'];
                             $associationInfo['id_tax_rules_group'] = $serviceProductPriceInfo['id_tax_rules_group'];
+                            $associationInfo['price_type'] = isset($serviceProductPriceInfo['price_type'])
+                                ? (int)$serviceProductPriceInfo['price_type']
+                                : RoomTypeServiceProductPrice::PRICE_TYPE_FIXED;
                             $associationInfo['tax_rules_group_name'] = $this->l('No tax');
 
                             if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
@@ -3339,6 +3344,7 @@ class AdminProductsControllerCore extends AdminController
                     $isAssociated = in_array(Tools::getValue($prefix.'associated'), array('on', 'true', '1'));
                     $price = Tools::getValue($prefix.'price');
                     $idTaxRulesGroup = Tools::getValue($prefix.'id_tax_rules_group');
+                    $priceType = (int)Tools::getValue($prefix.'price_type', RoomTypeServiceProductPrice::PRICE_TYPE_FIXED);
 
                     if ($isAssociated) {
                         $objServiceProduct = new Product($idServiceProduct, false, $this->context->language->id);
@@ -3346,7 +3352,11 @@ class AdminProductsControllerCore extends AdminController
                             // cache for faster access in next foreach loop
                             $objServiceProducts[$idServiceProduct] = $objServiceProduct;
 
-                            if (!$price) {
+                            if ($priceType == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE) {
+                                if ($price === '' || $price === false || !is_numeric($price) || $price < 0 || $price > 100) {
+                                    $this->errors[] = sprintf($this->l('Percentage for service product \'%s\' must be between 0 and 100.'), $objServiceProduct->name);
+                                }
+                            } elseif (!$price) {
                                 $this->errors[] = sprintf($this->l('Price for service product \'%s\' is empty.'), $objServiceProduct->name);
                             } elseif (!Validate::isPrice($price)) {
                                 $this->errors[] = sprintf($this->l('Price for service product \'%s\' is invalid.'), $objServiceProduct->name);
@@ -3365,6 +3375,7 @@ class AdminProductsControllerCore extends AdminController
                         $isAssociated = in_array(Tools::getValue($prefix.'associated'), array('on', 'true', '1'));
                         $price = Tools::getValue($prefix.'price');
                         $idTaxRulesGroup = Tools::getValue($prefix.'id_tax_rules_group');
+                        $priceType = (int)Tools::getValue($prefix.'price_type', RoomTypeServiceProductPrice::PRICE_TYPE_FIXED);
 
                         if ($isAssociated) {
                             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
@@ -3388,6 +3399,7 @@ class AdminProductsControllerCore extends AdminController
                                     $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
                                 }
                                 $objRoomTypeServiceProductPrice->price = $price;
+                                $objRoomTypeServiceProductPrice->price_type = $priceType;
                                 $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
                                 $objRoomTypeServiceProductPrice->save();
                             } else {
@@ -3404,6 +3416,7 @@ class AdminProductsControllerCore extends AdminController
                                 $objRoomTypeServiceProductPrice->id_element = $idProduct;
                                 $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
                                 $objRoomTypeServiceProductPrice->price = $price;
+                                $objRoomTypeServiceProductPrice->price_type = $priceType;
                                 $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRulesGroup;
                                 $objRoomTypeServiceProductPrice->save();
                             }

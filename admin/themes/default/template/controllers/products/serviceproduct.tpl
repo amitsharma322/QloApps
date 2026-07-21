@@ -46,6 +46,9 @@
                                 <span>{l s='Position'}</span>
                             </th>
                             <th>
+                                <span>{l s='Price type'}</span>
+                            </th>
+                            <th>
                                 <span>{l s='Price'}</span>
                             </th>
                             <th>
@@ -82,9 +85,22 @@
                                     </div>
                                 </td>
                                 <td>
+                                    {assign var=price_type_value value=$service_product.association_info.price_type}
+                                    {if isset($smarty.post["{$inputs_prefix}price_type"])}
+                                        {assign var=price_type_value value=$smarty.post["{$inputs_prefix}price_type"]}
+                                    {/if}
+                                    <div class="fixed-width">
+                                        <select class="service_product_price_type" name="{$inputs_prefix}price_type" data-id_product="{$service_product.id_product}">
+                                            <option value="{RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}" {if $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}selected="selected"{/if}>{l s='Fixed'}</option>
+                                            <option value="{RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}" {if $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}selected="selected"{/if}>{l s='Percentage of room price'}</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
                                     <div class="fixed-width-xl">
                                         <div class="input-group">
-                                            <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
+                                            <span class="input-group-addon service_product_price_addon" id="price_addon_{$service_product.id_product}"
+                                                data-fixed-addon="{$currency->prefix|escape:'html':'UTF-8'}{$currency->suffix|escape:'html':'UTF-8'}" data-percentage-addon="%">{if $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}%{else}{$currency->prefix}{$currency->suffix}{/if}</span>
                                             {assign var=price_value value=0}
                                             {if isset($smarty.post["{$inputs_prefix}price"])}
                                                 {assign var=price_value value=$smarty.post["{$inputs_prefix}price"]}
@@ -135,9 +151,22 @@
                                 <td class="text-center"><span {if $service_product.auto_add_to_cart}class="badge badge-success"{/if}>{if $service_product.auto_add_to_cart}{l s='Yes'}{else}{l s='No'}{/if}</span></td>
                                 <td>{l s='--'}</td>
                                 <td>
+                                    {assign var=price_type_value value=RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}
+                                    {if isset($smarty.post["{$inputs_prefix}price_type"])}
+                                        {assign var=price_type_value value=$smarty.post["{$inputs_prefix}price_type"]}
+                                    {/if}
+                                    <div class="fixed-width">
+                                        <select class="service_product_price_type" name="{$inputs_prefix}price_type" data-id_product="{$service_product.id_product}">
+                                            <option value="{RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}" {if $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}selected="selected"{/if}>{l s='Fixed'}</option>
+                                            <option value="{RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}" {if $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}selected="selected"{/if}>{l s='Percentage of room price'}</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
                                     <div class="fixed-width-xl">
                                         <div class="input-group">
-                                            <span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
+                                            <span class="input-group-addon service_product_price_addon" id="price_addon_{$service_product.id_product}"
+                                                data-fixed-addon="{$currency->prefix|escape:'html':'UTF-8'}{$currency->suffix|escape:'html':'UTF-8'}" data-percentage-addon="%">{if $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}%{else}{$currency->prefix}{$currency->suffix}{/if}</span>
                                             <input type="text" name="{$inputs_prefix}price" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}" value="{if isset($smarty.post["{$inputs_prefix}price"]) && $smarty.post["{$inputs_prefix}price"]}{$smarty.post["{$inputs_prefix}price"]}{else}{$service_product.price}{/if}">
                                         </div>
                                     </div>
@@ -188,3 +217,13 @@
         {/if}
     </div>
 {/if}
+<script type="text/javascript">
+	$(document).on('change', 'select.service_product_price_type', function () {
+		var idProduct = $(this).data('id_product');
+		var isPercentage = $(this).val() == {RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE};
+		var $addon = $('#price_addon_' + idProduct);
+		var $help = $('#price_help_' + idProduct);
+		$addon.html(isPercentage ? $addon.data('percentage-addon') : $addon.data('fixed-addon'));
+		$help.html(isPercentage ? $help.data('percentage-help') : $help.data('fixed-help'));
+	});
+</script>

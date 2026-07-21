@@ -3337,7 +3337,14 @@ class ProductCore extends ObjectModel
 
         if (!$specific_price || $specific_price['price'] < 0) {
             if (isset($priceForRoomInfo) && isset($priceForRoomInfo['price'])) {
-                $price = (float)$priceForRoomInfo['price'];
+                if (isset($priceForRoomInfo['price_type'])
+                    && $priceForRoomInfo['price_type'] == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE
+                ) {
+                    $room_type_price = RoomTypeServiceProductPrice::getRoomTypePriceExclTax($id_product_room_type);
+                    $price = $room_type_price * ((float)$priceForRoomInfo['price'] / 100);
+                } else {
+                    $price = (float)$priceForRoomInfo['price'];
+                }
             } else {
                 $price = (float)$result['price'];
             }

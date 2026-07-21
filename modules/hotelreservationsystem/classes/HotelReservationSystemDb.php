@@ -389,6 +389,7 @@ class HotelReservationSystemDb
                 `id_room_type_service_product_price` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `id_product` int(11) UNSIGNED NOT NULL,
                 `price` decimal(20,6) NOT NULL DEFAULT '0.000000',
+                `price_type` tinyint(1) unsigned NOT NULL DEFAULT '1',
                 `id_tax_rules_group` int(11) unsigned NOT NULL,
                 `id_element` int(11) unsigned NOT NULL,
                 `element_type` tinyint(11) unsigned NOT NULL,
