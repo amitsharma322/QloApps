@@ -111,11 +111,15 @@
                                                     {assign var=price_value value=$service_product.association_info.default_price}
                                                 {/if}
                                             {/if}
-                                            <input type="text" name="{$inputs_prefix}price" value="{$price_value}" data-id_product="{$service_product.id_product}">
+                                            <input type="text" name="{$inputs_prefix}price" value="{if isset($price_type_value) && $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}{$price_value|string_format:"%.2f"}{else}{$price_value}{/if}" data-id_product="{$service_product.id_product}">
                                         </div>
                                     </div>
                                     <div class="help-block">
-                                        {l s='Default price: %s' sprintf={displayPrice price=$service_product.association_info.default_price currency=$currency->id}}
+                                        {if isset($service_product.association_info.default_price_type) && $service_product.association_info.default_price_type == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}
+                                            {l s='Default price: %s%%' sprintf=$service_product.association_info.default_price|string_format:"%.2f"}
+                                        {else}
+                                            {l s='Default price: %s' sprintf={displayPrice price=$service_product.association_info.default_price currency=$currency->id}}
+                                        {/if}
                                     </div>
                                 </td>
                                 <td>
@@ -152,6 +156,9 @@
                                 <td>{l s='--'}</td>
                                 <td>
                                     {assign var=price_type_value value=RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}
+                                    {if isset($service_product.price_type)}
+                                        {assign var=price_type_value value=$service_product.price_type}
+                                    {/if}
                                     {if isset($smarty.post["{$inputs_prefix}price_type"])}
                                         {assign var=price_type_value value=$smarty.post["{$inputs_prefix}price_type"]}
                                     {/if}
@@ -167,11 +174,19 @@
                                         <div class="input-group">
                                             <span class="input-group-addon service_product_price_addon" id="price_addon_{$service_product.id_product}"
                                                 data-fixed-addon="{$currency->prefix|escape:'html':'UTF-8'}{$currency->suffix|escape:'html':'UTF-8'}" data-percentage-addon="%">{if $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}%{else}{$currency->prefix}{$currency->suffix}{/if}</span>
-                                            <input type="text" name="{$inputs_prefix}price" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}" value="{if isset($smarty.post["{$inputs_prefix}price"]) && $smarty.post["{$inputs_prefix}price"]}{$smarty.post["{$inputs_prefix}price"]}{else}{$service_product.price}{/if}">
+                                            {assign var=price_value value=$service_product.price}
+                                            {if isset($smarty.post["{$inputs_prefix}price"]) && $smarty.post["{$inputs_prefix}price"]}
+                                                {assign var=price_value value=$smarty.post["{$inputs_prefix}price"]}
+                                            {/if}
+                                            <input type="text" name="{$inputs_prefix}price" data-id_product="{$service_product.id_product|escape:'html':'UTF-8'}" value="{if isset($price_type_value) && $price_type_value == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}{$price_value|string_format:"%.2f"}{else}{$price_value}{/if}">
                                         </div>
                                     </div>
                                     <div class="help-block">
-                                        {l s='Default price: %s' sprintf={displayPrice price=$service_product.price currency=$currency->id}}
+                                        {if isset($service_product.price_type) && $service_product.price_type == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}
+                                            {l s='Default price: %s%%' sprintf=$service_product.price|string_format:"%.2f"}
+                                        {else}
+                                            {l s='Default price: %s' sprintf={displayPrice price=$service_product.price currency=$currency->id}}
+                                        {/if}
                                     </div>
                                 </td>
                                 <td>

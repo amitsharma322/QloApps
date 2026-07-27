@@ -1869,6 +1869,13 @@
             });
         });
 	});
+	$(document).on('click', '.price-type-option', function (e) {
+		e.preventDefault();
+		var value = $(this).data('value');
+		var text = $(this).data('text');
+		$('#price-type-text').text(text);
+		$('#new_service_price_type').val(value);
+	});
 </script>
 
 <div class="leadin">{block name="leadin"}{/block}</div>

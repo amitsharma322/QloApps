@@ -120,11 +120,29 @@
                         <label class="control-label required">{l s='Name'}</label>
                         <input type="text" class="form-control" name="new_service_name"/>
                     </div>
+
                     <div class="col-sm-6">
                         <label class="control-label required">{l s='Price(tax excl.)'}</label>
-                        <div class="input-group">
+                        {* <div class="input-group">
                             <span class="input-group-addon">{$cartCurrency->sign}</span>
                             <input type="text" class="form-control" name="new_service_price"/>
+                        </div> *}
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <button type="button"
+                                        class="btn btn-default dropdown-toggle"
+                                        data-toggle="dropdown">
+                                    <span id="price-type-text">Fixed</span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#" class="price-type-option" data-text="{l s='Fixed'}" data-value="{RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}">{l s='Fixed'}</a></li>
+                                    <li><a href="#" class="price-type-option" data-text="{l s='%'}" data-value="{RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}">{l s='% of room price'}</a></li>
+                                </ul>
+                            </div>
+                            <input type="hidden" id="new_service_price_type" name="new_service_price_type" value="{RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}">
+                            <input type="text" class="form-control" name="new_service_price"/>
+
                         </div>
                     </div>
                 </div>

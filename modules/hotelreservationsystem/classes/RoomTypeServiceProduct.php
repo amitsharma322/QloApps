@@ -181,7 +181,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return false;
     }
 
-    public function getServiceProductsData($idProductRoomType, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $subCategory = false, $idLang = false)
+    public function getServiceProductsData($idProductRoomType, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $subCategory = false, $idLang = false, $dateFrom = null, $dateTo = null)
     {
         $context = Context::getContext();
         if (!$idLang) {
@@ -201,6 +201,13 @@ class RoomTypeServiceProduct extends ObjectModel
         )) {
             $serviceProducts = Product::getProductsProperties($idLang, $serviceProducts);
             foreach($serviceProducts as &$serviceProduct) {
+                $numDays = 1;
+                // If price type is per day but the dates are not valid.
+                if (($serviceProduct['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY)
+                    && (!$numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo))
+                ) {
+                    $numDays = 1;
+                }
                 $serviceProduct['price_tax_exc'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],
                     0,
@@ -208,10 +215,10 @@ class RoomTypeServiceProduct extends ObjectModel
                     (int) $idProductRoomType,
                     false,
                     1,
-                    null,
-                    null,
+                    $dateFrom,
+                    $dateTo,
                     $context->cart->id
-                );
+                )/$numDays;
 
                 $serviceProduct['price_tax_incl'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],
@@ -220,10 +227,10 @@ class RoomTypeServiceProduct extends ObjectModel
                     (int) $idProductRoomType,
                     true,
                     1,
-                    null,
-                    null,
+                    $dateFrom,
+                    $dateTo,
                     $context->cart->id
-                );
+                )/$numDays;
 
                 $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
                 $serviceProduct['price_without_reduction'] = Product::getServiceProductPrice(
@@ -233,8 +240,8 @@ class RoomTypeServiceProduct extends ObjectModel
                     (int)$idProductRoomType,
                     $useTax,
                     1,
-                    null,
-                    null,
+                    $dateFrom,
+                    $dateTo,
                     $context->cart->id,
                     null,
                     false // for price without reduct
@@ -246,7 +253,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return $serviceProducts;
     }
 
-    public function getServiceProductsGroupByCategory($idProduct, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $idLang = false)
+    public function getServiceProductsGroupByCategory($idProduct, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $idLang = false, $dateFrom = null, $dateTo = null)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -255,7 +262,7 @@ class RoomTypeServiceProduct extends ObjectModel
         $objProduct = new Product($idProduct);
         if ($serviceProductsCategories = $objProduct->getAvailableServiceProductsCategories($idLang, 1)) {
             foreach ($serviceProductsCategories as $key => $category) {
-                if ($products = $this->getServiceProductsData($idProduct, $p, $n, $front, $available_for_order, $auto_add_to_cart, $category['id_category'], $idLang)) {
+                if ($products = $this->getServiceProductsData($idProduct, $p, $n, $front, $available_for_order, $auto_add_to_cart, $category['id_category'], $idLang, $dateFrom, $dateTo)) {
                     $serviceProductsCategories[$key]['products'] = $products;
                 } else {
                     unset($serviceProductsCategories[$key]);

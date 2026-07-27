@@ -3262,7 +3262,7 @@ class AdminProductsControllerCore extends AdminController
                         $associationInfo['default_price'] = $objProduct->price;
                         $associationInfo['id_tax_rules_group'] = $objProduct->id_tax_rules_group;
 
-                        $associationInfo['price_type'] = RoomTypeServiceProductPrice::PRICE_TYPE_FIXED;
+                        $associationInfo['default_price_type'] = $objProduct->price_type;
 
                         // assign custom price only if it is saved for service product
                         if ($serviceProductPriceInfo) {
@@ -3303,6 +3303,10 @@ class AdminProductsControllerCore extends AdminController
                         ))) {
                             $serviceProduct['tax_rules_group_name'] = $objTaxRulesGroup->name;
                         }
+
+                        // $serviceProduct['price_type'] = isset($serviceProduct['price_type'])
+                        //     ? (int)$serviceProduct['price_type']
+                        //     : RoomTypeServiceProductPrice::PRICE_TYPE_FIXED;
 
                         $unassociatedServiceProducts[] = $serviceProduct;
                     }

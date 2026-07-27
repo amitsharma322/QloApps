@@ -222,10 +222,10 @@ class AdminNormalProductsControllerCore extends AdminController
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (rsp.`id_element` = hrt.`id_product` AND rsp.`element_type` = '.(int)RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.')
                 '.HotelBranchInformation::addHotelRestriction(false, 'hrt');
 
-        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, IF(a.`price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.', "'.$this->l('Per Day').'", "'.$this->l('Per Booking').'") as price_calculation_method_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, IF(a.`price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.', "'.$this->l('Per Day').'", "'.$this->l('Per Booking').'") as price_calculation_method_txt, IF('.$alias.'.`price_type` = '.(int)RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE.', "'.$this->l('Percentage').'", "'.$this->l('Fixed').'") as price_type_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= ' COUNT(hrt.`id_product`) as products_associated, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
-        $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
+        $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, '.$alias.'.`price_type`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
         if ($join_category) {
             $this->_join .= ' INNER JOIN `'._DB_PREFIX_.'category_product` cp ON (cp.`id_product` = a.`id_product` AND cp.`id_category` = '.(int)$this->_category->id.') ';
@@ -343,7 +343,17 @@ class AdminNormalProductsControllerCore extends AdminController
                 'filter_key' => 'shop!name',
             );
         }
-
+        $this->fields_list['price_type_txt'] = array(
+            'title' => $this->l('Price type'),
+            'filter_key' => 'a!price_type',
+            'type' => 'select',
+            'list' => array(
+                RoomTypeServiceProductPrice::PRICE_TYPE_FIXED => $this->l('Fixed'),
+                RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE => $this->l('Percentage'),
+            ),
+            'visible_default' => true,
+            'optional' => true,
+        );
         $this->fields_list['price'] = array(
             'title' => $this->l('Base price'),
             'type' => 'price',
@@ -407,6 +417,10 @@ class AdminNormalProductsControllerCore extends AdminController
 
     public static function displayPrice($basePrice, $tr)
     {
+        if (isset($tr['price_type']) && $tr['price_type'] == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE) {
+            return sprintf('%.2f', $basePrice).' %';
+        }
+
         return Tools::displayPrice($basePrice, (int) Configuration::get('PS_CURRENCY_DEFAULT'));
     }
 
@@ -2251,6 +2265,13 @@ class AdminNormalProductsControllerCore extends AdminController
                     call_user_func(array($className, 'displayFieldName'), $field, $className),
                     $maxLength
                 );
+            }
+        }
+
+        if (Tools::getValue('price_type') == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE) {
+            $priceValue = Tools::getValue('price');
+            if ($priceValue === '' || $priceValue === false || !is_numeric($priceValue) || $priceValue < 0 || $priceValue > 100) {
+                $this->errors[] = Tools::displayError('Percentage price must be between 0 and 100.');
             }
         }
 

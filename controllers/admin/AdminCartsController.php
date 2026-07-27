@@ -1208,7 +1208,7 @@ class AdminCartsControllerCore extends AdminController
                 $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
+                $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null, false, false, $dateFrom, $dateTo);
             }
 
             if ($serviceProducts) {
@@ -1379,6 +1379,7 @@ class AdminCartsControllerCore extends AdminController
                     $priceCalcMethod = Tools::getValue('new_service_price_calc_method');
                     $priceAdditionType = Tools::getValue('new_service_price_addition_type');
                     $productQty = Tools::getValue('new_service_qty');
+                    $priceType = Tools::getValue('new_service_price_type');
                     $idTaxRuleGroup = Tools::getValue('new_service_price_tax_rule_group');
                     $autoAdded = Tools::getValue('new_service_auto_added');
 
@@ -1412,6 +1413,11 @@ class AdminCartsControllerCore extends AdminController
                     if (!isset($price)) {
                         $response['hasError'] = true;
                         $response['errors'][] = Tools::displayError('Service price is required');
+                    } elseif ($priceType == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE) {
+                        if (!is_numeric($price) || $price < 0 || $price > 100) {
+                            $response['hasError'] = true;
+                            $response['errors'][] = Tools::displayError('Percentage must be between 0 and 100');
+                        }
                     } elseif (!Validate::isPrice($price)) {
                         $response['hasError'] = true;
                         $response['errors'][] = Tools::displayError('Invalid service price');
@@ -1429,6 +1435,7 @@ class AdminCartsControllerCore extends AdminController
                         $objServiceProduct->allow_multiple_quantity = !$autoAdded;
                         $objServiceProduct->id_tax_rules_group = $idTaxRuleGroup;
                         $objServiceProduct->price = $price;
+                        $objServiceProduct->price_type = $priceType;
                         $objServiceProduct->wholesale_price = 0;
                         $languages = Language::getLanguages(false);
                         foreach ($languages as $lang) {
@@ -1458,6 +1465,15 @@ class AdminCartsControllerCore extends AdminController
                                 [$objHtlCartBooking->id_product],
                                 RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
                             );
+
+                            $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
+                            $objRoomTypeServiceProductPrice->id_product = $objServiceProduct->id;
+                            $objRoomTypeServiceProductPrice->id_element = $objHtlCartBooking->id_product;
+                            $objRoomTypeServiceProductPrice->element_type = RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE;
+                            $objRoomTypeServiceProductPrice->price = $price;
+                            $objRoomTypeServiceProductPrice->price_type = $priceType;
+                            $objRoomTypeServiceProductPrice->id_tax_rules_group = $idTaxRuleGroup;
+                            $objRoomTypeServiceProductPrice->save();
                             // If service product is create successfully the start adding the product in cart and order
                             $objCart = new Cart($objHtlCartBooking->id_cart);
                             $objServiceProduct = new Product($objServiceProduct->id, false, $objCart->id_lang);
@@ -1470,6 +1486,25 @@ class AdminCartsControllerCore extends AdminController
                                 0,
                                 $objHtlCartBooking->id
                             )) {
+                                // for a percentage-type service, resolve the actual amount (% of the room's own
+                                // price for this booking's dates) now, so what gets frozen below is a real currency
+                                // value rather than the raw percentage number
+                                $specificPriceAmount = $price;
+                                if ($priceType == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE) {
+                                    $roomTypePrice = RoomTypeServiceProductPrice::getRoomTypePriceExclTax(
+                                        $objHtlCartBooking->id_product,
+                                        $objHtlCartBooking->date_from,
+                                        $objHtlCartBooking->date_to,
+                                        0,
+                                        $objCart->id,
+                                        1
+                                    );
+                                    if ($priceCalcMethod == Product::PRICE_CALCULATION_METHOD_PER_BOOKING) {
+                                        $roomTypePrice *= HotelHelper::getNumberOfDays($objHtlCartBooking->date_from, $objHtlCartBooking->date_to);
+                                    }
+                                    $specificPriceAmount = $roomTypePrice * ((float)$price / 100);
+                                }
+
                                 // Lets create a specific price for the service to match the price provided by the user
                                 $objSpecificPrice = new SpecificPrice();
                                 $objSpecificPrice->id_shop = 0;
@@ -1481,7 +1516,7 @@ class AdminCartsControllerCore extends AdminController
                                 $objSpecificPrice->id_customer = $objCart->id_customer;
                                 $objSpecificPrice->id_product = $objServiceProduct->id;
                                 $objSpecificPrice->id_product_attribute = 0;
-                                $objSpecificPrice->price = $price;
+                                $objSpecificPrice->price = $specificPriceAmount;
                                 $objSpecificPrice->from_quantity = 1;
                                 $objSpecificPrice->reduction = 0;
                                 $objSpecificPrice->reduction_type = 'amount';
@@ -1531,7 +1566,7 @@ class AdminCartsControllerCore extends AdminController
                 $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($objCartBookingData->id_product, 1, 0, false, 2, null);
+                $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($objCartBookingData->id_product, 1, 0, false, 2, null, false, false, $objCartBookingData->date_from, $objCartBookingData->date_to);
             }
 
             if ($serviceProducts) {

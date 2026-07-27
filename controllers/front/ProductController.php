@@ -486,7 +486,7 @@ class ProductControllerCore extends FrontController
                     }
 
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
-                    $this->assignRoomServiceProductVars();
+                    $this->assignRoomServiceProductVars($date_from,$date_to);
 
                     // product price after imposing feature prices...
                     if ($useTax) {
@@ -580,22 +580,45 @@ class ProductControllerCore extends FrontController
         $this->setTemplate(_PS_THEME_DIR_.'product.tpl');
     }
 
-    public function assignRoomServiceProductVars()
+    public function assignRoomServiceProductVars($dateFrom,$dateTo,$roomServiceProducts = null)
     {
         // get service products for room type
         $p = 1;
         $n = RoomTypeServiceProduct::WK_NUM_RESULTS;
         $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
         $smartyVars = array();
+
+        // map of already-selected service product ids => quantity, so re-rendering this list keeps their selected state
+        $selectedQty = array();
+        if ($roomServiceProducts && ($decoded = json_decode($roomServiceProducts, true))) {
+            foreach ($decoded as $product) {
+                $selectedQty[(int) $product['id_product']] = (int) $product['quantity'];
+            }
+        }
+
         if (Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER')) {
             $serviceProductsByCategory = $objRoomTypeServiceProduct->getServiceProductsGroupByCategory(
                 $this->product->id,
                 $p,
                 $n,
-                true
+                true,
+                2,
+                0,
+                false,
+                $dateFrom,
+                $dateTo
             );
             if ($serviceProductsByCategory) {
                 $smartyVars['service_products_exists'] = 1;
+                foreach ($serviceProductsByCategory as &$category) {
+                    foreach ($category['products'] as &$serviceProduct) {
+                        if (array_key_exists((int) $serviceProduct['id_product'], $selectedQty)) {
+                            $serviceProduct['selected'] = true;
+                            $serviceProduct['quantity_added'] = $selectedQty[(int) $serviceProduct['id_product']];
+                        }
+                    }
+                }
+                unset($category, $serviceProduct);
             }
             $smartyVars['service_products_by_category'] = $serviceProductsByCategory;
         } else {
@@ -603,7 +626,13 @@ class ProductControllerCore extends FrontController
                 $this->product->id,
                 $p,
                 $n,
-                true
+                true,
+                2,
+                0,
+                false,
+                false,
+                $dateFrom,
+                $dateTo
             );
             $numTotalServiceProducts = $this->product->getProductServiceProducts(
                 $this->context->language->id,
@@ -616,6 +645,13 @@ class ProductControllerCore extends FrontController
             );
             if ($roomTypeServiceProducts) {
                 $smartyVars['service_products_exists'] = 1;
+                foreach ($roomTypeServiceProducts as &$serviceProduct) {
+                    if (array_key_exists((int) $serviceProduct['id_product'], $selectedQty)) {
+                        $serviceProduct['selected'] = true;
+                        $serviceProduct['quantity_added'] = $selectedQty[(int) $serviceProduct['id_product']];
+                    }
+                }
+                unset($serviceProduct);
             }
             $smartyVars['service_products'] = $roomTypeServiceProducts;
             $smartyVars['num_total_service_products'] = $numTotalServiceProducts;
@@ -1463,7 +1499,7 @@ class ProductControllerCore extends FrontController
             $roomServiceProducts = Tools::getValue('room_service_products');
             $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
             $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
-            $this->assignRoomServiceProductVars();
+            $this->assignRoomServiceProductVars($dateFrom,$dateTo,$roomServiceProducts);
             if ($this->assignBookingFormVars(
                 $idProduct,
                 $dateFrom,
@@ -1487,6 +1523,9 @@ class ProductControllerCore extends FrontController
         $html = $this->context->smarty->fetch('_partials/booking-form.tpl');
         $response['status'] = true;
         $response['html_booking_form'] = $html;
+        if ($this->product->booking_product) {
+            $response['html_service_products'] = $this->context->smarty->fetch('_partials/service-products.tpl');
+        }
 
         $this->ajaxDie(json_encode($response));
     }
@@ -1537,6 +1576,8 @@ class ProductControllerCore extends FrontController
         $p = Tools::getValue('p');
         $id_product = Tools::getValue('id_product');
         $id_category = Tools::getValue('id_category');
+        $dateFrom = Tools::getValue('date_from');
+        $dateTo = Tools::getValue('date_to');
 
         if ($this->isTokenValid()) {
             if ($p && $id_product) {
@@ -1555,7 +1596,10 @@ class ProductControllerCore extends FrontController
                             true,
                             2,
                             0,
-                            $id_category
+                            $id_category,
+                            false,
+                            $dateFrom,
+                            $dateTo
                         )) {
                             $this->context->smarty->assign('service_products', $roomTypeServiceProducts);
                             if (Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER')) {

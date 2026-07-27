@@ -983,7 +983,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 }
                 $objServiceProductCartDetail = new ServiceProductCartDetail();
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
+                $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1, 0, false, false, $dateFrom, $dateTo);
                 $cartBookings = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
                 foreach($cartBookings as &$cartBookingData) {
                     $cartBookingData['selected_service'] = $objServiceProductCartDetail->getServiceProductsInCart(

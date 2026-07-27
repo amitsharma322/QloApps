@@ -123,6 +123,34 @@ $(document).ready(function () {
 			{if isset($pack) && $pack->isPack($product->id)}<p class="help-block">{l s='The sum of rack rates of the service in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackWholesalePrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 		</div>
 	</div>
+	{if $product->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}
+		<div class="form-group">
+			<div class="col-lg-1"></div>
+			<label class="control-label col-lg-2" for="price_type">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Fixed: the retail price above is a plain currency amount. Percentage: the retail price above is treated as a percentage (0-100) of the room price it is booked against.'}">{l s='Price type'}</span>
+			</label>
+			<div class="col-lg-2">
+				<select name="price_type" id="price_type" onchange="toggleServicePriceTypeAddon();">
+					<option value="{RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}" {if $product->price_type != RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}selected="selected"{/if}>{l s='Fixed amount'}</option>
+					<option value="{RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}" {if $product->price_type == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}selected="selected"{/if}>{l s='Percentage of room price'}</option>
+				</select>
+			</div>
+		</div>
+		<script type="text/javascript">
+			function toggleServicePriceTypeAddon() {
+				var addon = '%';
+				if ($('#price_type').val() != '{RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}') {
+					addon = '{$currency->prefix|addslashes}{$currency->suffix|addslashes}';
+				}
+				$('#priceTE').closest('.input-group').find('.input-group-addon').first().text(addon);
+			}
+			$(document).ready(function () {
+				toggleServicePriceTypeAddon();
+			});
+		</script>
+	{else}
+		<input type="hidden" name="price_type" value="{RoomTypeServiceProductPrice::PRICE_TYPE_FIXED}" />
+	{/if}
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
 		<label class="control-label col-lg-2" for="priceTE">
@@ -132,7 +160,7 @@ $(document).ready(function () {
 			<div class="input-group">
 				<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
 				<input type="hidden" id="priceTEReal" name="price" value="{toolsConvertPrice price=$product->price}"/>
-				<input size="11" maxlength="27" id="priceTE" name="price_displayed" type="text" value="{{toolsConvertPrice price=$product->price}|string_format:'%.6f'}" onchange="noComma('priceTE'); $('#priceTEReal').val(this.value);" onkeyup="$('#priceType').val('TE'); $('#priceTEReal').val(this.value.replace(/,/g, '.')); if (isArrowKey(event)) return; calcPriceTI();" />
+				<input size="11" maxlength="27" id="priceTE" name="price_displayed" type="text" value="{if isset($product->price_type) && $product->price_type == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE}{$product->price|string_format:"%.2f"}{else}{{toolsConvertPrice price=$product->price}|string_format:'%.6f'}{/if}" onchange="noComma('priceTE'); $('#priceTEReal').val(this.value);" onkeyup="$('#priceType').val('TE'); $('#priceTEReal').val(this.value.replace(/,/g, '.')); if (isArrowKey(event)) return; calcPriceTI();" />
 			</div>
 		</div>
 	</div>

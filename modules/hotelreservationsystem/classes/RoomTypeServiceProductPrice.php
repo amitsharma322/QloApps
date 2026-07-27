@@ -26,6 +26,14 @@ class RoomTypeServiceProductPrice extends ObjectModel
     const PRICE_TYPE_FIXED = 1;
     const PRICE_TYPE_PERCENTAGE = 2;
 
+    /**
+     * Room type ids for which getRoomTypePriceExclTax() is currently being resolved (with auto-add
+     * services included), used to break the cycle when one of those auto-add services is itself a
+     * Percentage-type service needing the room's own auto-add-inclusive price to compute its base.
+     * @var array
+     */
+    private static $roomTypesResolvingAutoAddPrice = array();
+
     /** @var int id_product */
     public $id_product;
 
@@ -127,14 +135,44 @@ class RoomTypeServiceProductPrice extends ObjectModel
         );
     }
 
-    public static function getRoomTypePriceExclTax($idProductRoomType)
+    public static function getRoomTypePriceExclTax($idProductRoomType, $dateFrom = null, $dateTo = null, $idGroup = 0, $idCart = 0, $useReduc = 1)
     {
-        $cacheKey = 'RoomTypeServiceProductPrice::getRoomTypePriceExclTax'.(int)$idProductRoomType;
+        $cacheKey = 'RoomTypeServiceProductPrice::getRoomTypePriceExclTax'.(int)$idProductRoomType
+            .'_'.$dateFrom.'_'.$dateTo.'_'.(int)$idGroup.'_'.(int)$idCart.'_'.(int)$useReduc;
         if (Cache::isStored($cacheKey)) {
             return Cache::retrieve($cacheKey);
         }
 
-        $price = (float)Product::getPriceStatic((int)$idProductRoomType, false);
+        if ($dateFrom && $dateTo) {
+            if (!empty(self::$roomTypesResolvingAutoAddPrice[(int)$idProductRoomType])) {
+                // re-entrant call: one of this room type's auto-add services is itself a Percentage-type
+                // service resolving its base through this same room type - break the cycle with the flat rate
+                $price = (float)Product::getPriceStatic((int)$idProductRoomType, false);
+            } else {
+                self::$roomTypesResolvingAutoAddPrice[(int)$idProductRoomType] = true;
+                try {
+                    // room type's per-night price for these dates, honoring Room Type Feature Pricing
+                    // (seasonal/date-based rate rules) and auto-added-with-room services
+                    $price = (float)HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                        $idProductRoomType,
+                        $dateFrom,
+                        $dateTo,
+                        false,
+                        (int)$idGroup,
+                        (int)$idCart,
+                        0,
+                        0,
+                        1,
+                        $useReduc
+                    );
+                } finally {
+                    unset(self::$roomTypesResolvingAutoAddPrice[(int)$idProductRoomType]);
+                }
+            }
+        } else {
+            // no date range available (e.g. a listing-preview context) - fall back to the room type's plain catalog price
+            $price = (float)Product::getPriceStatic((int)$idProductRoomType, false);
+        }
 
         Cache::store($cacheKey, $price);
 

@@ -83,6 +83,9 @@ class ProductCore extends ObjectModel
     /** @var int price calculation method */
     public $price_calculation_method;
 
+    /** @var int RoomTypeServiceProductPrice::PRICE_TYPE_FIXED or PRICE_TYPE_PERCENTAGE */
+    public $price_type;
+
     /** @var string available_now */
     public $available_now;
 
@@ -322,6 +325,7 @@ class ProductCore extends ObjectModel
             'max_quantity' =>                array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedInt'),
             'price_calculation_method' =>    array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
             'price' =>                        array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice', 'required' => true),
+            'price_type' =>                array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
             'wholesale_price' =>            array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice'),
             'unity' =>                        array('type' => self::TYPE_STRING, 'shop' => true, 'validate' => 'isString'),
             'unit_price_ratio' =>            array('type' => self::TYPE_FLOAT, 'shop' => true),
@@ -3041,7 +3045,8 @@ class ProductCore extends ObjectModel
     public static function getPriceStatic($id_product, $usetax = true, $id_product_attribute = null, $decimals = 6, $divisor = null,
         $only_reduc = false, $usereduc = true, $quantity = 1, $force_associated_tax = false, $id_customer = null, $id_cart = null,
         $id_address = null, &$specific_price_output = null, $with_ecotax = true, $use_group_reduction = true, ?Context $context = null,
-        $use_customer_price = true, $id_hotel = false, $id_product_room_type = false, $id_group = null, $id_htl_cart_booking = 0)
+        $use_customer_price = true, $id_hotel = false, $id_product_room_type = false, $id_group = null, $id_htl_cart_booking = 0,
+        $date_from = null, $date_to = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3177,7 +3182,9 @@ class ProductCore extends ObjectModel
             $cart_quantity,
             $id_hotel,
             $id_product_room_type,
-            $id_htl_cart_booking
+            $id_htl_cart_booking,
+            $date_from,
+            $date_to
         );
 
         return $return;
@@ -3211,7 +3218,8 @@ class ProductCore extends ObjectModel
      **/
     public static function priceCalculation($id_shop, $id_product, $id_product_attribute, $id_country, $id_state, $zipcode, $id_currency,
         $id_group, $quantity, $use_tax, $decimals, $only_reduc, $use_reduc, $with_ecotax, &$specific_price, $use_group_reduction,
-        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_hotel = false, $id_product_room_type = false, $id_htl_cart_booking = 0)
+        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_hotel = false, $id_product_room_type = false, $id_htl_cart_booking = 0,
+        $date_from = null, $date_to = null)
     {
         static $address = null;
         static $context = null;
@@ -3247,7 +3255,8 @@ class ProductCore extends ObjectModel
             '-'.(int)$quantity.'-'.(int)$id_product_attribute.
             '-'.(int)$with_ecotax.'-'.(int)$id_customer.'-'.(int)$use_group_reduction.'-'.(int)$id_cart.'-'.(int)$real_quantity.
             '-'.($only_reduc?'1':'0').'-'.($use_reduc?'1':'0').'-'.($use_tax?'1':'0').'-'.(int)$decimals.'-'.($id_hotel?(int)$id_hotel:'0')
-            .'-'.($id_product_option?(int)$id_product_option:'0'.'-'.($id_product_room_type?(int)$id_product_room_type:'0').'-'.(int)$id_htl_cart_booking);
+            .'-'.($id_product_option?(int)$id_product_option:'0'.'-'.($id_product_room_type?(int)$id_product_room_type:'0').'-'.(int)$id_htl_cart_booking)
+            .'-'.$date_from.'-'.$date_to;
 
         // reference parameter is filled before any returns
         $specific_price = SpecificPrice::getSpecificPrice(
@@ -3335,13 +3344,23 @@ class ProductCore extends ObjectModel
             );
         }
 
+        $is_percentage_room_service_price = false;
+
         if (!$specific_price || $specific_price['price'] < 0) {
             if (isset($priceForRoomInfo) && isset($priceForRoomInfo['price'])) {
                 if (isset($priceForRoomInfo['price_type'])
                     && $priceForRoomInfo['price_type'] == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE
                 ) {
-                    $room_type_price = RoomTypeServiceProductPrice::getRoomTypePriceExclTax($id_product_room_type);
+                    $room_type_price = RoomTypeServiceProductPrice::getRoomTypePriceExclTax(
+                        $id_product_room_type,
+                        $date_from,
+                        $date_to,
+                        $id_group,
+                        $id_cart,
+                        $use_reduc
+                    );
                     $price = $room_type_price * ((float)$priceForRoomInfo['price'] / 100);
+                    $is_percentage_room_service_price = true;
                 } else {
                     $price = (float)$priceForRoomInfo['price'];
                 }
@@ -3353,14 +3372,18 @@ class ProductCore extends ObjectModel
         }
 
         // add option impact only if specific price is not set for this option
-        if ((!$specific_price || !$specific_price['id_product_attribute'] || $specific_price['price'] < 0)
+        if (!$is_percentage_room_service_price
+            && (!$specific_price || !$specific_price['id_product_attribute'] || $specific_price['price'] < 0)
             && isset($result['option_impact_price'])
         ) {
             $price += (float)$result['option_impact_price'];
         }
 
-        // convert only if the specific price is in the default currency (id_currency = 0)
-        if (!$specific_price || !($specific_price['price'] >= 0 && $specific_price['id_currency'])) {
+        // convert only if the specific price is in the default currency (id_currency = 0);
+        // a percentage-of-room-price amount is already resolved in the correct currency, skip re-conversion
+        if (!$is_percentage_room_service_price
+            && (!$specific_price || !($specific_price['price'] >= 0 && $specific_price['id_currency']))
+        ) {
             $price = Tools::convertPrice($price, $id_currency);
             if (isset($specific_price['price']) && $specific_price['price'] >= 0) {
                 $specific_price['price'] = $price;
@@ -3464,7 +3487,7 @@ class ProductCore extends ObjectModel
         }
 
         // Group reduction
-        if ($use_group_reduction) {
+        if ($use_group_reduction && !($specific_price && !empty($specific_price['id_htl_cart_booking']))) {
             $reduction_from_category = GroupReduction::getValueForProduct($id_product, $id_group);
             if ($reduction_from_category !== false) {
                 $group_reduction = $price * (float)$reduction_from_category;
@@ -6853,7 +6876,9 @@ class ProductCore extends ObjectModel
             (int)$idHotel,
             (int)$idProductRoomType,
             $idGroup,
-            $idCartBooking
+            $idCartBooking,
+            $dateFrom,
+            $dateTo
         );
 
         Hook::exec('actionServiceProductPricePriceModifier',

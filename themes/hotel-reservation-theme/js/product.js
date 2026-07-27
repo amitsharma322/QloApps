@@ -1146,6 +1146,8 @@ $(document).ready(function() {
                 id_category: id_category,
                 p: p,
                 id_product: $('#product_page_product_id').val(),
+                date_from: $('#room_check_in').val(),
+                date_to: $('#room_check_out').val(),
                 action: 'getServiceProducts',
                 ajax: true,
                 token: static_token
@@ -1481,6 +1483,10 @@ var BookingForm = {
                     if (response.status == true) {
                         $('.booking-form').replaceWith(response.html_booking_form);
                         BookingForm.init();
+
+                        if (typeof response.html_service_products !== 'undefined') {
+                            $('#service_products_cont').html(response.html_service_products);
+                        }
 
                         if (resetOccupancy) {
                             BookingForm.resetOccupancy();

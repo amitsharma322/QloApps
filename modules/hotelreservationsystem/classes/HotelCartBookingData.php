@@ -1251,7 +1251,11 @@ class HotelCartBookingData extends ObjectModel
                     0,
                     false,
                     2,
-                    null
+                    null,
+                    false,
+                    false,
+                    $value['date_from'],
+                    $value['date_to']
                 );
                 $cart_detail_data[$key]['selected_services'] = $objServiceProductCartDetail->getServiceProductsInCart(
                     $id_cart,
