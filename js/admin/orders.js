@@ -39,7 +39,13 @@ $(document).ready(function() {
         $('#view_order_tax_details .icon-angle-up').toggle();
         $('#view_order_tax_details .icon-angle-down').toggle();
     });
-
+	$(document).on('click', '.price-type-option', function (e) {
+		e.preventDefault();
+		var value = $(this).data('value');
+		var text = $(this).data('text');
+		$('#price-type-text').text(text);
+		$('#new_service_price_type').val(value);
+	});
     $(document).on('click', '.delete-voucher', function(e) {
         if (!confirm(txt_confirm)) {
             e.preventDefault();

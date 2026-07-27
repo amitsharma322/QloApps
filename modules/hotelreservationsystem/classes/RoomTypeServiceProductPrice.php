@@ -144,33 +144,19 @@ class RoomTypeServiceProductPrice extends ObjectModel
         }
 
         if ($dateFrom && $dateTo) {
-            if (!empty(self::$roomTypesResolvingAutoAddPrice[(int)$idProductRoomType])) {
-                // re-entrant call: one of this room type's auto-add services is itself a Percentage-type
-                // service resolving its base through this same room type - break the cycle with the flat rate
-                $price = (float)Product::getPriceStatic((int)$idProductRoomType, false);
-            } else {
-                self::$roomTypesResolvingAutoAddPrice[(int)$idProductRoomType] = true;
-                try {
-                    // room type's per-night price for these dates, honoring Room Type Feature Pricing
-                    // (seasonal/date-based rate rules) and auto-added-with-room services
-                    $price = (float)HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
-                        $idProductRoomType,
-                        $dateFrom,
-                        $dateTo,
-                        false,
-                        (int)$idGroup,
-                        (int)$idCart,
-                        0,
-                        0,
-                        1,
-                        $useReduc
-                    );
-                } finally {
-                    unset(self::$roomTypesResolvingAutoAddPrice[(int)$idProductRoomType]);
-                }
-            }
+            $price = (float)HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
+                $idProductRoomType,
+                $dateFrom,
+                $dateTo,
+                false,
+                (int)$idGroup,
+                (int)$idCart,
+                0,
+                0,
+                1,
+                $useReduc
+            );
         } else {
-            // no date range available (e.g. a listing-preview context) - fall back to the room type's plain catalog price
             $price = (float)Product::getPriceStatic((int)$idProductRoomType, false);
         }
 

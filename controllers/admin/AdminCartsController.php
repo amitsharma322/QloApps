@@ -1486,10 +1486,6 @@ class AdminCartsControllerCore extends AdminController
                                 0,
                                 $objHtlCartBooking->id
                             )) {
-                                // for a percentage-type service, resolve the actual amount (% of the room's own
-                                // price for this booking's dates) now, so what gets frozen below is a real currency
-                                // value rather than the raw percentage number
-                                $specificPriceAmount = $price;
                                 if ($priceType == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE) {
                                     $roomTypePrice = RoomTypeServiceProductPrice::getRoomTypePriceExclTax(
                                         $objHtlCartBooking->id_product,
@@ -1502,7 +1498,7 @@ class AdminCartsControllerCore extends AdminController
                                     if ($priceCalcMethod == Product::PRICE_CALCULATION_METHOD_PER_BOOKING) {
                                         $roomTypePrice *= HotelHelper::getNumberOfDays($objHtlCartBooking->date_from, $objHtlCartBooking->date_to);
                                     }
-                                    $specificPriceAmount = $roomTypePrice * ((float)$price / 100);
+                                    $price = $roomTypePrice * ((float)$price / 100);
                                 }
 
                                 // Lets create a specific price for the service to match the price provided by the user
@@ -1516,7 +1512,7 @@ class AdminCartsControllerCore extends AdminController
                                 $objSpecificPrice->id_customer = $objCart->id_customer;
                                 $objSpecificPrice->id_product = $objServiceProduct->id;
                                 $objSpecificPrice->id_product_attribute = 0;
-                                $objSpecificPrice->price = $specificPriceAmount;
+                                $objSpecificPrice->price = $price;
                                 $objSpecificPrice->from_quantity = 1;
                                 $objSpecificPrice->reduction = 0;
                                 $objSpecificPrice->reduction_type = 'amount';

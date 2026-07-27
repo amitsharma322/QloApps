@@ -8066,6 +8066,7 @@ class AdminOrdersControllerCore extends AdminController
                     )) {
                         $name = trim(Tools::getValue('new_service_name'));
                         $price = Tools::getValue('new_service_price');
+                        $priceType = Tools::getValue('new_service_price_type');
                         $priceCalcMethod = Tools::getValue('new_service_price_calc_method');
                         $priceAdditionType = Tools::getValue('new_service_price_addition_type');
                         $productQty = Tools::getValue('new_service_qty');
@@ -8103,6 +8104,11 @@ class AdminOrdersControllerCore extends AdminController
                         if (!isset($price)) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Service price is required');
+                        } elseif ($priceType == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE) {
+                            if (!is_numeric($price) || $price < 0 || $price > 100) {
+                                $response['hasError'] = true;
+                                $response['errors'][] = Tools::displayError('Percentage must be between 0 and 100');
+                            }
                         } elseif (!Validate::isPrice($price)) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Invalid service price');
@@ -8120,6 +8126,7 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProduct->allow_multiple_quantity = !$autoAdded;
                             $objServiceProduct->id_tax_rules_group = $idTaxRuleGroup;
                             $objServiceProduct->price = $price;
+                            $objServiceProduct->price_type = $priceType;
                             $objServiceProduct->wholesale_price = 0;
                             $languages = Language::getLanguages(false);
                             foreach ($languages as $lang) {
@@ -8179,6 +8186,7 @@ class AdminOrdersControllerCore extends AdminController
                                             if (Product::getProductPriceCalculation($objServiceProduct->id) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
                                                 $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
                                             }
+                                            ddd($productList);
                                             foreach ($productList as &$product) {
                                                 // This is used to get the actual quanity of the service as it is calculated incorrectly if the service is per night
                                                 if ($idRoomTypeServProductCart = $objServiceProductCartDetail->alreadyExists(
@@ -8186,6 +8194,20 @@ class AdminOrdersControllerCore extends AdminController
                                                     $product['id_product'],
                                                     $roomHtlCartInfo['id'])
                                                 ) {
+                                                    if ($priceType == RoomTypeServiceProductPrice::PRICE_TYPE_PERCENTAGE) {
+                                                        $roomTypePrice = RoomTypeServiceProductPrice::getRoomTypePriceExclTax(
+                                                            $objHotelBookingDetail->id_product,
+                                                            $objHotelBookingDetail->date_from,
+                                                            $objHotelBookingDetail->date_to,
+                                                            0,
+                                                            $objCart->id,
+                                                            1
+                                                        );
+                                                        if ($priceCalcMethod == Product::PRICE_CALCULATION_METHOD_PER_BOOKING) {
+                                                            $roomTypePrice *= HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
+                                                        }
+                                                        $price = $roomTypePrice * ((float)$price / 100);
+                                                    }
                                                     // Lets create a specific price for the service to match the price provided by the user
                                                     $objSpecificPrice = new SpecificPrice();
                                                     $objSpecificPrice->id_shop = 0;
