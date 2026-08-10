@@ -1,7 +1,7 @@
 {
-    "name": "psr/cache",
-    "description": "Common interface for caching libraries",
-    "keywords": ["psr", "psr-6", "cache"],
+    "name": "psr/simple-cache",
+    "description": "Common interfaces for simple caching",
+    "keywords": ["psr", "psr-16", "cache", "simple-cache", "caching"],
     "license": "MIT",
     "authors": [
         {
@@ -14,12 +14,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Psr\\Cache\\": "src/"
+            "Psr\\SimpleCache\\": "src/"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "3.0.x-dev"
         }
     }
 }

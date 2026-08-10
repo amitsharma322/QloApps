@@ -4,13 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInita08d71f03337ee7858b0d26c24ffd06c
+class ComposerStaticInitda04a58985381691b6d3de9dc943eed7
 {
     public static $prefixLengthsPsr4 = array (
         'P' => 
         array (
             'Psr\\SimpleCache\\' => 16,
-            'Psr\\Cache\\' => 10,
         ),
         'D' => 
         array (
@@ -23,10 +22,6 @@ class ComposerStaticInita08d71f03337ee7858b0d26c24ffd06c
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
-        'Psr\\Cache\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/cache/src',
-        ),
         'Detection\\' => 
         array (
             0 => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src',
@@ -35,14 +30,24 @@ class ComposerStaticInita08d71f03337ee7858b0d26c24ffd06c
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'Detection\\Cache\\Cache' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src/Cache/Cache.php',
+        'Detection\\Cache\\CacheException' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src/Cache/CacheException.php',
+        'Detection\\Cache\\CacheInvalidArgumentException' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src/Cache/CacheInvalidArgumentException.php',
+        'Detection\\Exception\\MobileDetectException' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src/Exception/MobileDetectException.php',
+        'Detection\\Exception\\MobileDetectExceptionCode' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src/Exception/MobileDetectExceptionCode.php',
+        'Detection\\MobileDetect' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src/MobileDetect.php',
+        'Detection\\MobileDetectStandalone' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src/MobileDetectStandalone.php',
+        'Psr\\SimpleCache\\CacheException' => __DIR__ . '/..' . '/psr/simple-cache/src/CacheException.php',
+        'Psr\\SimpleCache\\CacheInterface' => __DIR__ . '/..' . '/psr/simple-cache/src/CacheInterface.php',
+        'Psr\\SimpleCache\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/simple-cache/src/InvalidArgumentException.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInita08d71f03337ee7858b0d26c24ffd06c::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInita08d71f03337ee7858b0d26c24ffd06c::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInita08d71f03337ee7858b0d26c24ffd06c::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitda04a58985381691b6d3de9dc943eed7::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitda04a58985381691b6d3de9dc943eed7::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitda04a58985381691b6d3de9dc943eed7::$classMap;
 
         }, null, ClassLoader::class);
     }
