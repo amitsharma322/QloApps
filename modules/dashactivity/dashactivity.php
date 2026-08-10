@@ -70,7 +70,7 @@ class Dashactivity extends Module
 
     public function hookActionAdminControllerSetMedia()
     {
-        if (get_class($this->context->controller) == 'AdminDashboardController') {
+        if ($this->context->controller::class == 'AdminDashboardController') {
             if (method_exists($this->context->controller, 'addJquery')) {
                 $this->context->controller->addJquery();
             }
@@ -113,21 +113,21 @@ class Dashactivity extends Module
 
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
             $days = (strtotime($params['date_to']) - strtotime($params['date_from'])) / 3600 / 24;
-            $online_visitor = rand(10, 50);
-            $visits = rand(200, 2000) * $days;
+            $online_visitor = random_int(10, 50);
+            $visits = random_int(200, 2000) * $days;
 
             return array(
                 'data_value' => array(
-                    'pending_orders' => round(rand(0, 5)),
-                    'return_exchanges' => round(rand(0, 5)),
-                    'abandoned_cart' => round(rand(5, 50)),
-                    'products_out_of_stock' => round(rand(1, 10)),
-                    'new_messages' => round(rand(1, 10) * $days),
-                    'new_customers' => round(rand(1, 5) * $days),
+                    'pending_orders' => round(random_int(0, 5)),
+                    'return_exchanges' => round(random_int(0, 5)),
+                    'abandoned_cart' => round(random_int(5, 50)),
+                    'products_out_of_stock' => round(random_int(1, 10)),
+                    'new_messages' => round(random_int(1, 10) * $days),
+                    'new_customers' => round(random_int(1, 5) * $days),
                     'online_visitor' => round($online_visitor),
                     'active_shopping_cart' => round($online_visitor / 10),
-                    'new_registrations' => round(rand(1, 5) * $days),
-                    'total_suscribers' => round(rand(200, 2000)),
+                    'new_registrations' => round(random_int(1, 5) * $days),
+                    'total_suscribers' => round(random_int(200, 2000)),
                     'visits' => round($visits),
                     'unique_visitors' => round($visits * 0.6),
                 ),

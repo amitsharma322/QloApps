@@ -97,7 +97,7 @@ class QctmCronExpressionTranslator
             );
         }
 
-        if (strpos($weekday, ',') !== false && $hasFixedTime && $dayMonthWildcard) {
+        if (str_contains($weekday, ',') && $hasFixedTime && $dayMonthWildcard) {
             return vsprintf(
                 $this->module->l('Every %1$s at %2$s'),
                 array($this->joinNames($weekday, 'weekdayName'), $this->hourLabel($hour, $minute))
@@ -118,7 +118,7 @@ class QctmCronExpressionTranslator
             );
         }
 
-        if (strpos($day, ',') !== false && $hasFixedTime && $monthWeekdayWildcard) {
+        if (str_contains($day, ',') && $hasFixedTime && $monthWeekdayWildcard) {
             return vsprintf(
                 $this->module->l('On the %1$s of each month at %2$s'),
                 array($this->joinOrdinals($day), $this->hourLabel($hour, $minute))
@@ -199,7 +199,7 @@ class QctmCronExpressionTranslator
                     $this->module->l('from the %1$s to the %2$s of the month'),
                     array($this->ordinal($dm[1]), $this->ordinal($dm[2]))
                 );
-            } elseif (strpos($day, ',') !== false) {
+            } elseif (str_contains($day, ',')) {
                 $conditions[] = vsprintf($this->module->l('on the %s of the month'), array($this->joinOrdinals($day)));
             } elseif ($this->isNumeric($day)) {
                 $conditions[] = vsprintf($this->module->l('on the %s of the month'), array($this->ordinal($day)));
@@ -219,7 +219,7 @@ class QctmCronExpressionTranslator
                         $this->module->l('%1$s through %2$s'),
                         array($this->monthName($mm[1]), $this->monthName($mm[2]))
                     );
-                } elseif (strpos($month, ',') !== false) {
+                } elseif (str_contains($month, ',')) {
                     $monthDesc = $this->joinNames($month, 'monthName');
                 } else {
                     $monthDesc = $this->monthName($month);
@@ -238,7 +238,7 @@ class QctmCronExpressionTranslator
                     $this->module->l('%1$s through %2$s'),
                     array($this->weekdayName($wm[1]), $this->weekdayName($wm[2]))
                 );
-            } elseif (strpos($weekday, ',') !== false) {
+            } elseif (str_contains($weekday, ',')) {
                 $weekdayDesc = $this->joinNames($weekday, 'weekdayName');
             } else {
                 $weekdayDesc = $this->weekdayName($weekday);

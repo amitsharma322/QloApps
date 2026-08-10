@@ -57,9 +57,9 @@ if ($backupfile === false or strncmp($backupdir, $backupfile, strlen($backupdir)
     die(Tools::dieOrLog('The backup file does not exist.'));
 }
 
-if (substr($backupfile, -4) == '.bz2') {
+if (str_ends_with($backupfile, '.bz2')) {
     $contentType = 'application/x-bzip2';
-} elseif (substr($backupfile, -3) == '.gz') {
+} elseif (str_ends_with($backupfile, '.gz')) {
     $contentType = 'application/x-gzip';
 } else {
     $contentType = 'text/x-sql';

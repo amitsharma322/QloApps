@@ -100,7 +100,7 @@ class PhpEncryptionCore
 
         try {
             $randomKey = $engine::createNewRandomKey();
-        } catch (EnvironmentIsBrokenException $exception) {
+        } catch (EnvironmentIsBrokenException) {
             $buf = $engine::randomCompat();
             $randomKey = $engine::saveToAsciiSafeString($buf);
         }

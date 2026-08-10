@@ -89,7 +89,7 @@ class SEKeywords extends ModuleGraph
 
     public function hookTop($params)
     {
-        if (!isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], Tools::getHttpHost(false, false)) == 0) {
+        if (!isset($_SERVER['HTTP_REFERER']) || str_starts_with($_SERVER['HTTP_REFERER'], Tools::getHttpHost(false, false))) {
             return;
         }
 
@@ -201,7 +201,7 @@ class SEKeywords extends ModuleGraph
         foreach ($result as $row) {
             $host =& $row['server'];
             $varname =& $row['getvar'];
-            if (strstr($parsed_url['host'], $host)) {
+            if (strstr($parsed_url['host'], (string) $host)) {
                 $k_array = array();
                 preg_match('/[^a-zA-Z&]?'.$varname.'=.*\&'.'/U', $parsed_url['query'], $k_array);
 

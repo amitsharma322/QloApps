@@ -41,7 +41,7 @@ class AdminPaymentControllerCore extends AdminController
         foreach ($modules as $module) {
             if ($module->tab == 'payments_gateways') {
                 if ($module->id) {
-                    if (!get_class($module) == 'SimpleXMLElement') {
+                    if (!$module::class == 'SimpleXMLElement') {
                         $module->country = array();
                     }
                     $countries = DB::getInstance()->executeS('
@@ -53,7 +53,7 @@ class AdminPaymentControllerCore extends AdminController
                         $module->country[] = $country['id_country'];
                     }
 
-                    if (!get_class($module) == 'SimpleXMLElement') {
+                    if (!$module::class == 'SimpleXMLElement') {
                         $module->currency = array();
                     }
                     $currencies = DB::getInstance()->executeS('
@@ -65,7 +65,7 @@ class AdminPaymentControllerCore extends AdminController
                         $module->currency[] = $currency['id_currency'];
                     }
 
-                    if (!get_class($module) == 'SimpleXMLElement') {
+                    if (!$module::class == 'SimpleXMLElement') {
                         $module->group = array();
                     }
                     $groups = DB::getInstance()->executeS('

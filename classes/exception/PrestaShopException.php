@@ -49,7 +49,7 @@ class PrestaShopExceptionCore extends Exception
 				#psException pre .selected{color: #F20000; font-weight: bold;}
 			</style>';
             echo '<div id="psException">';
-            echo '<h2>['.get_class($this).']</h2>';
+            echo '<h2>['.static::class.']</h2>';
             echo $this->getExtendedMessage();
 
             $this->displayFileDebug($this->getFile(), $this->getLine());
@@ -162,7 +162,7 @@ class PrestaShopExceptionCore extends Exception
                     $hiddenArgs[] = $args[$argIndex];
                 }
             }
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             //In worst case scenario there are some critical args we could't detect so we return an empty array
         }
 

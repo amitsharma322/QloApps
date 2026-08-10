@@ -271,17 +271,17 @@ class SupplyOrderDetailCore extends ObjectModel
         /* required fields */
         $fields_required = $this->fieldsRequired;
 
-        if (isset(self::$fieldsRequiredDatabase[get_class($this)])) {
+        if (isset(self::$fieldsRequiredDatabase[static::class])) {
             $fields_required = array_merge(
                 $this->fieldsRequired,
-                self::$fieldsRequiredDatabase[get_class($this)]
+                self::$fieldsRequiredDatabase[static::class]
             );
         }
 
         foreach ($fields_required as $field) {
             if (($value = $this->{$field}) == false && (string)$value != '0') {
                 if (!$this->id || $field != 'passwd') {
-                    $errors[] = '<b>'.SupplyOrderDetail::displayFieldName($field, get_class($this), $htmlentities)
+                    $errors[] = '<b>'.SupplyOrderDetail::displayFieldName($field, static::class, $htmlentities)
                                 .'</b> '.Tools::displayError('is required.');
                 }
             }
@@ -292,7 +292,7 @@ class SupplyOrderDetailCore extends ObjectModel
             if ($value = $this->{$field} && Tools::strlen($value) > $max_length) {
                 $errors[] = sprintf(
                     Tools::displayError('%1$s is too long. Maximum length: %2$d'),
-                    SupplyOrderDetail::displayFieldName($field, get_class($this), $htmlentities),
+                    SupplyOrderDetail::displayFieldName($field, static::class, $htmlentities),
                     $max_length
                 );
             }
@@ -302,7 +302,7 @@ class SupplyOrderDetailCore extends ObjectModel
         foreach ($this->fieldsValidate as $field => $function) {
             if ($value = $this->{$field}) {
                 if (!Validate::$function($value) && (!empty($value) || in_array($field, $this->fieldsRequired))) {
-                    $errors[] = '<b>'.SupplyOrderDetail::displayFieldName($field, get_class($this), $htmlentities).'</b> '.Tools::displayError('is invalid.');
+                    $errors[] = '<b>'.SupplyOrderDetail::displayFieldName($field, static::class, $htmlentities).'</b> '.Tools::displayError('is invalid.');
                 } elseif ($field == 'passwd') {
                     if ($value = Tools::getValue($field)) {
                         $this->{$field} = Tools::encrypt($value);
@@ -314,15 +314,15 @@ class SupplyOrderDetailCore extends ObjectModel
         }
 
         if ($this->quantity_expected <= 0) {
-            $errors[] = '<b>'.SupplyOrderDetail::displayFieldName('quantity_expected', get_class($this)).'</b> '.Tools::displayError('is invalid.');
+            $errors[] = '<b>'.SupplyOrderDetail::displayFieldName('quantity_expected', static::class).'</b> '.Tools::displayError('is invalid.');
         }
 
         if ($this->tax_rate < 0 || $this->tax_rate > 100) {
-            $errors[] = '<b>'.SupplyOrderDetail::displayFieldName('tax_rate', get_class($this)).'</b> '.Tools::displayError('is invalid.');
+            $errors[] = '<b>'.SupplyOrderDetail::displayFieldName('tax_rate', static::class).'</b> '.Tools::displayError('is invalid.');
         }
 
         if ($this->discount_rate < 0 || $this->discount_rate > 100) {
-            $errors[] = '<b>'.SupplyOrderDetail::displayFieldName('discount_rate', get_class($this)).'</b> '.Tools::displayError('is invalid.');
+            $errors[] = '<b>'.SupplyOrderDetail::displayFieldName('discount_rate', static::class).'</b> '.Tools::displayError('is invalid.');
         }
 
         return $errors;

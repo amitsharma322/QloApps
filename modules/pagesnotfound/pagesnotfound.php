@@ -192,7 +192,7 @@ class PagesNotFound extends Module
             return;
         }
 
-        if (get_class(Context::getContext()->controller) == 'PageNotFoundController') {
+        if (Context::getContext()->controller::class == 'PageNotFoundController') {
             $http_referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
             if (empty($http_referer) || Validate::isAbsoluteUrl($http_referer)) {
                 Db::getInstance()->execute(
@@ -221,9 +221,5 @@ class PagesNotFound extends Module
 
 function pnfSort($a, $b)
 {
-    if ($a['nb'] == $b['nb']) {
-        return 0;
-    }
-
-    return ($a['nb'] > $b['nb']) ? -1 : 1;
+    return $b['nb'] <=> $a['nb'];
 }

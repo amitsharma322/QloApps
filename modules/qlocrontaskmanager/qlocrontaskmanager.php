@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once dirname(__FILE__).'/classes/QctmRequiredClasses.php';
+require_once __DIR__.'/classes/QctmRequiredClasses.php';
 
 class QloCronTaskManager extends Module
 {
@@ -206,7 +206,7 @@ class QloCronTaskManager extends Module
 
         $output = @shell_exec('crontab -l 2>/dev/null');
 
-        return strpos((string) $output, 'qlocrontaskmanager/cron.php') !== false;
+        return str_contains((string) $output, 'qlocrontaskmanager/cron.php');
     }
 
     public function hookActionModuleUninstallBefore($params)

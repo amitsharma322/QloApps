@@ -307,12 +307,12 @@ class HelperCore
     protected function l($string, $class = 'AdminTab', $addslashes = false, $htmlentities = true)
     {
         // if the class is extended by a module, use modules/[module_name]/xx.php lang file
-        $current_class = get_class($this);
+        $current_class = static::class;
         if (Module::getModuleNameFromClass($current_class)) {
             return Translate::getModuleTranslation(Module::$classInModule[$current_class], $string, $current_class);
         }
 
-        return Translate::getAdminTranslation($string, get_class($this), $addslashes, $htmlentities);
+        return Translate::getAdminTranslation($string, static::class, $addslashes, $htmlentities);
     }
 
     /**

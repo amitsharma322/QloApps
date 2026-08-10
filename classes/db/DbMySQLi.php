@@ -91,7 +91,7 @@ class DbMySQLiCore extends Db
      */
     public static function createDatabase($host, $user = null, $password = null, $database = null, $dropit = false)
     {
-        if (strpos($host, ':') !== false) {
+        if (str_contains($host, ':')) {
             list($host, $port) = explode(':', $host);
             $link = @new mysqli($host, $user, $password, null, $port);
         } else {

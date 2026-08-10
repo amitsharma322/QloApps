@@ -9,7 +9,7 @@ if (preg_match('/\.{1,2}[\/|\\\]/', $_POST['path']) !== 0) {
     die('wrong path');
 }
 
-if (strpos($_POST['name'], '/') !== false || strpos($_POST['name'], '\\') !== false) {
+if (str_contains($_POST['name'], '/') || str_contains($_POST['name'], '\\')) {
     die('wrong path');
 }
 

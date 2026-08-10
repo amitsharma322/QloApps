@@ -29,7 +29,7 @@
  *
  * @since 1.5.0.1
  */
-class DbQueryCore
+class DbQueryCore implements \Stringable
 {
     /**
      * List of data to build the query
@@ -329,7 +329,7 @@ class DbQueryCore
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->build();
     }

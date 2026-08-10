@@ -259,7 +259,7 @@ class SupplierCore extends ObjectModel
 
         $nb_days_new_product = Validate::isUnsignedInt(Configuration::get('PS_NB_DAYS_NEW_PRODUCT')) ? Configuration::get('PS_NB_DAYS_NEW_PRODUCT') : 20;
 
-        if (strpos('.', $order_by) > 0) {
+        if (strpos('.', (string) $order_by) > 0) {
             $order_by = explode('.', $order_by);
             $order_by = pSQL($order_by[0]).'.`'.pSQL($order_by[1]).'`';
         }

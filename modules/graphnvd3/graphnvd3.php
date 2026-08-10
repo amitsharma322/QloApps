@@ -76,7 +76,7 @@ class GraphNvD3 extends ModuleGraphEngine
     {
         static $divid = 1;
 
-        if (strpos($params['width'], '%') !== false) {
+        if (str_contains($params['width'], '%')) {
             $params['width'] = (int)preg_replace('/\s*%\s*/', '', $params['width']).'%';
         } else {
             $params['width'] = (int)$params['width'].'px';

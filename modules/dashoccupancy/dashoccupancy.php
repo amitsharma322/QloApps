@@ -54,7 +54,7 @@ class DashOccupancy extends Module
 
     public function hookActionAdminControllerSetMedia()
     {
-        if (get_class($this->context->controller) == 'AdminDashboardController') {
+        if ($this->context->controller::class == 'AdminDashboardController') {
             $this->context->controller->addJs($this->_path.'views/js/'.$this->name.'.js');
             $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
@@ -69,11 +69,11 @@ class DashOccupancy extends Module
     {
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
             $occupancyData = array();
-            $occupancyData['count_total'] = sprintf('%02d', rand(0, 1000));
+            $occupancyData['count_total'] = sprintf('%02d', random_int(0, 1000));
             $tmp = $occupancyData['count_total'];
-            $occupancyData['count_occupied'] = sprintf('%02d', round(rand(0, $occupancyData['count_total'])));
+            $occupancyData['count_occupied'] = sprintf('%02d', round(random_int(0, $occupancyData['count_total'])));
             $tmp = $tmp - $occupancyData['count_occupied'];
-            $occupancyData['count_available'] = sprintf('%02d', round(rand(0, $tmp)));
+            $occupancyData['count_available'] = sprintf('%02d', round(random_int(0, $tmp)));
             $tmp = $tmp - $occupancyData['count_available'];
             $occupancyData['count_unavailable'] = sprintf('%02d', $tmp);
         } else {

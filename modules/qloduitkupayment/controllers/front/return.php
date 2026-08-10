@@ -135,7 +135,7 @@ class QloDuitkuPaymentReturnModuleFrontController extends ModuleFrontController
                     }
 
                     $this->module->logger->log('After Cart Validation in return.', FileLogger::DEBUG);
-                } catch (Exception $e) {
+                } catch (Exception) {
                     Tools::redirect($this->context->link->getModuleLink('qloduitkupayment', 'error') . '?validation_err=1&id=' . $response['merchantOrderId']);
                 }
             } else {

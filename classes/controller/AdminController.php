@@ -451,7 +451,7 @@ class AdminControllerCore extends Controller
         global $token;
 
         $this->controller_type = 'admin';
-        $this->controller_name = get_class($this);
+        $this->controller_name = static::class;
         if (strpos($this->controller_name, 'ControllerOverride')) {
             $this->controller_name = substr($this->controller_name, 0, -18);
         }
@@ -864,7 +864,7 @@ class AdminControllerCore extends Controller
      */
     protected function getCookieFilterPrefix()
     {
-        return str_replace(array('admin', 'controller'), '', Tools::strtolower(get_class($this)));
+        return str_replace(array('admin', 'controller'), '', Tools::strtolower(static::class));
     }
 
     public function processFilter()
@@ -1136,12 +1136,12 @@ class AdminControllerCore extends Controller
                 // no need to use displayConf() here
                 if (!empty($action) && method_exists($this, 'ajaxProcess'.Tools::toCamelCase($action))) {
                     Hook::exec('actionAdmin'.ucfirst($action).'Before', array('controller' => $this));
-                    Hook::exec('action'.get_class($this).ucfirst($action).'Before', array('controller' => $this));
+                    Hook::exec('action'.static::class.ucfirst($action).'Before', array('controller' => $this));
 
                     $return = $this->{'ajaxProcess'.Tools::toCamelCase($action)}();
 
                     Hook::exec('actionAdmin'.ucfirst($action).'After', array('controller' => $this, 'return' => $return));
-                    Hook::exec('action'.get_class($this).ucfirst($action).'After', array('controller' => $this, 'return' => $return));
+                    Hook::exec('action'.static::class.ucfirst($action).'After', array('controller' => $this, 'return' => $return));
 
                     return $return;
                 } elseif (!empty($action) && $this->controller_name == 'AdminModules' && Tools::getIsset('configure')) {
@@ -1165,12 +1165,12 @@ class AdminControllerCore extends Controller
                 if (!empty($this->action) && method_exists($this, 'process'.ucfirst(Tools::toCamelCase($this->action)))) {
                     // Hook before action
                     Hook::exec('actionAdmin'.ucfirst($this->action).'Before', array('controller' => $this));
-                    Hook::exec('action'.get_class($this).ucfirst($this->action).'Before', array('controller' => $this));
+                    Hook::exec('action'.static::class.ucfirst($this->action).'Before', array('controller' => $this));
                     // Call process
                     $return = $this->{'process'.Tools::toCamelCase($this->action)}();
                     // Hook After Action
                     Hook::exec('actionAdmin'.ucfirst($this->action).'After', array('controller' => $this, 'return' => $return));
-                    Hook::exec('action'.get_class($this).ucfirst($this->action).'After', array('controller' => $this, 'return' => $return));
+                    Hook::exec('action'.static::class.ucfirst($this->action).'After', array('controller' => $this, 'return' => $return));
                     return $return;
                 }
             }
@@ -1517,7 +1517,7 @@ class AdminControllerCore extends Controller
                 );
                 $matches = array();
                 if (preg_match('/[\?|&]controller=([^&]*)/', (string)$_SERVER['HTTP_REFERER'], $matches) !== false
-                    && strtolower($matches[1]) != strtolower(preg_replace('/controller/i', '', get_class($this)))) {
+                    && strtolower($matches[1]) != strtolower(preg_replace('/controller/i', '', static::class))) {
                     $this->redirect_after = preg_replace('/[\?|&]conf=([^&]*)/i', '', (string)$_SERVER['HTTP_REFERER']);
                 } else {
                     $this->redirect_after = self::$currentIndex.'&token='.$this->token;
@@ -1571,7 +1571,7 @@ class AdminControllerCore extends Controller
             $list_id = isset($this->list_id) ? $this->list_id : $this->table;
         }
 
-        $prefix = str_replace(array('admin', 'controller'), '', Tools::strtolower(get_class($this)));
+        $prefix = str_replace(array('admin', 'controller'), '', Tools::strtolower(static::class));
         $filters = $this->context->cookie->getFamily($prefix.$list_id.'Filter_');
         foreach ($filters as $cookie_key => $filter) {
             if (strncmp($cookie_key, $prefix.$list_id.'Filter_', 7 + Tools::strlen($prefix.$list_id)) == 0) {
@@ -1898,10 +1898,10 @@ class AdminControllerCore extends Controller
             // ${1} in the replacement string of the regexp is required,
             // because the token may begin with a number and mix up with it (e.g. $17)
             $url = preg_replace('/([&?]token=)[^&]*(&.*)?$/', '${1}'.$this->token.'$2', $_SERVER['REQUEST_URI']);
-            if (false === strpos($url, '?token=') && false === strpos($url, '&token=')) {
+            if (!str_contains($url, '?token=') && !str_contains($url, '&token=')) {
                 $url .= '&token='.$this->token;
             }
-            if (strpos($url, '?') === false) {
+            if (!str_contains($url, '?')) {
                 $url = str_replace('&token', '?controller=AdminDashboard&token', $url);
             }
 
@@ -2135,7 +2135,7 @@ class AdminControllerCore extends Controller
                 $img = str_replace('png', 'gif', $img);
             }
             // tab[class_name] does not contains the "Controller" suffix
-            $tabs[$index]['current'] = ($tab['class_name'].'Controller' == get_class($this)) || ($current_id == $tab['id_tab']);
+            $tabs[$index]['current'] = ($tab['class_name'].'Controller' == static::class) || ($current_id == $tab['id_tab']);
             $tabs[$index]['img'] = $img;
             $tabs[$index]['href'] = $this->context->link->getAdminLink($tab['class_name']);
 
@@ -2153,8 +2153,8 @@ class AdminControllerCore extends Controller
                 // class_name is the name of the class controller
                 if (Tab::checkTabRights($sub_tab['id_tab']) === true && (bool)$sub_tab['active'] && $sub_tab['class_name'] != 'AdminCarrierWizard') {
                     $sub_tabs[$index2]['href'] = $this->context->link->getAdminLink($sub_tab['class_name']);
-                    $sub_tabs[$index2]['current'] = ($sub_tab['class_name'].'Controller' == get_class($this) || $sub_tab['class_name'] == Tools::getValue('controller'));
-                } elseif ($sub_tab['class_name'] == 'AdminCarrierWizard' && $sub_tab['class_name'].'Controller' == get_class($this)) {
+                    $sub_tabs[$index2]['current'] = ($sub_tab['class_name'].'Controller' == static::class || $sub_tab['class_name'] == Tools::getValue('controller'));
+                } elseif ($sub_tab['class_name'] == 'AdminCarrierWizard' && $sub_tab['class_name'].'Controller' == static::class) {
                     foreach ($sub_tabs as $i => $tab) {
                         if ($tab['class_name'] == 'AdminCarriers') {
                             break;
@@ -2939,7 +2939,7 @@ class AdminControllerCore extends Controller
     protected function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($class === null || $class == 'AdminTab') {
-            $class = substr(get_class($this), 0, -10);
+            $class = substr(static::class, 0, -10);
         } elseif (strtolower(substr($class, -10)) == 'controller') {
             /* classname has changed, from AdminXXX to AdminXXXController, so we remove 10 characters and we keep same keys */
             $class = substr($class, 0, -10);
@@ -3338,7 +3338,7 @@ class AdminControllerCore extends Controller
         if (!Validate::isTableOrIdentifier($this->table)) {
             throw new PrestaShopException(sprintf('Table name %s is invalid:', $this->table));
         }
-        $prefix = str_replace(array('admin', 'controller'), '', Tools::strtolower(get_class($this)));
+        $prefix = str_replace(array('admin', 'controller'), '', Tools::strtolower(static::class));
         if (empty($order_by)) {
             if ($this->context->cookie->{$prefix.$this->list_id.'Orderby'}) {
                 $order_by = $this->context->cookie->{$prefix.$this->list_id.'Orderby'};
@@ -3856,7 +3856,7 @@ class AdminControllerCore extends Controller
         }
 
         /* Multilingual fields */
-        $class_vars = get_class_vars(get_class($object));
+        $class_vars = get_class_vars($object::class);
         $fields = array();
         if (isset($class_vars['definition']['fields'])) {
             $fields = $class_vars['definition']['fields'];

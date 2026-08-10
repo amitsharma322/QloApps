@@ -1362,7 +1362,7 @@ class OrderCore extends ObjectModel
             Order::setInvoiceDetails($order_invoice);
 
             if (Configuration::get('PS_INVOICE')) {
-                $this->setLastInvoiceNumber($order_invoice->id, $this->id_shop);
+                static::setLastInvoiceNumber($order_invoice->id, $this->id_shop);
             }
 
             // Update order_carrier
@@ -1422,8 +1422,8 @@ class OrderCore extends ObjectModel
             if (Configuration::get('PS_INVOICE')) {
                 $this->invoice_number = $this->getInvoiceNumber($order_invoice->id);
                 $invoice_number = Hook::exec('actionSetInvoice', array(
-                    get_class($this) => $this,
-                    get_class($order_invoice) => $order_invoice,
+                    static::class => $this,
+                    $order_invoice::class => $order_invoice,
                     'use_existing_payment' => (bool)$use_existing_payment
                 ));
 
@@ -2411,10 +2411,7 @@ class OrderCore extends ObjectModel
 
     public static function sortDocuments($a, $b)
     {
-        if ($a->date_add == $b->date_add) {
-            return 0;
-        }
-        return ($a->date_add < $b->date_add) ? -1 : 1;
+        return $a->date_add <=> $b->date_add;
     }
 
     public function getWsShippingNumber()

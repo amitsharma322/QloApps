@@ -956,7 +956,7 @@ class LanguageCore extends ObjectModel
                 $other_files = array();
 
                 foreach ($files_list as $key => $data) {
-                    if (substr($data['filename'], 0, 5) == 'mails') {
+                    if (str_starts_with($data['filename'], 'mails')) {
                         $mails_files[] = $data;
                     } else {
                         $other_files[] = $data;
@@ -1049,7 +1049,7 @@ class LanguageCore extends ObjectModel
                 $gz = new Archive_Tar($filegz, true);
                 $files_list = Language::getLanguagePackListContent($lang['iso_code'], $gz);
                 foreach ($files_list as $i => $file) {
-                    if (strpos($file['filename'], 'modules/'.$module_name.'/') !== 0) {
+                    if (!str_starts_with($file['filename'], 'modules/'.$module_name.'/')) {
                         unset($files_list[$i]);
                     }
                 }

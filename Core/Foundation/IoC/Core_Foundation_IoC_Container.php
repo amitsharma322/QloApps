@@ -91,7 +91,7 @@ class Core_Foundation_IoC_Container
 
         try {
             $refl = new ReflectionClass($className);
-        } catch (ReflectionException $re) {
+        } catch (ReflectionException) {
             throw new Core_Foundation_IoC_Exception(sprintf('This doesn\'t seem to be a class name: `%s`.', $className));
         }
 

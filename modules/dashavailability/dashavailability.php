@@ -54,7 +54,7 @@ class DashAvailability extends Module
 
     public function hookActionAdminControllerSetMedia()
     {
-        if (get_class($this->context->controller) == 'AdminDashboardController') {
+        if ($this->context->controller::class == 'AdminDashboardController') {
             Media::addJsDef(array(
                 'avail_rooms_txt' => $this->l('Available Rooms'),
             ));
@@ -95,7 +95,7 @@ class DashAvailability extends Module
             $to = strtotime($dateFrom.'+'.$days.' days 23:59:59');
             $data = array();
             for ($date = $from; $date <= $to; $date = strtotime('+1 days', $date)) {
-                $availability_data['values'][] = array($date, round(rand(0, 20)));
+                $availability_data['values'][] = array($date, round(random_int(0, 20)));
             }
         } else {
             $availability_data = AdminStatsController::getAvailabilityLineChartData($days, $dateFrom, $params['id_hotel']);

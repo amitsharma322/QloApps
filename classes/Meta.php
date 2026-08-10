@@ -94,7 +94,7 @@ class MetaCore extends ObjectModel
                 continue;
             }
 
-            $module = Tools::strtolower(basename(dirname(dirname(dirname($file)))));
+            $module = Tools::strtolower(basename(dirname($file, 3)));
             $selected_pages[$module.' - '.$filename] = 'module-'.$module.'-'.$filename;
         }
 

@@ -133,16 +133,16 @@ class DashGuestCycle extends Module
         $dateToday = date('Y-m-d');
 
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
-            $totalArrivals     = rand(100, 1000);
-            $arrived           = rand(0, $totalArrivals);
-            $totalDepartures   = rand(100, 1000);
-            $departed          = rand(0, $totalDepartures);
-            $newBookings       = rand(10, 500);
-            $occupied          = rand(10, 500);
-            $newMessages       = rand(0, 20);
-            $cancelledBookings = rand(0, 20);
-            $totalAdults       = rand(100, 1000);
-            $children          = rand(0, $totalAdults);
+            $totalArrivals     = random_int(100, 1000);
+            $arrived           = random_int(0, $totalArrivals);
+            $totalDepartures   = random_int(100, 1000);
+            $departed          = random_int(0, $totalDepartures);
+            $newBookings       = random_int(10, 500);
+            $occupied          = random_int(10, 500);
+            $newMessages       = random_int(0, 20);
+            $cancelledBookings = random_int(0, 20);
+            $totalAdults       = random_int(100, 1000);
+            $children          = random_int(0, $totalAdults);
         } else {
             $arrivalsData   = AdminStatsController::getArrivalsByDate($dateToday, $idHotel);
             $departuresData = AdminStatsController::getDeparturesByDate($dateToday, $idHotel);

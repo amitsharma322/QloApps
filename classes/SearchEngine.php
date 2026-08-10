@@ -51,7 +51,7 @@ class SearchEngineCore extends ObjectModel
         foreach ($result as $row) {
             $host =& $row['server'];
             $varname =& $row['getvar'];
-            if (strstr($parsed_url['host'], $host)) {
+            if (strstr($parsed_url['host'], (string) $host)) {
                 $array = array();
                 preg_match('/[^a-z]'.$varname.'=.+\&/U', $parsed_url['query'], $array);
                 if (empty($array[0])) {

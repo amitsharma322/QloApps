@@ -411,7 +411,7 @@ class AdminModulesControllerCore extends AdminController
         $tmp_folder = _PS_MODULE_DIR_.md5(time());
 
         $success = false;
-        if (substr($file, -4) == '.zip') {
+        if (str_ends_with($file, '.zip')) {
             if (Tools::ZipExtract($file, $tmp_folder)) {
                 $zip_folders = scandir($tmp_folder);
                 if (Tools::ZipExtract($file, _PS_MODULE_DIR_)) {
@@ -457,7 +457,7 @@ class AdminModulesControllerCore extends AdminController
 
     protected function recursiveDeleteOnDisk($dir)
     {
-        if (strpos(realpath($dir), realpath(_PS_MODULE_DIR_)) === false) {
+        if (!str_contains(realpath($dir), realpath(_PS_MODULE_DIR_))) {
             return;
         }
         if (is_dir($dir)) {
@@ -608,8 +608,8 @@ class AdminModulesControllerCore extends AdminController
                 }
             } elseif (!isset($_FILES['file']['tmp_name']) || empty($_FILES['file']['tmp_name'])) {
                 $this->errors[] = $this->l('No file has been selected');
-            } elseif (substr($_FILES['file']['name'], -4) != '.tar' && substr($_FILES['file']['name'], -4) != '.zip'
-                && substr($_FILES['file']['name'], -4) != '.tgz' && substr($_FILES['file']['name'], -7) != '.tar.gz') {
+            } elseif (!str_ends_with($_FILES['file']['name'], '.tar') && !str_ends_with($_FILES['file']['name'], '.zip')
+                && !str_ends_with($_FILES['file']['name'], '.tgz') && !str_ends_with($_FILES['file']['name'], '.tar.gz')) {
                 $this->errors[] = Tools::displayError('Unknown archive type.');
             } elseif (!move_uploaded_file($_FILES['file']['tmp_name'], _PS_MODULE_DIR_.$_FILES['file']['name'])) {
                 $this->errors[] = Tools::displayError('An error occurred while copying the archive to the module directory.');
@@ -931,7 +931,7 @@ class AdminModulesControllerCore extends AdminController
                             $echo = $module->{$method}();
 
                             // After a successful install of a single module that has a configuration method, to the configuration page
-                            if ($key == 'install' && $echo === true && strpos(Tools::getValue('install'), '|') === false && method_exists($module, 'getContent')) {
+                            if ($key == 'install' && $echo === true && !str_contains(Tools::getValue('install'), '|') && method_exists($module, 'getContent')) {
                                 Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&configure='.$module->name.'&conf=12');
                             }
                         }
@@ -1266,7 +1266,7 @@ class AdminModulesControllerCore extends AdminController
         // Filter on module name
         $filter_name = Tools::getValue('filtername');
         if (!empty($filter_name)) {
-            if (stristr($module->name, $filter_name) === false && stristr($module->displayName, $filter_name) === false && stristr($module->description, $filter_name) === false) {
+            if (stristr($module->name, (string) $filter_name) === false && stristr($module->displayName, (string) $filter_name) === false && stristr($module->description, (string) $filter_name) === false) {
                 return true;
             }
             return false;
@@ -1322,7 +1322,7 @@ class AdminModulesControllerCore extends AdminController
             return true;
         } elseif ($show_type_modules == 'otherModules' && (in_array($module->name, $this->list_partners_modules) || in_array($module->name, $this->list_natives_modules))) {
             return true;
-        } elseif (strpos($show_type_modules, 'authorModules[') !== false) {
+        } elseif (str_contains($show_type_modules, 'authorModules[')) {
             // setting selected author in authors set
             $author_selected = substr(str_replace(array('authorModules[', "\'"), array('', "'"), $show_type_modules), 0, -1);
             $this->modules_authors[$author_selected] = 'selected';

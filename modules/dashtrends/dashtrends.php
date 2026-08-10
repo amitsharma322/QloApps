@@ -65,7 +65,7 @@ class Dashtrends extends Module
 
     public function hookActionAdminControllerSetMedia()
     {
-        if (get_class($this->context->controller) == 'AdminDashboardController') {
+        if ($this->context->controller::class == 'AdminDashboardController') {
             Media::addJsDef(array(
                 'date_txt' => $this->l('Date'),
             ));
@@ -101,14 +101,14 @@ class Dashtrends extends Module
             $from = strtotime($date_from.' 00:00:00');
             $to = min(time(), strtotime($date_to.' 23:59:59'));
             for ($date = $from; $date <= $to; $date = strtotime('+1 day', $date)) {
-                $tmp_data['visits'][$date] = round(rand(100, 600));
-                $tmp_data['conversion_rate'][$date] = rand(80, 250) / 100;
-                $tmp_data['average_cart_value'][$date] = round(rand(60, 10000), 2);
+                $tmp_data['visits'][$date] = round(random_int(100, 600));
+                $tmp_data['conversion_rate'][$date] = random_int(80, 250) / 100;
+                $tmp_data['average_cart_value'][$date] = round(random_int(60, 10000), 2);
                 $tmp_data['orders'][$date] = round($tmp_data['visits'][$date] * $tmp_data['conversion_rate'][$date] / 100);
                 $tmp_data['total_paid_tax_excl'][$date] = $tmp_data['orders'][$date] * $tmp_data['average_cart_value'][$date];
-                $tmp_data['total_purchases'][$date] = $tmp_data['total_paid_tax_excl'][$date] * rand(50, 70) / 100;
-                $tmp_data['total_expenses'][$date] = $tmp_data['total_paid_tax_excl'][$date] * rand(0, 10) / 100;
-                $tmp_data['total_refunds'][$date] = $tmp_data['total_paid_tax_excl'][$date] * rand(0, 5) / 100;
+                $tmp_data['total_purchases'][$date] = $tmp_data['total_paid_tax_excl'][$date] * random_int(50, 70) / 100;
+                $tmp_data['total_expenses'][$date] = $tmp_data['total_paid_tax_excl'][$date] * random_int(0, 10) / 100;
+                $tmp_data['total_refunds'][$date] = $tmp_data['total_paid_tax_excl'][$date] * random_int(0, 5) / 100;
             }
         } else {
             $tmp_data['visits'] = AdminStatsController::getVisits(false, $date_from, $date_to, 'day');
@@ -261,15 +261,13 @@ class Dashtrends extends Module
         $translated_array = array();
         foreach ($compare as $key => $date_array)
         {
-            $normal_min = key($normal[$key]);
-            end($normal[$key]); // move the internal pointer to the end of the array
-            $normal_max = key($normal[$key]);
+            $normal_min = key($normal[$key]); // move the internal pointer to the end of the array
+            $normal_max = array_key_last($normal[$key]);
             reset($normal[$key]);
             $normal_size = $normal_max - $normal_min;
 
-            $compare_min = key($compare[$key]);
-            end($compare[$key]); // move the internal pointer to the end of the array
-            $compare_max = key($compare[$key]);
+            $compare_min = key($compare[$key]); // move the internal pointer to the end of the array
+            $compare_max = array_key_last($compare[$key]);
             reset($compare[$key]);
             $compare_size = $compare_max - $compare_min;
 

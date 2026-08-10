@@ -297,9 +297,9 @@ class AdminSearchControllerCore extends AdminController
             $this->_list['modules'] = array();
             $all_modules = Module::getModulesOnDisk(true, true, Context::getContext()->employee->id);
             foreach ($all_modules as $module) {
-                if ((isset($module->name) && stripos($module->name, $this->query) !== false)
-                    || (isset($module->displayName) && stripos($module->displayName, $this->query) !== false)
-                    || (isset($module->description) && stripos($module->description, $this->query) !== false)
+                if ((isset($module->name) && stripos($module->name, (string) $this->query) !== false)
+                    || (isset($module->displayName) && stripos($module->displayName, (string) $this->query) !== false)
+                    || (isset($module->description) && stripos($module->description, (string) $this->query) !== false)
                 ) {
                     $module->linkto = 'index.php?tab=AdminModules&tab_module='.$module->tab.'&module_name='.$module->name.'&anchor='.ucfirst($module->name).'&token='.Tools::getAdminTokenLite('AdminModules');
                     $this->_list['modules'][] = $module;
@@ -361,7 +361,7 @@ class AdminSearchControllerCore extends AdminController
 
         $this->_list['features'] = array();
         foreach ($_LANGADM as $key => $value) {
-            if (stripos($value, $this->query) !== false) {
+            if (stripos($value, (string) $this->query) !== false) {
                 $value = stripslashes($value);
                 $key = strtolower(substr($key, 0, -32));
                 if (in_array($key, array('AdminTab', 'index'))) {

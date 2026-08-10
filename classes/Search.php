@@ -279,7 +279,7 @@ class SearchCore
         if (empty($product_pool)) {
             return ($ajax ? array() : array('total' => 0, 'result' => array()));
         }
-        $product_pool = ((strpos($product_pool, ',') === false) ? (' = '.(int)$product_pool.' ') : (' IN ('.rtrim($product_pool, ',').') '));
+        $product_pool = ((!str_contains($product_pool, ',')) ? (' = '.(int)$product_pool.' ') : (' IN ('.rtrim($product_pool, ',').') '));
 
         if ($ajax) {
             $sql = 'SELECT DISTINCT p.id_product, pl.name pname, cl.name cname,

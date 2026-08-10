@@ -67,7 +67,7 @@ if (($_SERVER['REQUEST_METHOD'] == 'PUT') || ($_SERVER['REQUEST_METHOD'] == 'POS
     }
     fclose($putresource);
 }
-if (isset($input_xml) && strncmp($input_xml, 'xml=', 4) == 0) {
+if (isset($input_xml) && str_starts_with($input_xml, 'xml=')) {
     $input_xml = substr($input_xml, 4);
 }
 

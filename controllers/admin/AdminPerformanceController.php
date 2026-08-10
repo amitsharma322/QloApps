@@ -645,7 +645,7 @@ class AdminPerformanceControllerCore extends AdminController
         }
 
         if (!empty($this->action)) {
-            Hook::exec('action'.get_class($this).ucfirst($this->action).'Before', array('controller' => $this));
+            Hook::exec('action'.static::class.ucfirst($this->action).'Before', array('controller' => $this));
         }
         if (Tools::isSubmit('submitAddServer')) {
             if ($this->tabAccess['add'] === 1) {
@@ -914,7 +914,7 @@ class AdminPerformanceControllerCore extends AdminController
         }
 
         if ($redirectAdmin && (!isset($this->errors) || !count($this->errors))) {
-            Hook::exec('action'.get_class($this).ucfirst($this->action).'After', array('controller' => $this, 'return' => ''));
+            Hook::exec('action'.static::class.ucfirst($this->action).'After', array('controller' => $this, 'return' => ''));
             Tools::redirectAdmin(self::$currentIndex.'&token='.Tools::getValue('token').'&conf=4');
         }
     }

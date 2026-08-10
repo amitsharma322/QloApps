@@ -228,7 +228,7 @@ class PrestaShopBackupCore
             $table = current($table);
 
             // Skip tables which do not start with _DB_PREFIX_
-            if (strlen($table) < strlen(_DB_PREFIX_) || strncmp($table, _DB_PREFIX_, strlen(_DB_PREFIX_)) != 0) {
+            if (strlen($table) < strlen(_DB_PREFIX_) || !str_starts_with($table, _DB_PREFIX_)) {
                 continue;
             }
 
@@ -268,7 +268,7 @@ class PrestaShopBackupCore
                                 $s .= $tmp;
                             } else {
                                 foreach ($lines as $line) {
-                                    if (strpos($line, '`'.$field.'`') !== false) {
+                                    if (str_contains($line, '`'.$field.'`')) {
                                         if (preg_match('/(.*NOT NULL.*)/Ui', $line)) {
                                             $s .= "'',";
                                         } else {

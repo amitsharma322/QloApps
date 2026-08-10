@@ -43,7 +43,7 @@ abstract class ModuleAdminControllerCore extends AdminController
 
         $tab = new Tab($this->id);
         if (!$tab->module) {
-            throw new PrestaShopException('Admin tab '.get_class($this).' is not a module tab');
+            throw new PrestaShopException('Admin tab '.static::class.' is not a module tab');
         }
 
         $this->module = Module::getInstanceByName($tab->module);

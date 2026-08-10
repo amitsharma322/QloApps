@@ -142,7 +142,7 @@ class ToolsCore
 
     public static function strReplaceFirst($search, $replace, $subject, $cur = 0)
     {
-        return (strpos($subject, $search, $cur))?substr_replace($subject, $replace, (int)strpos($subject, $search, $cur), strlen($search)):$subject;
+        return (strpos($subject, (string) $search, $cur))?substr_replace($subject, $replace, (int)strpos($subject, (string) $search, $cur), strlen($search)):$subject;
     }
 
     /**
@@ -159,11 +159,11 @@ class ToolsCore
             $link = Context::getContext()->link;
         }
 
-        if (strpos($url, 'http://') === false && strpos($url, 'https://') === false && $link) {
-            if (strpos($url, $base_uri) === 0) {
+        if (!str_contains($url, 'http://') && !str_contains($url, 'https://') && $link) {
+            if (str_starts_with($url, $base_uri)) {
                 $url = substr($url, strlen($base_uri));
             }
-            if (strpos($url, 'index.php?controller=') !== false && strpos($url, 'index.php/') == 0) {
+            if (str_contains($url, 'index.php?controller=') && str_starts_with($url, 'index.php/')) {
                 $url = substr($url, strlen('index.php?controller='));
                 if (Configuration::get('PS_REWRITING_SETTINGS')) {
                     $url = Tools::strReplaceFirst('&', '?', $url);
@@ -203,10 +203,10 @@ class ToolsCore
     public static function redirectLink($url)
     {
         if (!preg_match('@^https?://@i', $url)) {
-            if (strpos($url, __PS_BASE_URI__) !== false && strpos($url, __PS_BASE_URI__) == 0) {
+            if (str_contains($url, __PS_BASE_URI__) && str_starts_with($url, __PS_BASE_URI__)) {
                 $url = substr($url, strlen(__PS_BASE_URI__));
             }
-            if (strpos($url, 'index.php?controller=') !== false && strpos($url, 'index.php/') == 0) {
+            if (str_contains($url, 'index.php?controller=') && str_starts_with($url, 'index.php/')) {
                 $url = substr($url, strlen('index.php?controller='));
             }
             $explode = explode('?', $url);
@@ -1794,7 +1794,7 @@ class ToolsCore
         if (function_exists('mb_strpos')) {
             return mb_strpos($str, $find, $offset, $encoding);
         }
-        return strpos($str, $find, $offset);
+        return strpos($str, (string) $find, $offset);
     }
 
     public static function strrpos($str, $find, $offset = 0, $encoding = 'utf-8')
@@ -1802,7 +1802,7 @@ class ToolsCore
         if (function_exists('mb_strrpos')) {
             return mb_strrpos($str, $find, $offset, $encoding);
         }
-        return strrpos($str, $find, $offset);
+        return strrpos($str, (string) $find, $offset);
     }
 
     public static function ucfirst($str)
@@ -1977,7 +1977,7 @@ class ToolsCore
         $tmp = $value * $precision_factor;
         $tmp2 = (string)$tmp;
         // If the current value has already the desired precision
-        if (strpos($tmp2, '.') === false) {
+        if (!str_contains($tmp2, '.')) {
             return ($value);
         }
         if ($tmp2[strlen($tmp2) - 1] == 0) {
@@ -1999,7 +1999,7 @@ class ToolsCore
         $tmp = $value * $precision_factor;
         $tmp2 = (string)$tmp;
         // If the current value has already the desired precision
-        if (strpos($tmp2, '.') === false) {
+        if (!str_contains($tmp2, '.')) {
             return ($value);
         }
         if ($tmp2[strlen($tmp2) - 1] == 0) {
@@ -2049,7 +2049,7 @@ class ToolsCore
 
             if (
                 preg_match('/(.*-----BEGIN CERTIFICATE-----.*-----END CERTIFICATE-----){50}$/Uims', $ca_cert_content) &&
-                substr(rtrim($ca_cert_content), -1) == '-'
+                str_ends_with(rtrim($ca_cert_content), '-')
             ) {
                 file_put_contents(_PS_CACHE_CA_CERT_FILE_, $ca_cert_content);
             }
@@ -2775,7 +2775,7 @@ exit;
     {
         $pos = false;
         if ($needle) {
-            $pos = strpos($haystack, $needle);
+            $pos = strpos($haystack, (string) $needle);
         }
         if ($pos === false) {
             return $haystack;
@@ -2823,7 +2823,7 @@ exit;
         }
 
         //Case management system of ubuntu, php version return 5.2.4-2ubuntu5.2
-        if (strpos($version, '-') !== false) {
+        if (str_contains($version, '-')) {
             $version  = substr($version, 0, strpos($version, '-'));
         }
 
@@ -2968,7 +2968,7 @@ exit;
     {
         header('HTTP/1.1 404 Not Found');
         header('Status: 404 Not Found');
-        include(dirname(__FILE__).'/../404.php');
+        include(__DIR__.'/../404.php');
         die;
     }
 
@@ -2982,7 +2982,7 @@ exit;
      */
     public static function url($begin, $end)
     {
-        return $begin.((strpos($begin, '?') !== false) ? '&' : '?').$end;
+        return $begin.((str_contains($begin, '?')) ? '&' : '?').$end;
     }
 
     /**
@@ -3183,7 +3183,7 @@ exit;
 
             // we need strpos (example, evasive can be evasive20)
             foreach ($apache_module_list as $module) {
-                if (strpos($module, $name) !== false) {
+                if (str_contains($module, $name)) {
                     return true;
                 }
             }
@@ -3321,7 +3321,7 @@ exit;
 
     public static function unSerialize($serialized, $object = false)
     {
-        if (is_string($serialized) && (strpos($serialized, 'O:') === false || !preg_match('/(^|;|{|})O:[0-9]+:"/', $serialized)) && !$object || $object) {
+        if (is_string($serialized) && (!str_contains($serialized, 'O:') || !preg_match('/(^|;|{|})O:[0-9]+:"/', $serialized)) && !$object || $object) {
             return @unserialize($serialized);
         }
 
@@ -3788,11 +3788,9 @@ exit;
             $head_stack = array($replacements);
 
             do {
-                end($bref_stack);
-
-                $bref = &$bref_stack[key($bref_stack)];
+                $bref = &$bref_stack[array_key_last($bref_stack)];
                 $head = array_pop($head_stack);
-                unset($bref_stack[key($bref_stack)]);
+                unset($bref_stack[array_key_last($bref_stack)]);
                 foreach (array_keys($head) as $key) {
                     if (isset($key, $bref) && is_array($bref[$key]) && is_array($head[$key])) {
                         $bref_stack[] = &$bref[$key];

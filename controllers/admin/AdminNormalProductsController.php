@@ -500,7 +500,7 @@ class AdminNormalProductsControllerCore extends AdminController
     protected function copyFromPost(&$object, $table)
     {
         parent::copyFromPost($object, $table);
-        if (get_class($object) != 'Product') {
+        if ($object::class != 'Product') {
             return;
         }
 
@@ -1309,7 +1309,7 @@ class AdminNormalProductsControllerCore extends AdminController
     {
         if (Validate::isLoadedObject($product = new Product((int)Tools::getValue('id_product')))) {
             foreach ($_POST as $field => $value) {
-                if (strncmp($field, 'label_', 6) == 0 && !Validate::isLabel($value)) {
+                if (str_starts_with($field, 'label_') && !Validate::isLabel($value)) {
                     $this->errors[] = Tools::displayError('The label fields defined are invalid.');
                 }
             }
@@ -2536,7 +2536,7 @@ class AdminNormalProductsControllerCore extends AdminController
             $this->fields_form = array();
 
             // Check if Module
-            if (substr($this->tab_display, 0, 6) == 'Module') {
+            if (str_starts_with($this->tab_display, 'Module')) {
                 $this->tab_display_module = strtolower(substr($this->tab_display, 6, Tools::strlen($this->tab_display) - 6));
                 $this->tab_display = 'Modules';
             }
@@ -2970,7 +2970,7 @@ class AdminNormalProductsControllerCore extends AdminController
         if (!$product->active) {
             $admin_dir = dirname($_SERVER['PHP_SELF']);
             $admin_dir = substr($admin_dir, strrpos($admin_dir, '/') + 1);
-            $preview_url .= ((strpos($preview_url, '?') === false) ? '?' : '&').'adtoken='.$this->token.'&ad='.$admin_dir.'&id_employee='.(int)$this->context->employee->id;
+            $preview_url .= ((!str_contains($preview_url, '?')) ? '?' : '&').'adtoken='.$this->token.'&ad='.$admin_dir.'&id_employee='.(int)$this->context->employee->id;
         }
 
         return $preview_url;

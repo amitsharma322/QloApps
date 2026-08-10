@@ -419,7 +419,7 @@ class AdminCronTaskManagerController extends ModuleAdminController
         try {
             $next = \Cron\CronExpression::factory($cronExpression)->getNextRunDate();
             return $next->format('Y-m-d H:i:s');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return '-';
         }
     }

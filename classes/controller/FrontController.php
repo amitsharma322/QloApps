@@ -539,7 +539,7 @@ class FrontControllerCore extends Controller
         }
 
         foreach ($assign_array as $assign_key => $assign_value) {
-            if (substr($assign_value, 0, 1) == '/' || $protocol_content == 'https://') {
+            if (str_starts_with($assign_value, '/') || $protocol_content == 'https://') {
                 $this->context->smarty->assign($assign_key, $protocol_content.Tools::getMediaServer($assign_value).$assign_value);
             } else {
                 $this->context->smarty->assign($assign_key, $assign_value);
@@ -809,7 +809,7 @@ class FrontControllerCore extends Controller
                         'link' => $this->context->link,
                     ));
                     // If the controller is a module, then getTemplatePath will try to find the template in the modules, so we need to instanciate a real frontcontroller
-                    $front_controller = preg_match('/ModuleFrontController$/', get_class($this)) ? new FrontController() : $this;
+                    $front_controller = preg_match('/ModuleFrontController$/', static::class) ? new FrontController() : $this;
                     $this->smartyOutputContent($front_controller->getTemplatePath($this->getThemeDir().'maintenance.tpl'));
                     exit;
                 }
@@ -1046,7 +1046,7 @@ class FrontControllerCore extends Controller
                     $reader = new GeoIp2\Database\Reader(_PS_GEOIP_DIR_ . _PS_GEOIP_CITY_FILE_);
                     try {
                         $record = $reader->city(Tools::getRemoteAddr());
-                    } catch (GeoIp2\Exception\AddressNotFoundException $e) {
+                    } catch (GeoIp2\Exception\AddressNotFoundException) {
                         $record = null;
                     }
 
@@ -1505,7 +1505,7 @@ class FrontControllerCore extends Controller
                     $type = 'js';
                     $file = $media;
                 }
-                if (strpos($file, __PS_BASE_URI__.'modules/') === 0) {
+                if (str_starts_with($file, __PS_BASE_URI__.'modules/')) {
                     $override_path = str_replace(__PS_BASE_URI__.'modules/', _PS_ROOT_DIR_.'/themes/'._THEME_NAME_.'/'.$type.'/modules/', $file, $different);
                     if (strrpos($override_path, $type.'/'.basename($file)) !== false) {
                         $override_path_css = str_replace($type.'/'.basename($file), basename($file), $override_path, $different_css);
@@ -1739,7 +1739,7 @@ class FrontControllerCore extends Controller
         }
 
         $tpl_file = basename($template);
-        $dirname = dirname($template).(substr(dirname($template), -1, 1) == '/' ? '' : '/');
+        $dirname = dirname($template).(str_ends_with(dirname($template), '/') ? '' : '/');
 
         if ($dirname == _PS_THEME_DIR_) {
             if (file_exists(_PS_THEME_MOBILE_DIR_.$tpl_file)) {

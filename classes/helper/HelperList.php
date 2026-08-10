@@ -473,7 +473,7 @@ class HelperListCore extends Helper
         $tpl->assign(array(
             'id' => $id,
             'href' => $this->currentIndex.'&'.$this->identifier.'='.$id.'&details'.$this->table.'&token='.($token != null ? $token : $this->token),
-            'controller' => str_replace('Controller', '', get_class($this->context->controller)),
+            'controller' => str_replace('Controller', '', $this->context->controller::class),
             'token' => $token != null ? $token : $this->token,
             'action' => self::$cache_lang['Details'],
             'params' => $ajax_params,

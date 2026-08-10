@@ -160,7 +160,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
                     }
                     fclose($postResource);
 
-                    if (isset($inputXml) && strncmp($inputXml, 'xml=', 4) == 0) {
+                    if (isset($inputXml) && str_starts_with($inputXml, 'xml=')) {
                         // Now $inputXml has the post request XML.
                         $inputXml = substr($inputXml, 4);
                     }
@@ -444,7 +444,7 @@ class WebserviceSpecificManagementHotelAri extends ObjectModel implements Webser
 
                         // We have to create the json and xml response for request by ourself. So we need to check if data to be sent in xml or json
                         // We have no way to check the output format from parent classed. So we used below code
-                        if (get_class($this->objOutput->getObjectRender()) == 'WebserviceOutputJSON') {
+                        if ($this->objOutput->getObjectRender()::class == 'WebserviceOutputJSON') {
                             $this->getResponseJson($searchAriData, $dateWiseBreakdown);
                         } else {
                             $this->getResponseXml($searchAriData, $dateWiseBreakdown);

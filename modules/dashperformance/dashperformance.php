@@ -54,7 +54,7 @@ class DashPerformance extends Module
 
     public function hookActionAdminControllerSetMedia()
     {
-        if (get_class($this->context->controller) == 'AdminDashboardController') {
+        if ($this->context->controller::class == 'AdminDashboardController') {
             $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
         }
     }
@@ -68,14 +68,14 @@ class DashPerformance extends Module
     {
         $data = array();
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
-            $data['dp_average_daily_rate'] = Tools::displayPrice(sprintf('%0.2f', rand(100000, 1000000) / 100));
-            $data['dp_total_revenue_per_available_room'] = Tools::displayPrice(sprintf('%0.2f', rand(pow(10, 5), pow(10, 6)) / 100));
-            $data['dp_average_occupancy_rate'] = sprintf('%0.2f', rand(5000, 10000) / 100).'%';
-            $data['dp_revenue_per_available_room'] = Tools::displayPrice(sprintf('%0.2f', rand(pow(10, 5), pow(10, 6)) / 100));
-            $data['dp_gross_operating_profit_par'] = Tools::displayPrice(sprintf('%0.2f', rand(pow(10, 6), pow(10, 7)) / 100));
-            $data['dp_average_length_of_stay'] = sprintf('%0.2f', rand(1, 500) / 100);
-            $data['dp_direct_revenue_ratio'] = sprintf('%0.2f', rand(4000, 8000) / 100).'%';
-            $data['dp_cancellation_rate'] = sprintf('%0.2f', rand(1, 1000) / 100).'%';
+            $data['dp_average_daily_rate'] = Tools::displayPrice(sprintf('%0.2f', random_int(100000, 1000000) / 100));
+            $data['dp_total_revenue_per_available_room'] = Tools::displayPrice(sprintf('%0.2f', random_int(pow(10, 5), pow(10, 6)) / 100));
+            $data['dp_average_occupancy_rate'] = sprintf('%0.2f', random_int(5000, 10000) / 100).'%';
+            $data['dp_revenue_per_available_room'] = Tools::displayPrice(sprintf('%0.2f', random_int(pow(10, 5), pow(10, 6)) / 100));
+            $data['dp_gross_operating_profit_par'] = Tools::displayPrice(sprintf('%0.2f', random_int(pow(10, 6), pow(10, 7)) / 100));
+            $data['dp_average_length_of_stay'] = sprintf('%0.2f', random_int(1, 500) / 100);
+            $data['dp_direct_revenue_ratio'] = sprintf('%0.2f', random_int(4000, 8000) / 100).'%';
+            $data['dp_cancellation_rate'] = sprintf('%0.2f', random_int(1, 1000) / 100).'%';
         } else {
             $data['dp_average_daily_rate'] = Tools::displayPrice(AdminStatsController::getAverageDailyRate(
                 $params['date_from'],

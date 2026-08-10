@@ -296,7 +296,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
     public function manage()
     {
         $this->context = Context::getContext();
-        if (get_class($this->objOutput->getObjectRender()) == 'WebserviceOutputJSON') {
+        if ($this->objOutput->getObjectRender()::class == 'WebserviceOutputJSON') {
             $this->outputType = 'json';
         }
 
@@ -392,7 +392,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                 return;
             }
         } else if (simplexml_load_string($inputXML)) {
-            if (isset($inputXML) && strncmp($inputXML, 'xml=', 4) == 0) {
+            if (isset($inputXML) && str_starts_with($inputXML, 'xml=')) {
                 $inputXML = Tools::substr($inputXML, 4);
             }
         } else {
@@ -585,7 +585,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
         $formattedServices = array();
         foreach ($selectedServices as $service) {
-            $key = isset($service['id_service']) ? $service['id_service'] : 'new_'.rand();
+            $key = isset($service['id_service']) ? $service['id_service'] : 'new_'.random_int(0, mt_getrandmax());
             if (isset($service['id_service'])) {
                 $formattedServices[$key]['quantity'] = isset($service['quantity']) ? $service['quantity'] : 1;
                 $formattedServices[$key]['id_product'] = $service['id_service'];
@@ -3669,7 +3669,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
     private function validateBookingNumericFilter($field, $operator, $value)
     {
-        $values = strpos($value, '|') !== false ? explode('|', $value) : array($value);
+        $values = str_contains($value, '|') ? explode('|', $value) : array($value);
         foreach ($values as $filterValue) {
             if (!Validate::isUnsignedInt($filterValue)) {
                 $this->wsObject->setError(400, 'Invalid value for filter "'.$field.'".', 39);
@@ -4000,7 +4000,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                 ->overrideContent($this->output);
    
 
-        } catch (\Throwable $th) {
+        } catch (\Throwable) {
             $this->wsObject->setError(400, 'Invalid request data provided.', 39);
         }
     }

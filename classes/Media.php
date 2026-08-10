@@ -753,11 +753,11 @@ class MediaCore
         }
 
         // rebuild the original js_files array
-        if (strpos($compressed_js_path, _PS_ROOT_DIR_) !== false) {
+        if (str_contains($compressed_js_path, _PS_ROOT_DIR_)) {
             $url = str_replace(_PS_ROOT_DIR_.'/', __PS_BASE_URI__, $compressed_js_path);
         }
 
-        if (strpos($compressed_js_path, _PS_CORE_DIR_) !== false) {
+        if (str_contains($compressed_js_path, _PS_CORE_DIR_)) {
             $url = str_replace(_PS_CORE_DIR_.'/', __PS_BASE_URI__, $compressed_js_path);
         }
 
@@ -859,7 +859,7 @@ class MediaCore
             foreach ($scripts as $script) {
                 /** @var DOMElement $script */
                 if ($src = $script->getAttribute('src')) {
-                    if (substr($src, 0, 2) == '//') {
+                    if (str_starts_with($src, '//')) {
                         $src = Tools::getCurrentUrlProtocolPrefix().substr($src, 2);
                     }
 
@@ -929,7 +929,7 @@ class MediaCore
         /* This is an external script, if it already belongs to js_files then remove it from content */
         preg_match('/src\s*=\s*["\']?([^"\']*)[^>]/ims', $original, $results);
         if (array_key_exists(1, $results)) {
-            if (substr($results[1], 0, 2) == '//') {
+            if (str_starts_with($results[1], '//')) {
                 $protocol_link = Tools::getCurrentUrlProtocolPrefix();
                 $results[1] = $protocol_link.ltrim($results[1], '/');
             }

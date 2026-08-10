@@ -414,7 +414,7 @@ class ShopCore extends ObjectModel
                     $url .= $default_shop->getBaseURI().'index.php?'.http_build_query($params);
                 } else {
                     // Catch url with subdomain "www"
-                    if (strpos($url, 'www.') === 0 && 'www.'.$_SERVER['HTTP_HOST'] === $url || $_SERVER['HTTP_HOST'] === 'www.'.$url) {
+                    if (str_starts_with($url, 'www.') && 'www.'.$_SERVER['HTTP_HOST'] === $url || $_SERVER['HTTP_HOST'] === 'www.'.$url) {
                         $url .= $_SERVER['REQUEST_URI'];
                     } else {
                         $url .= $default_shop->getBaseURI();
@@ -1008,7 +1008,7 @@ class ShopCore extends ObjectModel
     public static function addSqlAssociation($table, $alias, $inner_join = true, $on = null, $force_not_default = false)
     {
         $table_alias = $table.'_shop';
-        if (strpos($table, '.') !== false) {
+        if (str_contains($table, '.')) {
             list($table_alias, $table) = explode('.', $table);
         }
 

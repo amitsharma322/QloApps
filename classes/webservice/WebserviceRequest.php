@@ -242,7 +242,7 @@ class WebserviceRequestCore
         $this->outputFormat = $type;
         switch ($type) {
             case 'JSON' :
-                require_once dirname(__FILE__).'/WebserviceOutputJSON.php';
+                require_once __DIR__.'/WebserviceOutputJSON.php';
                 $obj_render = new WebserviceOutputJSON();
                 break;
             case 'XML' :
@@ -942,14 +942,14 @@ class WebserviceRequestCore
         }
         $fields = array();
         foreach ($part as $str) {
-            $field_name = trim(substr($str, 0, (strpos($str, '[') === false ? strlen($str) : strpos($str, '['))));
+            $field_name = trim(substr($str, 0, (!str_contains($str, '[') ? strlen($str) : strpos($str, '['))));
             if (!isset($fields[$field_name])) {
                 $fields[$field_name] = null;
             }
-            if (strpos($str, '[') !== false) {
+            if (str_contains($str, '[')) {
                 $sub_fields = substr($str, strpos($str, '[') + 1, strlen($str) - strpos($str, '[') - 2);
                 $tmp_array = array();
-                if (strpos($sub_fields, ',') !== false) {
+                if (str_contains($sub_fields, ',')) {
                     $tmp_array = explode(',', $sub_fields);
                 } else {
                     $tmp_array = array($sub_fields);
@@ -1614,18 +1614,18 @@ class WebserviceRequestCore
             $arr_languages[] = (int)$this->urlFragments['language'];
         }
         // if a range or a list is asked
-        elseif (strpos($this->urlFragments['language'], '[') === 0
+        elseif (str_starts_with($this->urlFragments['language'], '[')
             && strpos($this->urlFragments['language'], ']') === $length_values - 1) {
-            if (strpos($this->urlFragments['language'], '|') !== false
-                xor strpos($this->urlFragments['language'], ',') !== false) {
+            if (str_contains($this->urlFragments['language'], '|')
+                xor str_contains($this->urlFragments['language'], ',')) {
                 $params_values = str_replace(array(']', '['), '', $this->urlFragments['language']);
                 // it's a list
-                if (strpos($params_values, '|') !== false) {
+                if (str_contains($params_values, '|')) {
                     $list_enabled_lang = explode('|', $params_values);
                     $arr_languages = $list_enabled_lang;
                 }
                 // it's a range
-                elseif (strpos($params_values, ',') !== false) {
+                elseif (str_contains($params_values, ',')) {
                     $range_enabled_lang = explode(',', $params_values);
                     if (count($range_enabled_lang) != 2) {
                         $this->setError(400, 'A range value for a language must contains only 2 values', 78);
@@ -1773,7 +1773,7 @@ class WebserviceRequestCore
             $headers = array_merge($_ENV, $_SERVER);
             foreach ($headers as $key => $val) {
                 //we need this header
-                if (strpos(strtolower($key), 'content-type') !== false) {
+                if (str_contains(strtolower($key), 'content-type')) {
                     continue;
                 }
                 if (strtoupper(substr($key, 0, 5)) != 'HTTP_') {

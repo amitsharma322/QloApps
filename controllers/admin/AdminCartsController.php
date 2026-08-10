@@ -544,7 +544,7 @@ class AdminCartsControllerCore extends AdminController
                         if (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES[$field_id]['tmp_name'], $tmp_name)) {
                             $errors[] = Tools::displayError('An error occurred during the image upload process.');
                         }
-                        $file_name = md5(uniqid(rand(), true));
+                        $file_name = md5(uniqid(random_int(0, mt_getrandmax()), true));
                         if (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name)) {
                             continue;
                         } elseif (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', (int)Configuration::get('PS_PRODUCT_PICTURE_WIDTH'), (int)Configuration::get('PS_PRODUCT_PICTURE_HEIGHT'))) {

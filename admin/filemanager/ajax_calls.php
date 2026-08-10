@@ -34,7 +34,7 @@ if (isset($_GET['action'])) {
             if (preg_match('/\.{1,2}[\/|\\\]/', $path_pos) !== 0
                 || $filename !== fix_filename($filename, $transliteration)
                 || !in_array(strtolower($info['extension']), array('jpg', 'jpeg', 'png'))
-                || strpos($_POST['url'], 'http://featherfiles.aviary.com/') !== 0
+                || !str_starts_with($_POST['url'], 'http://featherfiles.aviary.com/')
                 || !isset($info['extension'])
 
             ) {
@@ -78,7 +78,7 @@ if (isset($_GET['action'])) {
             }*/
             break;
         case 'extract':
-            if (strpos($_POST['path'], '/') === 0 || strpos($_POST['path'], '../') !== false || strpos($_POST['path'], './') === 0) {
+            if (str_starts_with($_POST['path'], '/') || str_contains($_POST['path'], '../') || str_starts_with($_POST['path'], './')) {
                 die('wrong path');
             }
             $path = $current_path.$_POST['path'];

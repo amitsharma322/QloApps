@@ -145,7 +145,7 @@ class AdminTaxesControllerCore extends AdminController
         }
 
         if (!array_key_exists('DeleteItem', self::$cache_lang)) {
-            self::$cache_lang['DeleteItem'] = $this->l('Delete item #', __CLASS__, true, false);
+            self::$cache_lang['DeleteItem'] = $this->l('Delete item #', self::class, true, false);
         }
 
         if (TaxRule::isTaxInUse($id)) {

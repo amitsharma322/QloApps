@@ -37,7 +37,7 @@ class AdminPreferencesControllerCore extends AdminController
         $this->table = 'configuration';
 
         // Prevent classes which extend AdminPreferences to load useless data
-        if (get_class($this) == 'AdminPreferencesController') {
+        if (static::class == 'AdminPreferencesController') {
             $round_mode = array(
                 array(
                     'value' => PS_ROUND_HALF_UP,

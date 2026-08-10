@@ -589,7 +589,7 @@ class AdminProductsControllerCore extends AdminController
     protected function copyFromPost(&$object, $table)
     {
         parent::copyFromPost($object, $table);
-        if (get_class($object) != 'Product') {
+        if ($object::class != 'Product') {
             return;
         }
 
@@ -2588,7 +2588,7 @@ class AdminProductsControllerCore extends AdminController
             $this->fields_form = array();
 
             // Check if Module
-            if (substr($this->tab_display, 0, 6) == 'Module') {
+            if (str_starts_with($this->tab_display, 'Module')) {
                 $this->tab_display_module = strtolower(substr($this->tab_display, 6, Tools::strlen($this->tab_display) - 6));
                 $this->tab_display = 'Modules';
             }
@@ -3098,7 +3098,7 @@ class AdminProductsControllerCore extends AdminController
         if (!$product->active) {
             $admin_dir = dirname($_SERVER['PHP_SELF']);
             $admin_dir = substr($admin_dir, strrpos($admin_dir, '/') + 1);
-            $preview_url .= ((strpos($preview_url, '?') === false) ? '?' : '&').'adtoken='.$this->token.'&ad='.$admin_dir.'&id_employee='.(int)$this->context->employee->id;
+            $preview_url .= ((!str_contains($preview_url, '?')) ? '?' : '&').'adtoken='.$this->token.'&ad='.$admin_dir.'&id_employee='.(int)$this->context->employee->id;
         }
 
         return $preview_url;

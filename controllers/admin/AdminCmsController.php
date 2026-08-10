@@ -416,7 +416,7 @@ class AdminCmsControllerCore extends AdminController
                 'id_employee' => (int)$this->context->employee->id
                 )
             );
-            $preview_url .= (strpos($preview_url, '?') === false ? '?' : '&').$params;
+            $preview_url .= (!str_contains($preview_url, '?') ? '?' : '&').$params;
         }
 
         return $preview_url;

@@ -60,10 +60,10 @@ class DbPDOCore extends Db
         } else {
             $dsn .= 'host='.$host;
         }
-        if(class_exists('Pdo\\Mysql')){
+        if(class_exists(\Pdo\Mysql::class)){
             $bufferedQueryAttr = \Pdo\Mysql::ATTR_USE_BUFFERED_QUERY;
         }else{
-            $bufferedQueryAttr = PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;;
+            $bufferedQueryAttr = PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
         }
         
         return new PDO($dsn, $user, $password, array(PDO::ATTR_TIMEOUT => $timeout, $bufferedQueryAttr => true));
@@ -87,7 +87,7 @@ class DbPDOCore extends Db
             if ($dropit && ($link->exec('DROP DATABASE `'.str_replace('`', '\\`', $dbname).'`') !== false)) {
                 return true;
             }
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
         return $success;
@@ -295,7 +295,7 @@ class DbPDOCore extends Db
     {
         try {
             $link = DbPDO::_getPDO($server, $user, $pwd, $db, 5);
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
 
@@ -319,7 +319,7 @@ class DbPDOCore extends Db
     {
         try {
             $link = DbPDO::_getPDO($server, $user, $pwd, $db, 5);
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
 
@@ -412,7 +412,7 @@ class DbPDOCore extends Db
     {
         try {
             $link = DbPDO::_getPDO($server, $user, $pwd, false, 5);
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
         $result = $link->exec('SET NAMES \'utf8\'');
@@ -433,7 +433,7 @@ class DbPDOCore extends Db
     {
         try {
             $link = DbPDO::_getPDO($server, $user, $pwd, false, 5);
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
         $ret = (bool)(($result = $link->query('SELECT @@auto_increment_increment as aii')) && ($row = $result->fetch()) && $row['aii'] == 1);

@@ -1330,7 +1330,7 @@ class ProductControllerCore extends FrontController
         $indexes = array_flip($authorized_file_fields);
         foreach ($_FILES as $field_name => $file) {
             if (in_array($field_name, $authorized_file_fields) && isset($file['tmp_name']) && !empty($file['tmp_name'])) {
-                $file_name = md5(uniqid(rand(), true));
+                $file_name = md5(uniqid(random_int(0, mt_getrandmax()), true));
                 if ($error = ImageManager::validateUpload($file, (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE'))) {
                     $this->errors[] = $error;
                 }
@@ -1390,7 +1390,7 @@ class ProductControllerCore extends FrontController
     {
         $customization_form_target = Tools::safeOutput(urldecode($_SERVER['REQUEST_URI']));
         foreach ($_GET as $field => $value) {
-            if (strncmp($field, 'group_', 6) == 0) {
+            if (str_starts_with($field, 'group_')) {
                 $customization_form_target = preg_replace('/&group_([[:digit:]]+)=([[:digit:]]+)/', '', $customization_form_target);
             }
         }

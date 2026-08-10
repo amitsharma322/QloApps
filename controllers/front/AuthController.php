@@ -113,7 +113,7 @@ class AuthControllerCore extends FrontController
         $key = Tools::safeOutput(Tools::getValue('key'));
 
         if (!empty($key)) {
-            $back .= (strpos($back, '?') !== false ? '&' : '?').'key='.$key;
+            $back .= (str_contains($back, '?') ? '&' : '?').'key='.$key;
         }
 
         // sanitize backurl for XSS protection
@@ -514,8 +514,8 @@ class AuthControllerCore extends FrontController
                 $post_back = $_POST;
                 // Preparing addresses
                 foreach ($addresses_types as $addresses_type) {
-                    $$addresses_type = new Address();
-                    $$addresses_type->id_customer = 1;
+                    ${$addresses_type} = new Address();
+                    ${$addresses_type}->id_customer = 1;
 
                     if ($addresses_type == 'address_invoice') {
                         foreach ($_POST as $key => &$post) {
@@ -525,12 +525,12 @@ class AuthControllerCore extends FrontController
                         }
                     }
 
-                    $this->errors = array_unique(array_merge($this->errors, $$addresses_type->validateController()));
+                    $this->errors = array_unique(array_merge($this->errors, ${$addresses_type}->validateController()));
                     if ($addresses_type == 'address_invoice') {
                         $_POST = $post_back;
                     }
 
-                    if (!($country = new Country($$addresses_type->id_country)) || !Validate::isLoadedObject($country)) {
+                    if (!($country = new Country(${$addresses_type}->id_country)) || !Validate::isLoadedObject($country)) {
                         $this->errors[] = Tools::displayError('Country cannot be loaded with address->id_country');
                     }
 
@@ -538,7 +538,7 @@ class AuthControllerCore extends FrontController
                         $this->errors[] = Tools::displayError('This country is not active.');
                     }
 
-                    $postcode = $$addresses_type->postcode;
+                    $postcode = ${$addresses_type}->postcode;
                     /* Check zip code format */
                     if ($country->zip_code_format && !$country->checkZipCode($postcode)) {
                         $this->errors[] = sprintf(Tools::displayError('The Zip/Postal code you\'ve entered is invalid. It must follow this format: %s'), str_replace('C', $country->iso_code, str_replace('N', '0', str_replace('L', 'A', $country->zip_code_format))));
@@ -550,21 +550,21 @@ class AuthControllerCore extends FrontController
 
                     if ($country->need_identification_number) {
                         if (!Configuration::get('PS_REGISTRATION_PROCESS_TYPE')) {
-                            $$addresses_type->dni = null;
+                            ${$addresses_type}->dni = null;
                         } elseif (!Tools::getValue('dni') || !Validate::isDniLite(Tools::getValue('dni'))) {
                             $this->errors[] = Tools::displayError('The identification number is incorrect or has already been used.');
                         }
                     } elseif (!$country->need_identification_number) {
-                        $$addresses_type->dni = null;
+                        ${$addresses_type}->dni = null;
                     }
 
                     if (Tools::isSubmit('submitAccount') || Tools::isSubmit('submitGuestAccount')) {
-                        if (!($country = new Country($$addresses_type->id_country, Configuration::get('PS_LANG_DEFAULT'))) || !Validate::isLoadedObject($country)) {
+                        if (!($country = new Country(${$addresses_type}->id_country, Configuration::get('PS_LANG_DEFAULT'))) || !Validate::isLoadedObject($country)) {
                             $this->errors[] = Tools::displayError('Country is invalid');
                         }
                     }
                     $contains_state = isset($country) && is_object($country) ? (int)$country->contains_states: 0;
-                    $id_state = isset($$addresses_type) && is_object($$addresses_type) ? (int)$$addresses_type->id_state: 0;
+                    $id_state = isset(${$addresses_type}) && is_object(${$addresses_type}) ? (int)${$addresses_type}->id_state: 0;
                     if ((Tools::isSubmit('submitAccount') || Tools::isSubmit('submitGuestAccount')) && $contains_state && !$id_state) {
                         $this->errors[] = Tools::displayError('This country requires you to choose a State.');
                     }
@@ -613,7 +613,7 @@ class AuthControllerCore extends FrontController
                         $_POST['phone'] = $phoneAddress;
 
                         foreach ($addresses_types as $addresses_type) {
-                            $$addresses_type->id_customer = (int)$customer->id;
+                            ${$addresses_type}->id_customer = (int)$customer->id;
                             if ($addresses_type == 'address_invoice') {
                                 foreach ($_POST as $key => &$post) {
                                     if ($tmp = Tools::getValue($key.'_invoice')) {
@@ -622,11 +622,11 @@ class AuthControllerCore extends FrontController
                                 }
                             }
 
-                            $this->errors = array_unique(array_merge($this->errors, $$addresses_type->validateController()));
+                            $this->errors = array_unique(array_merge($this->errors, ${$addresses_type}->validateController()));
                             if ($addresses_type == 'address_invoice') {
                                 $_POST = $post_back;
                             }
-                            if (!count($this->errors) && (Configuration::get('PS_REGISTRATION_PROCESS_TYPE') || $this->ajax || Tools::isSubmit('submitGuestAccount')) && !$$addresses_type->save()) {
+                            if (!count($this->errors) && (Configuration::get('PS_REGISTRATION_PROCESS_TYPE') || $this->ajax || Tools::isSubmit('submitGuestAccount')) && !${$addresses_type}->save()) {
                                 $this->errors[] = Tools::displayError('An error occurred while creating your address.');
                             }
                         }

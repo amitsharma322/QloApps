@@ -203,7 +203,7 @@ abstract class AdminTabCore
     {
         $this->context = Context::getContext();
 
-        $this->id = Tab::getIdFromClassName(get_class($this));
+        $this->id = Tab::getIdFromClassName(static::class);
         $this->_conf = array(
             1 => $this->l('Deletion successful'), 2 => $this->l('Selection successfully deleted'),
             3 => $this->l('Creation successful'), 4 => $this->l('Update successful'),
@@ -225,7 +225,7 @@ abstract class AdminTabCore
         if (!$this->_defaultOrderBy) {
             $this->_defaultOrderBy = $this->identifier;
         }
-        $className = get_class($this);
+        $className = static::class;
 //		if ($className == 'AdminCategories' OR $className == 'AdminProducts')
 //			$className = 'AdminCatalog';
         $this->token = Tools::getAdminToken($className.(int)$this->id.(int)$this->context->employee->id);
@@ -247,19 +247,19 @@ abstract class AdminTabCore
     protected function l($string, $class = 'AdminTab', $addslashes = false, $htmlentities = true)
     {
         // if the class is extended by a module, use modules/[module_name]/xx.php lang file
-        $current_class = get_class($this);
+        $current_class = static::class;
         if (Module::getModuleNameFromClass($current_class)) {
             $string = str_replace('\'', '\\\'', $string);
             return Translate::getModuleTranslation(Module::$classInModule[$current_class], $string, $current_class);
         }
         global $_LANGADM;
 
-        if ($class == __CLASS__) {
+        if ($class == self::class) {
             $class = 'AdminTab';
         }
 
         $key = md5(str_replace('\'', '\\\'', $string));
-        $str = (array_key_exists(get_class($this).$key, $_LANGADM)) ? $_LANGADM[get_class($this).$key] : ((array_key_exists($class.$key, $_LANGADM)) ? $_LANGADM[$class.$key] : $string);
+        $str = (array_key_exists(static::class.$key, $_LANGADM)) ? $_LANGADM[static::class.$key] : ((array_key_exists($class.$key, $_LANGADM)) ? $_LANGADM[$class.$key] : $string);
         $str = $htmlentities ? htmlentities($str, ENT_QUOTES, 'utf-8') : $str;
         return str_replace('"', '&quot;', ($addslashes ? addslashes($str) : stripslashes($str)));
     }
@@ -1189,7 +1189,7 @@ abstract class AdminTabCore
         }
 
         /* Multilingual fields */
-        $rules = call_user_func(array(get_class($object), 'getValidationRules'), get_class($object));
+        $rules = call_user_func(array($object::class, 'getValidationRules'), $object::class);
         if (count($rules['validateLang'])) {
             $language_ids = Language::getIDs(false);
             foreach ($language_ids as $id_lang) {
@@ -1673,7 +1673,9 @@ abstract class AdminTabCore
 
         $irow = 0;
         if ($this->_list && isset($this->fieldsDisplay['position'])) {
-            $positions = array_map(create_function('$elem', 'return (int)$elem[\'position\'];'), $this->_list);
+            $positions = array_map(function ($elem) {
+                return (int) $elem['position'];
+            }, $this->_list);
             sort($positions);
         }
         if ($this->_list) {
@@ -1805,7 +1807,7 @@ abstract class AdminTabCore
     protected function _displayDuplicate($token, $id)
     {
         $_cacheLang['Duplicate'] = $this->l('Duplicate');
-        $_cacheLang['Copy images too?'] = $this->l('This will copy the images too. If you wish to proceed, click "OK". If not, click "Cancel".', __CLASS__, true, false);
+        $_cacheLang['Copy images too?'] = $this->l('This will copy the images too. If you wish to proceed, click "OK". If not, click "Cancel".', self::class, true, false);
         $duplicate = Tools::safeOutput(self::$currentIndex.'&'.$this->identifier.'='.$id.'&duplicate'.$this->table.'&token='.($token != null ? $token : $this->token));
 
         echo '<a class="pointer" onclick="if (confirm(\''.$_cacheLang['Copy images too?'].'\')) document.location = \''.$duplicate.'\'; else document.location = \''.$duplicate.'&noimage=1\';">
@@ -1833,7 +1835,7 @@ abstract class AdminTabCore
     protected function _displayDeleteLink($token, $id)
     {
         $_cacheLang['Delete'] = $this->l('Delete');
-        $_cacheLang['DeleteItem'] = $this->l('Delete item #', __CLASS__, true, false);
+        $_cacheLang['DeleteItem'] = $this->l('Delete item #', self::class, true, false);
         $href = Tools::safeOutput(self::$currentIndex.'&'.$this->identifier.'='.(int)$id.'&delete'.$this->table.'&token='.($token != null ? $token : $this->token));
 
         echo '<a href="'.$href.'" onclick="return confirm(\''.$_cacheLang['DeleteItem'].(int)$id.' ?'.
@@ -1848,7 +1850,7 @@ abstract class AdminTabCore
     {
         echo '</table>';
         if ($this->delete) {
-            echo '<p><input type="submit" class="button" name="submitDel'.$this->table.'" value="'.$this->l('Delete selection').'" onclick="return confirm(\''.$this->l('Delete selected items?', __CLASS__, true, false).'\');" /></p>';
+            echo '<p><input type="submit" class="button" name="submitDel'.$this->table.'" value="'.$this->l('Delete selection').'" onclick="return confirm(\''.$this->l('Delete selected items?', self::class, true, false).'\');" /></p>';
         }
         echo '
 				</td>

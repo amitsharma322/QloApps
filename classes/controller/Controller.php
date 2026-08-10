@@ -97,7 +97,7 @@ abstract class ControllerCore
     public function init()
     {
         if (_PS_MODE_DEV_ && $this->controller_type == 'admin') {
-            set_error_handler(array(__CLASS__, 'myErrorHandler'));
+            set_error_handler(array(self::class, 'myErrorHandler'));
         }
 
         if (!defined('_PS_BASE_URL_')) {
@@ -159,8 +159,8 @@ abstract class ControllerCore
 
         if (!headers_sent()
             && isset($_SERVER['HTTP_USER_AGENT'])
-            && (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false
-            || strpos($_SERVER['HTTP_USER_AGENT'], 'Trident') !== false)) {
+            && (str_contains($_SERVER['HTTP_USER_AGENT'], 'MSIE')
+            || str_contains($_SERVER['HTTP_USER_AGENT'], 'Trident'))) {
             header('X-UA-Compatible: IE=edge,chrome=1');
         }
     }
@@ -647,7 +647,7 @@ abstract class ControllerCore
     protected function ajaxDie($value = null, $controller = null, $method = null)
     {
         if ($controller === null) {
-            $controller = get_class($this);
+            $controller = static::class;
         }
 
         if ($method === null) {

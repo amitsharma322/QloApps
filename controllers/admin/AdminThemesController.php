@@ -184,7 +184,7 @@ class AdminThemesControllerCore extends AdminController
                         'type' => 'file',
                         'name' => 'PS_FAVICON',
                         'tab' => 'icons',
-                        'thumb' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_FAVICON').(Tools::getValue('conf') ? sprintf('?%04d', rand(0, 9999)) : ''))
+                        'thumb' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_FAVICON').(Tools::getValue('conf') ? sprintf('?%04d', random_int(0, 9999)) : ''))
                     ),
                     'PS_STORES_ICON' => array(
                         'title' => $this->l('Map icon'),
@@ -1148,7 +1148,7 @@ class AdminThemesControllerCore extends AdminController
                 }
 
                 foreach ($_POST as $key => $value) {
-                    if (strncmp($key, 'modulesToExport_module', strlen('modulesToExport_module')) == 0) {
+                    if (str_starts_with($key, 'modulesToExport_module')) {
                         $this->to_export[] = $value;
                     }
                 }
@@ -1470,10 +1470,10 @@ class AdminThemesControllerCore extends AdminController
             mkdir($dst);
         }
         while (($file = readdir($dir)) !== false) {
-            if (strncmp($file, '.', 1) != 0) {
+            if (!str_starts_with($file, '.')) {
                 if (is_dir($src.'/'.$file)) {
                     self::recurseCopy($src.'/'.$file, $dst.'/'.$file);
-                } elseif (is_readable($src.'/'.$file) && $file != 'Thumbs.db' && $file != '.DS_Store' && substr($file, -1) != '~') {
+                } elseif (is_readable($src.'/'.$file) && $file != 'Thumbs.db' && $file != '.DS_Store' && !str_ends_with($file, '~')) {
                     copy($src.'/'.$file, $dst.'/'.$file);
                 }
             }
@@ -1532,7 +1532,7 @@ class AdminThemesControllerCore extends AdminController
                     }
                 } elseif (Tools::getValue('theme_archive_server') != '') {
                     $filename = _PS_ALL_THEMES_DIR_.Tools::getValue('theme_archive_server');
-                    if (substr($filename, -4) != '.zip') {
+                    if (!str_ends_with($filename, '.zip')) {
                         $this->errors[] = $this->l('Only zip files are allowed');
                     } elseif (!copy($filename, $sandbox.Theme::UPLOADED_THEME_DIR_NAME.'.zip')) {
                         $this->errors[] = $this->l('An error has occurred during the file copy.');
@@ -1831,7 +1831,7 @@ class AdminThemesControllerCore extends AdminController
             $theme_archive_server[] = '-';
 
             foreach ($files as $file) {
-                if (is_file(_PS_ALL_THEMES_DIR_.$file) && substr(_PS_ALL_THEMES_DIR_.$file, -4) == '.zip') {
+                if (is_file(_PS_ALL_THEMES_DIR_.$file) && str_ends_with(_PS_ALL_THEMES_DIR_.$file, '.zip')) {
                     $theme_archive_server[] = array(
                         'id' => basename(_PS_ALL_THEMES_DIR_.$file),
                         'name' => basename(_PS_ALL_THEMES_DIR_.$file)
@@ -2538,7 +2538,7 @@ class AdminThemesControllerCore extends AdminController
             $this->modules_errors = array();
             foreach ($shops as $id_shop) {
                 foreach ($_POST as $key => $value) {
-                    if (strncmp($key, 'to_install', strlen('to_install')) == 0) {
+                    if (str_starts_with($key, 'to_install')) {
                         $module = Module::getInstanceByName($value);
                         if ($module) {
                             $is_installed_success = true;
@@ -2559,7 +2559,7 @@ class AdminThemesControllerCore extends AdminController
 
                             unset($module_hook[$module->name]);
                         }
-                    } elseif (strncmp($key, 'to_enable', strlen('to_enable')) == 0) {
+                    } elseif (str_starts_with($key, 'to_enable')) {
                         $module = Module::getInstanceByName($value);
                         if ($module) {
                             $is_installed_success = true;
@@ -2581,7 +2581,7 @@ class AdminThemesControllerCore extends AdminController
 
                             unset($module_hook[$module->name]);
                         }
-                    } elseif (strncmp($key, 'to_disable', strlen('to_disable')) == 0) {
+                    } elseif (str_starts_with($key, 'to_disable')) {
                         $key_exploded = explode('_', $key);
                         $id_shop_module = (int)substr($key_exploded[2], 4);
 

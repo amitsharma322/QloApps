@@ -185,7 +185,7 @@ function fix_filename($str, $transliteration)
     // Empty or incorrectly transliterated filename.
     // Here is a point: a good file UNKNOWN_LANGUAGE.jpg could become .jpg in previous code.
     // So we add that default 'file' name to fix that issue.
-    if (strpos($str, '.') === 0) {
+    if (str_starts_with($str, '.')) {
         $str = 'file'.$str;
     }
 
@@ -291,7 +291,7 @@ function image_check_memory_usage($img, $max_breedte, $max_hoogte)
 
 function endsWith($haystack, $needle)
 {
-    return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+    return $needle === "" || str_ends_with($haystack, $needle);
 }
 
 function new_thumbnails_creation($targetPath, $targetFile, $name, $current_path, $relative_image_creation, $relative_path_from_current_pos, $relative_image_creation_name_to_prepend, $relative_image_creation_name_to_append, $relative_image_creation_width, $relative_image_creation_height, $fixed_image_creation, $fixed_path_from_filemanager, $fixed_image_creation_name_to_prepend, $fixed_image_creation_to_append, $fixed_image_creation_width, $fixed_image_creation_height)

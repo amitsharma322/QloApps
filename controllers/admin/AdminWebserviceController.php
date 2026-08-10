@@ -275,7 +275,7 @@ class AdminWebserviceControllerCore extends AdminController
 
     public function checkForWarning()
     {
-        if (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') === false) {
+        if (!str_contains($_SERVER['SERVER_SOFTWARE'], 'Apache')) {
             $this->warnings[] = $this->l('To avoid operating problems, please use an Apache server.');
             if (function_exists('apache_get_modules')) {
                 $apache_modules = apache_get_modules();

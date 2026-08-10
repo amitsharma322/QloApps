@@ -224,7 +224,7 @@ class AdminScenesControllerCore extends AdminController
             $this->addJqueryPlugin('imgareaselect');
             $this->addJs(_PS_JS_DIR_.'admin/scenes.js');
             $image_to_map_desc .= '<div class="panel panel-default"><span class="thumbnail row-margin-bottom"><img id="large_scene_image" alt="" src="'.
-                _THEME_SCENE_DIR_.$obj->id.'-scene_default.jpg?rand='.(int)rand().'" /></span>';
+                _THEME_SCENE_DIR_.$obj->id.'-scene_default.jpg?rand='.(int)random_int(0, mt_getrandmax()).'" /></span>';
 
             $image_to_map_desc .= '
 				<div id="ajax_choose_product" class="row" style="display:none;">
@@ -245,7 +245,7 @@ class AdminScenesControllerCore extends AdminController
 				';
 
             if ($obj->id && file_exists(_PS_SCENE_IMG_DIR_.'thumbs/'.$obj->id.'-m_scene_default.jpg')) {
-                $image_to_map_desc .= '</div><hr/><img class="thumbnail" id="large_scene_image" style="clear:both;border:1px solid black;" alt="" src="'._THEME_SCENE_DIR_.'thumbs/'.$obj->id.'-m_scene_default.jpg?rand='.(int)rand().'" />';
+                $image_to_map_desc .= '</div><hr/><img class="thumbnail" id="large_scene_image" style="clear:both;border:1px solid black;" alt="" src="'._THEME_SCENE_DIR_.'thumbs/'.$obj->id.'-m_scene_default.jpg?rand='.(int)random_int(0, mt_getrandmax()).'" />';
             }
 
             $img_alt_desc = '';

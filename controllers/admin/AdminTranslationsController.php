@@ -1021,7 +1021,7 @@ class AdminTranslationsControllerCore extends AdminController
                 $content = file_get_contents($dir.$file);
 
                 // Get file type
-                $type_file = substr($file, -4) == '.tpl' ? 'tpl' : 'php';
+                $type_file = str_ends_with($file, '.tpl') ? 'tpl' : 'php';
 
                 // Parse this content
                 $matches = Translate::userParseFile($content, $this->type_selected, $type_file, $module_name);
@@ -1121,12 +1121,12 @@ class AdminTranslationsControllerCore extends AdminController
                 $content = file_get_contents($file_path);
 
                 // Module files can now be ignored by adding this string in a file
-                if (strpos($content, 'IGNORE_THIS_FILE_FOR_TRANSLATION') !== false) {
+                if (str_contains($content, 'IGNORE_THIS_FILE_FOR_TRANSLATION')) {
                     continue;
                 }
 
                 // Get file type
-                $type_file = substr($file, -4) == '.tpl' ? 'tpl' : 'php';
+                $type_file = str_ends_with($file, '.tpl') ? 'tpl' : 'php';
 
                 // Parse this content
                 $matches = Translate::userParseFile($content, $this->type_selected, $type_file, $module_name);
@@ -1675,7 +1675,7 @@ class AdminTranslationsControllerCore extends AdminController
         $dir = $this->translations_informations[$this->type_selected]['dir'];
         $file = $this->translations_informations[$this->type_selected]['file'];
 
-        $$var = array();
+        ${$var} = array();
         if (!Tools::file_exists_cache($dir)) {
             if (!mkdir($dir, 0700)) {
                 throw new PrestaShopException('Directory '.$dir.' cannot be created.');
@@ -1690,7 +1690,7 @@ class AdminTranslationsControllerCore extends AdminController
             $this->displayWarning(Tools::displayError('This file must be writable:').' '.$dir.'/'.$file);
         }
         include($dir.DIRECTORY_SEPARATOR.$file);
-        return $$var;
+        return ${$var};
     }
 
     public function displayToggleButton($closed = false)
@@ -1829,9 +1829,9 @@ class AdminTranslationsControllerCore extends AdminController
                 if (preg_match('/^(.*)\.php$/', $file) && Tools::file_exists_cache($file_path = $dir.$file) && !in_array($file, Translate::$ignore_folder)) {
                     $prefix_key = basename($file);
                     // -4 becomes -14 to remove the ending "Controller.php" from the filename
-                    if (strpos($file, 'Controller.php') !== false) {
+                    if (str_contains($file, 'Controller.php')) {
                         $prefix_key = basename(substr($file, 0, -14));
-                    } elseif (strpos($file, 'Helper') !== false) {
+                    } elseif (str_contains($file, 'Helper')) {
                         $prefix_key = 'Helper';
                     }
 
@@ -2649,7 +2649,7 @@ class AdminTranslationsControllerCore extends AdminController
                         if (!in_array($file, Translate::$ignore_folder)) {
                             $files_to_copy_iso[] = array(
                                 "from" => $dir.$file,
-                                "to" => str_replace((strpos($dir, _PS_CORE_DIR_) !== false) ? _PS_CORE_DIR_ : _PS_ROOT_DIR_, _PS_ROOT_DIR_.'/themes/'.$current_theme, $dir).$file
+                                "to" => str_replace((str_contains($dir, _PS_CORE_DIR_)) ? _PS_CORE_DIR_ : _PS_ROOT_DIR_, _PS_ROOT_DIR_.'/themes/'.$current_theme, $dir).$file
                             );
                         }
                     }
@@ -3061,7 +3061,7 @@ class AdminTranslationsControllerCore extends AdminController
 
     public static function getEmailHTML($email)
     {
-        if (defined('_PS_HOST_MODE_') && strpos($email, _PS_MAIL_DIR_) !== false) {
+        if (defined('_PS_HOST_MODE_') && str_contains($email, _PS_MAIL_DIR_)) {
             $email_file = $email;
         } elseif (__PS_BASE_URI__ != '/') {
             $email_file = str_replace(__PS_BASE_URI__, '', _PS_ROOT_DIR_.'/').$email;
@@ -3072,7 +3072,7 @@ class AdminTranslationsControllerCore extends AdminController
         $sanitizedFilePath = realpath($email_file);
         $permittedMailDir  = realpath(_PS_MAIL_DIR_) . DIRECTORY_SEPARATOR;
 
-        if ($sanitizedFilePath === false || $permittedMailDir === false || strpos($sanitizedFilePath, $permittedMailDir) !== 0) {
+        if ($sanitizedFilePath === false || $permittedMailDir === false || !str_starts_with($sanitizedFilePath, $permittedMailDir)) {
             return false;
         }
 

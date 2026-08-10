@@ -160,7 +160,7 @@ class HelperOptionsCore extends Helper
                 }
 
                 // Fill values for all languages for all lang fields
-                if (substr($field['type'], -4) == 'Lang') {
+                if (str_ends_with($field['type'], 'Lang')) {
                     $field['value'] = array();
                     $field['languages'] = array();
                     foreach ($languages as $language) {

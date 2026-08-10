@@ -381,11 +381,7 @@ class CookieCore
             return setcookie(
                 $this->_name,
                 $content,
-                $time,
-                $this->_path,
-                $this->_domain . '; SameSite=' . $this->_sameSite,
-                $this->_secure,
-                true
+                ['expires' => $time, 'path' => $this->_path, 'domain' => $this->_domain . '; SameSite=' . $this->_sameSite, 'secure' => $this->_secure, 'httponly' => true]
             );
         }
 
@@ -444,7 +440,7 @@ class CookieCore
             return $result;
         }
         foreach ($this->_content as $key => $value) {
-            if (strncmp($key, $origin, strlen($origin)) == 0) {
+            if (str_starts_with($key, $origin)) {
                 $result[$key] = $value;
             }
         }

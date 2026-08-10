@@ -1116,10 +1116,10 @@ abstract class ModuleCore
             $reflection_class = new ReflectionClass($current_class);
             $file_path = realpath($reflection_class->getFileName());
             $realpath_module_dir = realpath(_PS_MODULE_DIR_);
-            if (substr(realpath($file_path), 0, strlen($realpath_module_dir)) == $realpath_module_dir) {
+            if (str_starts_with(realpath($file_path), $realpath_module_dir)) {
                 // For controllers in module/controllers path
-                if (basename(dirname(dirname($file_path))) == 'controllers') {
-                    self::$classInModule[$current_class] = basename(dirname(dirname(dirname($file_path))));
+                if (basename(dirname($file_path, 2)) == 'controllers') {
+                    self::$classInModule[$current_class] = basename(dirname($file_path, 3));
                 } else {
                     // For old AdminTab controllers
                     self::$classInModule[$current_class] = substr(dirname($file_path), strlen($realpath_module_dir) + 1);
@@ -1426,11 +1426,11 @@ abstract class ModuleCore
                     $file_path = _PS_MODULE_DIR_.$module.'/'.$module.'.php';
                     $file = trim(file_get_contents(_PS_MODULE_DIR_.$module.'/'.$module.'.php'));
 
-                    if (substr($file, 0, 5) == '<?php') {
+                    if (str_starts_with($file, '<?php')) {
                         $file = substr($file, 5);
                     }
 
-                    if (substr($file, -2) == '?>') {
+                    if (str_ends_with($file, '?>')) {
                         $file = substr($file, 0, -2);
                     }
 
@@ -1869,7 +1869,7 @@ abstract class ModuleCore
 
         if ($trusted_modules_list_content === null) {
             $trusted_modules_list_content = Tools::file_get_contents(_PS_ROOT_DIR_.self::CACHE_FILE_TRUSTED_MODULES_LIST);
-            if (strpos($trusted_modules_list_content, $context->theme->name) === false) {
+            if (!str_contains($trusted_modules_list_content, $context->theme->name)) {
                 self::generateTrustedXml();
             }
         }
@@ -1888,7 +1888,7 @@ abstract class ModuleCore
 
         // If the module is trusted, which includes both partner modules and modules bought on Addons
 
-        if (stripos($trusted_modules_list_content, $module_name) !== false) {
+        if (stripos($trusted_modules_list_content, (string) $module_name) !== false) {
             // If the module is not a partner, then return 1 (which means the module is "trusted")
             if (stripos($modules_list_content, '<module name="'.$module_name.'"/>') == false) {
                 return 1;
@@ -1898,7 +1898,7 @@ abstract class ModuleCore
             }
             // The module seems to be trusted, but it does not seem to be dedicated to this country
             return 2;
-        } elseif (stripos($untrusted_modules_list_content, $module_name) !== false) {
+        } elseif (stripos($untrusted_modules_list_content, (string) $module_name) !== false) {
             // If the module is already in the untrusted list, then return 0 (untrusted)
             return 0;
         } else {
@@ -2024,7 +2024,7 @@ abstract class ModuleCore
                 // 'module_key' => $obj->module_key,
             );
             $xml = Tools::addonsRequest('check_module', $params);
-            return (bool)(strpos($xml, 'success') !== false);
+            return (bool)(str_contains($xml, 'success'));
         }
     }
 
@@ -2977,7 +2977,7 @@ abstract class ModuleCore
             // require module controller file
             require_once _PS_ROOT_DIR_.'/'.$parentClassFilePath;
             if ($classInfo['controller_type'] == 'admin') {
-                $overrideClassName = $classname.((strpos($classname, 'Controller') === false) ? 'Controller' : '').'Override';
+                $overrideClassName = $classname.((!str_contains($classname, 'Controller')) ? 'Controller' : '').'Override';
             } else {
                 $overrideClassName = Tools::ucfirst($classInfo['module']).Tools::ucfirst($classInfo['class']).'ModuleFrontControllerOverride';
             }
@@ -3178,7 +3178,7 @@ abstract class ModuleCore
 
             require_once _PS_ROOT_DIR_.'/'.$parentClassFilePath;
             if ($classInfo['controller_type'] == 'admin') {
-                $overrideClassName = $classname.((strpos($classname, 'Controller') === false) ? 'Controller' : '').'Override';
+                $overrideClassName = $classname.((!str_contains($classname, 'Controller')) ? 'Controller' : '').'Override';
             } else {
                 $overrideClassName = Tools::ucfirst($classInfo['module']).Tools::ucfirst($classInfo['class']).'ModuleFrontControllerOverride';
             }

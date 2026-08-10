@@ -123,7 +123,7 @@ class Dashgoals extends Module
 
 	public function hookActionAdminControllerSetMedia()
 	{
-		if (get_class($this->context->controller) == 'AdminDashboardController') {
+		if ($this->context->controller::class == 'AdminDashboardController') {
             Media::addJsDef(array(
                 'goal_set_txt' => $this->l('Goal Set'),
                 'goal_diff_txt' => $this->l('Goal Difference'),
@@ -234,9 +234,9 @@ class Dashgoals extends Module
 			$from = strtotime(date('Y-01-01 00:00:00'));
 			$to = strtotime(date('Y-12-31 00:00:00'));
 			for ($date = $from; $date <= $to; $date = strtotime('+1 day', $date)) {
-				$visits[$date] = round(rand(2000, 5000));
-				$orders[$date] = round(rand(40, 100));
-				$sales[$date] = round(rand(3000, 9000), 2);
+				$visits[$date] = round(random_int(2000, 5000));
+				$orders[$date] = round(random_int(40, 100));
+				$sales[$date] = round(random_int(3000, 9000), 2);
 			}
 
 			// Now we can calculate the value for every months

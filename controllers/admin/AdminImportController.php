@@ -448,7 +448,7 @@ class AdminImportControllerCore extends AdminController
             case 'k': $bytes *= 1024;
         }
 
-        if (!isset($bytes) || $bytes == '') {
+        if (!isset($bytes) || $bytes == 0) {
             $bytes = 20971520;
         } // 20Mb
 
@@ -3257,10 +3257,7 @@ class AdminImportControllerCore extends AdminController
 
     protected static function usortFiles($a, $b)
     {
-        if ($a == $b) {
-            return 0;
-        }
-        return ($b < $a) ? 1 : - 1;
+        return $a <=> $b;
     }
 
     protected function openCsvFile()

@@ -27,10 +27,10 @@
 /**
  * @since 1.5.0
  */
-class PrestaShopDatabaseExceptionCore extends PrestaShopException
+class PrestaShopDatabaseExceptionCore extends PrestaShopException implements \Stringable
 {
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->message;
+        return (string) $this->message;
     }
 }

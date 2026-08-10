@@ -190,7 +190,7 @@ class SpecificPriceCore extends ObjectModel
 
         foreach (array_reverse($priority) as $k => $field) {
             if (!empty($field)) {
-                $select .= ' IF (`'.bqSQL($field).'` = '.(int)$$field.', '.pow(2, $k + 1).', 0) + ';
+                $select .= ' IF (`'.bqSQL($field).'` = '.(int)${$field}.', '.pow(2, $k + 1).', 0) + ';
             }
         }
 

@@ -477,11 +477,11 @@ function runAdminTab($tab, $ajax_mode = false)
                             foreach ($_POST as $key => $value) {
                                 if (is_array($admin_obj->table)) {
                                     foreach ($admin_obj->table as $table) {
-                                        if (strncmp($key, $table.'Filter_', 7) === 0 || strncmp($key, 'submitFilter', 12) === 0) {
+                                        if (strncmp($key, $table.'Filter_', 7) === 0 || str_starts_with($key, 'submitFilter')) {
                                             $cookie->$key = !is_array($value) ? $value : json_encode($value);
                                         }
                                     }
-                                } elseif (strncmp($key, $admin_obj->table.'Filter_', 7) === 0 || strncmp($key, 'submitFilter', 12) === 0) {
+                                } elseif (strncmp($key, $admin_obj->table.'Filter_', 7) === 0 || str_starts_with($key, 'submitFilter')) {
                                     $cookie->$key = !is_array($value) ? $value : json_encode($value);
                                 }
                             }
@@ -515,7 +515,7 @@ function runAdminTab($tab, $ajax_mode = false)
 
                         // ${1} in the replacement string of the regexp is required, because the token may begin with a number and mix up with it (e.g. $17)
                         $url = preg_replace('/([&?]token=)[^&]*(&.*)?$/', '${1}'.$admin_obj->token.'$2', $_SERVER['REQUEST_URI']);
-                        if (false === strpos($url, '?token=') && false === strpos($url, '&token=')) {
+                        if (!str_contains($url, '?token=') && !str_contains($url, '&token=')) {
                             $url .= '&token='.$admin_obj->token;
                         }
 
@@ -530,7 +530,7 @@ function runAdminTab($tab, $ajax_mode = false)
 
                         // ${1} in the replacement string of the regexp is required, because the token may begin with a number and mix up with it (e.g. $17)
                         $url = preg_replace('/([&?]token=)[^&]*(&.*)?$/', '${1}'.$admin_obj->token.'$2', $_SERVER['REQUEST_URI']);
-                        if (false === strpos($url, '?token=') && false === strpos($url, '&token=')) {
+                        if (!str_contains($url, '?token=') && !str_contains($url, '&token=')) {
                             $url .= '&token='.$admin_obj->token;
                         }
 

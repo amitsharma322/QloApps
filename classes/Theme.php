@@ -346,7 +346,7 @@ class ThemeCore extends ObjectModel
     {
         // Object must have a variable called 'responsive'
         if (!property_exists($this, 'responsive')) {
-            throw new PrestaShopException('property "responsive" is missing in object '.get_class($this));
+            throw new PrestaShopException('property "responsive" is missing in object '.static::class);
         }
 
         // Update only responsive field
@@ -362,7 +362,7 @@ class ThemeCore extends ObjectModel
     public function toggleDefaultLeftColumn()
     {
         if (!property_exists($this, 'default_left_column')) {
-            throw new PrestaShopException('property "default_left_column" is missing in object '.get_class($this));
+            throw new PrestaShopException('property "default_left_column" is missing in object '.static::class);
         }
 
         $this->setFieldsToUpdate(array('default_left_column' => true));
@@ -375,7 +375,7 @@ class ThemeCore extends ObjectModel
     public function toggleDefaultRightColumn()
     {
         if (!property_exists($this,'default_right_column')) {
-            throw new PrestaShopException('property "default_right_column" is missing in object '.get_class($this));
+            throw new PrestaShopException('property "default_right_column" is missing in object '.static::class);
         }
 
         $this->setFieldsToUpdate(array('default_right_column' => true));

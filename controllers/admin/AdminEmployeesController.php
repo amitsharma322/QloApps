@@ -128,7 +128,7 @@ class AdminEmployeesControllerCore extends AdminController
                 if (file_exists($path.$theme.DIRECTORY_SEPARATOR.'css'.DIRECTORY_SEPARATOR.'schemes'.$rtl)) {
                     foreach (scandir($path.$theme.DIRECTORY_SEPARATOR.'css'.DIRECTORY_SEPARATOR.'schemes'.$rtl) as $css) {
                         if ($css[0] != '.' && preg_match('/\.css$/', $css)) {
-                            $name = strpos($css, 'admin-theme-') !== false ? Tools::ucfirst(preg_replace('/^admin-theme-(.*)\.css$/', '$1', $css)) : $css;
+                            $name = str_contains($css, 'admin-theme-') ? Tools::ucfirst(preg_replace('/^admin-theme-(.*)\.css$/', '$1', $css)) : $css;
                             $this->themes[] = array('id' => $theme.'|schemes'.$rtl.'/'.$css, 'name' => $name);
                         }
                     }
@@ -513,12 +513,12 @@ class AdminEmployeesControllerCore extends AdminController
 
             // Unset set shops
             foreach ($_POST as $postkey => $postvalue) {
-                if (strstr($postkey, 'checkBoxShopAsso_'.$this->table) !== false) {
+                if (str_contains($postkey, 'checkBoxShopAsso_'.$this->table)) {
                     unset($_POST[$postkey]);
                 }
             }
             foreach ($_GET as $postkey => $postvalue) {
-                if (strstr($postkey, 'checkBoxShopAsso_'.$this->table) !== false) {
+                if (str_contains($postkey, 'checkBoxShopAsso_'.$this->table)) {
                     unset($_GET[$postkey]);
                 }
             }

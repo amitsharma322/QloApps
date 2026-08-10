@@ -155,7 +155,7 @@ abstract class HTMLTemplateCore
      */
     public function assignHookData($object)
     {
-        $template = ucfirst(str_replace('HTMLTemplate', '', get_class($this)));
+        $template = ucfirst(str_replace('HTMLTemplate', '', static::class));
         $hook_name = 'displayPDF'.$template;
 
         $this->smarty->assign(array(

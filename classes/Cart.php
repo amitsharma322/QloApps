@@ -2089,7 +2089,7 @@ class CartCore extends ObjectModel
                     }
                     try {
                         $address[$this->id] = Address::initialize($id_address);
-                    } catch (Exception $e) {
+                    } catch (Exception) {
                         $address[$this->id] = new Address();
                         $address[$this->id]->id_country = Configuration::get('PS_COUNTRY_DEFAULT');
                     }
@@ -3284,10 +3284,8 @@ class CartCore extends ObjectModel
                     break;
                 }
             }
-
-            reset($options);
             if (!isset($delivery_option[$id_address])) {
-                $delivery_option[$id_address] = key($options);
+                $delivery_option[$id_address] = array_key_first($options);
             }
         }
 
@@ -4325,7 +4323,7 @@ class CartCore extends ObjectModel
                 $customized_value = $custom['value'];
 
                 if ((int)$custom['type'] == 0) {
-                    $customized_value = md5(uniqid(rand(), true));
+                    $customized_value = md5(uniqid(random_int(0, mt_getrandmax()), true));
                     Tools::copy(_PS_UPLOAD_DIR_.$custom['value'], _PS_UPLOAD_DIR_.$customized_value);
                     Tools::copy(_PS_UPLOAD_DIR_.$custom['value'].'_small', _PS_UPLOAD_DIR_.$customized_value.'_small');
                 }

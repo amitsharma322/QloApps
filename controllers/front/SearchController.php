@@ -99,7 +99,7 @@ class SearchControllerCore extends FrontController
             $search = Search::find($this->context->language->id, $query, $this->p, $this->n, $this->orderBy, $this->orderWay);
             if (is_array($search['result'])) {
                 foreach ($search['result'] as &$product) {
-                    $product['link'] .= (strpos($product['link'], '?') === false ? '?' : '&').'search_query='.urlencode($query).'&results='.(int)$search['total'];
+                    $product['link'] .= (!str_contains($product['link'], '?') ? '?' : '&').'search_query='.urlencode($query).'&results='.(int)$search['total'];
                 }
             }
 

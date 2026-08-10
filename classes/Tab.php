@@ -312,7 +312,7 @@ class TabCore extends ObjectModel
                     $objreflect = new ReflectionMethod($class_name, 'renderKpis');
                     $tab['has_kpi'] = ($objreflect->getDeclaringClass()->getName() === $class_name)
                         || isset($hookKpiClasses[$tab['class_name']]);
-                } catch (ReflectionException $e) {
+                } catch (ReflectionException) {
                     $tab['has_kpi'] = isset($hookKpiClasses[$tab['class_name']]);
                 }
             }

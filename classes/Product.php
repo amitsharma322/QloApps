@@ -5101,7 +5101,7 @@ class ProductCore extends ObjectModel
         $has_required_fields = 0;
         foreach ($_POST as $field => $value) {
             /* Label update */
-            if (strncmp($field, 'label_', 6) == 0) {
+            if (str_starts_with($field, 'label_')) {
                 if (!$tmp = $this->_checkLabelField($field, $value)) {
                     return false;
                 }

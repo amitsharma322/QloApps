@@ -1174,7 +1174,7 @@ class OrderInvoiceCore extends ObjectModel
     public function getInvoiceNumberFormatted($id_lang, $id_shop = null)
     {
         $invoice_formatted_number = Hook::exec('actionInvoiceNumberFormatted', array(
-            get_class($this) => $this,
+            static::class => $this,
             'id_lang' => (int)$id_lang,
             'id_shop' => (int)$id_shop,
             'number' => (int)$this->number

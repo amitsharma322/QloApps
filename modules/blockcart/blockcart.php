@@ -534,7 +534,7 @@ class Blockcart extends Module
             'warning_num' => $warning_num,
             'module_dir' => _MODULE_DIR_,
             'current_page' => $current_page,
-            'order_page' => (strpos($_SERVER['PHP_SELF'], 'order') !== false),
+            'order_page' => (str_contains($_SERVER['PHP_SELF'], 'order')),
             'blockcart_top' => (isset($params['blockcart_top']) && $params['blockcart_top']) ? true : false,
         ));
         $res = $this->getContentVars($params);

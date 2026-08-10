@@ -171,7 +171,7 @@ class DashInsights extends Module
                 );
 
                 foreach ($this->discreteDates as $discreteDate) {
-                    $allHotelSeriesInfo['data'][$discreteDate['timestamp_from']] = rand(1, 100);
+                    $allHotelSeriesInfo['data'][$discreteDate['timestamp_from']] = random_int(1, 100);
                 }
                 $seriesWiseRoomNights[] = $allHotelSeriesInfo;
             } else { // if one of the hotels is selected
@@ -182,7 +182,7 @@ class DashInsights extends Module
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                 $currentHotelRoomNightsData = array();
                 foreach ($this->discreteDates as $discreteDate) {
-                    $currentHotelRoomNightsData[$discreteDate['timestamp_from']] = rand(1, 100);
+                    $currentHotelRoomNightsData[$discreteDate['timestamp_from']] = random_int(1, 100);
                 }
 
                 $currentHotelSeriesInfo = array(
@@ -193,7 +193,7 @@ class DashInsights extends Module
                 // average series info
                 $averageRoomNightsData = array();
                 foreach ($this->discreteDates as $discreteDate) {
-                    $averageRoomNightsData[$discreteDate['timestamp_from']] = sprintf('%0.2f', rand(1, 10000) / 100);
+                    $averageRoomNightsData[$discreteDate['timestamp_from']] = sprintf('%0.2f', random_int(1, 10000) / 100);
                 }
 
                 $averageSeriesInfo = array(
@@ -279,7 +279,7 @@ class DashInsights extends Module
 
                 // 1 = SUN
                 for ($i = 1; $i <= 7; $i++) {
-                    $allHotelSeriesInfo['data'][$i] = round(rand(0, 100));
+                    $allHotelSeriesInfo['data'][$i] = round(random_int(0, 100));
                 }
 
                 $seriesWiseDaysOfTheWeek[] = $allHotelSeriesInfo;
@@ -291,7 +291,7 @@ class DashInsights extends Module
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                 $currentHotelDaysOfTheWeekData = array();
                 for ($i = 1; $i <= 7; $i++) {
-                    $currentHotelDaysOfTheWeekData[$i] = round(rand(0, 100));
+                    $currentHotelDaysOfTheWeekData[$i] = round(random_int(0, 100));
                 }
 
                 $currentHotelSeriesInfo = array(
@@ -302,7 +302,7 @@ class DashInsights extends Module
                 // average series info
                 $averageDaysOfTheWeekData = array();
                 for ($i = 1; $i <= 7; $i++) {
-                    $averageDaysOfTheWeekData[$i] = sprintf('%0.2f', rand(1, 10000) / 100);
+                    $averageDaysOfTheWeekData[$i] = sprintf('%0.2f', random_int(1, 10000) / 100);
                 }
 
                 $averageSeriesInfo = array(
@@ -416,13 +416,13 @@ class DashInsights extends Module
                 );
 
                 $roomsOccupied = array(
-                    7 => rand(1, 100),
-                    6 => rand(1, 100),
-                    5 => rand(1, 100),
-                    4 => rand(1, 100),
-                    3 => rand(1, 100),
-                    2 => rand(1, 100),
-                    1 => rand(1, 100),
+                    7 => random_int(1, 100),
+                    6 => random_int(1, 100),
+                    5 => random_int(1, 100),
+                    4 => random_int(1, 100),
+                    3 => random_int(1, 100),
+                    2 => random_int(1, 100),
+                    1 => random_int(1, 100),
                 );
                 $totalOccupiedRooms = array_sum($roomsOccupied);
                 foreach ($roomsOccupied as $key => $value) {
@@ -434,13 +434,13 @@ class DashInsights extends Module
             } else { // if one of the hotels is selected
                 // calculation for currently selected hotel
                 $roomsOccupied = array(
-                    7 => rand(1, 100),
-                    6 => rand(1, 100),
-                    5 => rand(1, 100),
-                    4 => rand(1, 100),
-                    3 => rand(1, 100),
-                    2 => rand(1, 100),
-                    1 => rand(1, 100),
+                    7 => random_int(1, 100),
+                    6 => random_int(1, 100),
+                    5 => random_int(1, 100),
+                    4 => random_int(1, 100),
+                    3 => random_int(1, 100),
+                    2 => random_int(1, 100),
+                    1 => random_int(1, 100),
                 );
 
                 $totalOccupiedRooms = array_sum($roomsOccupied);
@@ -458,13 +458,13 @@ class DashInsights extends Module
 
                 // calculation for other hotels average series info
                 $roomsOccupied = array(
-                    7 => rand(1, 100),
-                    6 => rand(1, 100),
-                    5 => rand(1, 100),
-                    4 => rand(1, 100),
-                    3 => rand(1, 100),
-                    2 => rand(1, 100),
-                    1 => rand(1, 100),
+                    7 => random_int(1, 100),
+                    6 => random_int(1, 100),
+                    5 => random_int(1, 100),
+                    4 => random_int(1, 100),
+                    3 => random_int(1, 100),
+                    2 => random_int(1, 100),
+                    1 => random_int(1, 100),
                 );
 
                 $totalOccupiedRooms = array_sum($roomsOccupied);

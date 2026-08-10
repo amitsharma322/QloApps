@@ -61,10 +61,10 @@ class ValidateCore
     {
         if (!$url || $url == 'http://') {
             $errors[] = Tools::displayError('Please specify module URL');
-        } elseif (substr($url, -4) != '.tar' && substr($url, -4) != '.zip' && substr($url, -4) != '.tgz' && substr($url, -7) != '.tar.gz') {
+        } elseif (!str_ends_with($url, '.tar') && !str_ends_with($url, '.zip') && !str_ends_with($url, '.tgz') && !str_ends_with($url, '.tar.gz')) {
             $errors[] = Tools::displayError('Unknown archive type');
         } else {
-            if ((strpos($url, 'http')) === false) {
+            if (!str_contains($url, 'http')) {
                 $url = 'http://'.$url;
             }
             if (!is_array(@get_headers($url))) {
@@ -936,7 +936,7 @@ class ValidateCore
      */
     public static function isCookie($data)
     {
-        return (is_object($data) && get_class($data) == 'Cookie');
+        return (is_object($data) && $data::class == 'Cookie');
     }
 
     /**

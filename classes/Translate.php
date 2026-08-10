@@ -188,7 +188,7 @@ class TranslateCore
             $current_key = strtolower('<{'.$name.'}'._THEME_NAME_.'>'.$source).'_'.$key;
             $default_key = strtolower('<{'.$name.'}prestashop>'.$source).'_'.$key;
 
-            if ('controller' == substr($source, -10, 10)) {
+            if (str_ends_with($source, 'controller')) {
                  $file = substr($source, 0, -10);
                  $current_key_file = strtolower('<{'.$name.'}'._THEME_NAME_.'>'.$file).'_'.$key;
                  $default_key_file = strtolower('<{'.$name.'}prestashop>'.$file).'_'.$key;
@@ -560,9 +560,9 @@ class TranslateCore
                 if (preg_match('/^(.*)\.php$/', $file) && Tools::file_exists_cache($filePath = $dir.$file) && !in_array($file, self::$ignore_folder)) {
                     $prefixKey = basename($file);
                     // -4 becomes -14 to remove the ending "Controller.php" from the filename
-                    if (strpos($file, 'Controller.php') !== false) {
+                    if (str_contains($file, 'Controller.php')) {
                         $prefixKey = basename(substr($file, 0, -14));
-                    } elseif (strpos($file, 'Helper') !== false) {
+                    } elseif (str_contains($file, 'Helper')) {
                         $prefixKey = 'Helper';
                     }
 

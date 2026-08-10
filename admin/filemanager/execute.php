@@ -15,8 +15,8 @@ $realPathThumb = realpath($_POST['path_thumb']);
 
 if (preg_match('/\.{1,2}[\/|\\\]/', $_POST['path_thumb']) !== 0
     || preg_match('/\.{1,2}[\/|\\\]/', $_POST['path']) !== 0
-    || ($realPath && strpos($realPath, realpath($current_path)) !== 0)
-    || ($realPathThumb && strpos($realPathThumb, realpath($thumbs_base_path)) !== 0)
+    || ($realPath && !str_starts_with($realPath, realpath($current_path)))
+    || ($realPathThumb && !str_starts_with($realPathThumb, realpath($thumbs_base_path)))
 ) {
     die('wrong path');
 }

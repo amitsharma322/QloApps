@@ -851,11 +851,11 @@ class DispatcherCore
         foreach ($modules as $mod) {
             foreach (Dispatcher::getControllersInDirectory(_PS_MODULE_DIR_.$mod->name.'/controllers/') as $controller) {
                 if ($type == 'admin') {
-                    if (strpos($controller, 'Admin') !== false) {
+                    if (str_contains($controller, 'Admin')) {
                         $modules_controllers[$mod->name][] = $controller;
                     }
                 } elseif ($type == 'front') {
-                    if (strpos($controller, 'Admin') === false) {
+                    if (!str_contains($controller, 'Admin')) {
                         $modules_controllers[$mod->name][] = $controller;
                     }
                 } else {

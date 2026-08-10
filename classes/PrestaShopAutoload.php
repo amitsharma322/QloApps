@@ -102,7 +102,7 @@ class PrestaShopAutoload
         }
 
         // If $classname has not core suffix (E.g. Shop, Product)
-        if (substr($classname, -4) != 'Core') {
+        if (!str_ends_with($classname, 'Core')) {
             $class_dir = (isset($this->index[$classname]['override'])
                 && $this->index[$classname]['override'] === true) ? $this->normalizeDirectory(_PS_ROOT_DIR_) : $this->root_dir;
 
@@ -185,7 +185,7 @@ class PrestaShopAutoload
             if ($file[0] != '.') {
                 if (is_dir($root_dir.$path.$file)) {
                     $classes = array_merge($classes, $this->getClassesFromDir($path.$file.'/', $host_mode));
-                } elseif (substr($file, -4) == '.php') {
+                } elseif (str_ends_with($file, '.php')) {
                     $content = file_get_contents($root_dir.$path.$file);
 
                     $namespacePattern = '[\\a-z0-9_]*[\\]';
@@ -199,7 +199,7 @@ class PrestaShopAutoload
                             'override' => $host_mode
                         );
 
-                        if (substr($m['classname'], -4) == 'Core') {
+                        if (str_ends_with($m['classname'], 'Core')) {
                             $classes[substr($m['classname'], 0, -4)] = array(
                                 'path' => '',
                                 'type' => $classes[$m['classname']]['type'],

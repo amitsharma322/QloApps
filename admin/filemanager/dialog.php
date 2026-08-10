@@ -20,11 +20,11 @@ if (isset($_POST['submit'])) {
     }
 
 //remember last position
-    setcookie('last_position', $subdir, time() + (86400 * 7));
+    setcookie('last_position', $subdir, ['expires' => time() + (86400 * 7)]);
 
     if ($subdir == '') {
         if (!empty($_COOKIE['last_position'])
-            && strpos($_COOKIE['last_position'], '.') === false
+            && !str_contains($_COOKIE['last_position'], '.')
         ) {
             $subdir = trim($_COOKIE['last_position']);
         }
@@ -42,9 +42,9 @@ if (isset($_POST['submit'])) {
         $_SESSION['subfolder'] = '';
     }
     $subfolder = '';
-    if (!empty($_SESSION['subfolder']) && strpos($_SESSION['subfolder'], '../') === false
-        && strpos($_SESSION['subfolder'], './') === false && strpos($_SESSION['subfolder'], '/') !== 0
-        && strpos($_SESSION['subfolder'], '.') === false
+    if (!empty($_SESSION['subfolder']) && !str_contains($_SESSION['subfolder'], '../')
+        && !str_contains($_SESSION['subfolder'], './') && !str_starts_with($_SESSION['subfolder'], '/')
+        && !str_contains($_SESSION['subfolder'], '.')
     ) {
         $subfolder = $_SESSION['subfolder'];
     }
@@ -794,7 +794,7 @@ if (isset($_POST['submit'])) {
     );
     foreach ($files as $file_array) {
         $file = $file_array['file'];
-        if ($file == '.' || (isset($file_array['extension']) && $file_array['extension'] != lang_Type_dir) || ($file == '..' && $subdir == '') || in_array($file, $hidden_folders) || ($filter != '' && $file != ".." && strpos($file, $filter) === false)) {
+        if ($file == '.' || (isset($file_array['extension']) && $file_array['extension'] != lang_Type_dir) || ($file == '..' && $subdir == '') || in_array($file, $hidden_folders) || ($filter != '' && $file != ".." && !str_contains($file, $filter))) {
             continue;
         }
         $new_name = fix_filename($file, $transliteration);
@@ -925,7 +925,7 @@ if (isset($_POST['submit'])) {
     foreach ($files as $nu => $file_array) {
         $file = $file_array['file'];
 
-        if ($file == '.' || $file == '..' || is_dir($current_path.$subfolder.$subdir.$file) || in_array($file, $hidden_files) || !in_array(fix_strtolower($file_array['extension']), $ext) || ($filter != '' && strpos($file, $filter) === false)) {
+        if ($file == '.' || $file == '..' || is_dir($current_path.$subfolder.$subdir.$file) || in_array($file, $hidden_files) || !in_array(fix_strtolower($file_array['extension']), $ext) || ($filter != '' && !str_contains($file, $filter))) {
             continue;
         }
 
@@ -971,7 +971,7 @@ if (isset($_POST['submit'])) {
             try {
                 create_img_gd($file_path, $src_thumb, 122, 91);
                 new_thumbnails_creation($current_path.$subfolder.$subdir, $file_path, $file, $current_path, $relative_image_creation, $relative_path_from_current_pos, $relative_image_creation_name_to_prepend, $relative_image_creation_name_to_append, $relative_image_creation_width, $relative_image_creation_height, $fixed_image_creation, $fixed_path_from_filemanager, $fixed_image_creation_name_to_prepend, $fixed_image_creation_to_append, $fixed_image_creation_width, $fixed_image_creation_height);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $src_thumb = $mini_src = "";
             }
         }

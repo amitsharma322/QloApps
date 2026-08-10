@@ -257,8 +257,8 @@ class imageLib
 
   private function initialise()
   {
-      $this->psdReaderPath = dirname(__FILE__) . '/classPhpPsdReader.php';
-      $this->filterOverlayPath = dirname(__FILE__) . '/filters';
+      $this->psdReaderPath = __DIR__ . '/classPhpPsdReader.php';
+      $this->filterOverlayPath = __DIR__ . '/filters';
 
     // *** Set if image should be interlaced or not.
     $this->isInterlace = false;
@@ -315,7 +315,7 @@ class imageLib
     $cropPos = 'm';
         if (is_array($option) && fix_strtolower($option[0]) == 'crop') {
             $cropPos = $option[1];         # get the crop option
-        } elseif (strpos($option, '-') !== false) {
+        } elseif (str_contains($option, '-')) {
             // *** Or pass in a hyphen seperated option
       $optionPiecesArray = explode('-', $option);
             $cropPos = end($optionPiecesArray);
@@ -873,7 +873,7 @@ class imageLib
           } else {
               throw new Exception('Crop resize option array is badly formatted.');
           }
-      } elseif (strpos($option, 'crop') !== false) {
+      } elseif (str_contains($option, 'crop')) {
           return 'crop';
       }
 
@@ -983,7 +983,7 @@ class imageLib
           imagefilter($this->imageResized, IMG_FILTER_GRAYSCALE);
           imagefilter($this->imageResized, IMG_FILTER_CONTRAST, -15);
           imagefilter($this->imageResized, IMG_FILTER_BRIGHTNESS, 2);
-          $this->sharpen($this->width);
+          $this->sharpen();
       }
   }
 
@@ -1148,6 +1148,8 @@ class imageLib
       imagecopy($comp, $im, 0, 0, 0, 0, $width, $height);
       imagecopy($comp, $filter, 0, 0, 0, 0, $width, $height);
       imagecopymerge($im, $comp, 0, 0, 0, 0, $width, $height, $amount);
+
+      imagedestroy($comp);
       return $im;
   }
 
@@ -1259,6 +1261,9 @@ class imageLib
     }
 
       $this->imageResized = $final;
+
+      imagedestroy($li);
+      imagedestroy($im);
   }
 
 
@@ -1566,6 +1571,10 @@ class imageLib
       imagesavealpha($rgb, true);
 
       $this->imageResized = $rgb;
+
+      imagedestroy($image);
+      imagedestroy($newImage);
+      imagedestroy($shadow);
   }
 
 
@@ -2160,7 +2169,7 @@ class imageLib
   private function getTextFont($font)
   {
       // *** Font path (shou
-    $fontPath =  dirname(__FILE__) . '/' . $this->fontDir;
+    $fontPath =  __DIR__ . '/' . $this->fontDir;
 
 
     // *** The below is/may be needed depending on your version (see ref)
@@ -3040,7 +3049,7 @@ class imageLib
   function checkStringStartsWith($needle, $haystack)
   # Check if a string starts with a specific pattern
   {
-      return (substr($haystack, 0, strlen($needle))==$needle);
+      return (str_starts_with($haystack, $needle));
   }
 
 
@@ -3311,6 +3320,7 @@ class imageLib
     public function __destruct()
     {
         if (is_resource($this->imageResized)) {
+            imagedestroy($this->imageResized);
         }
     }
 

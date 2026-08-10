@@ -1051,6 +1051,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 }
                 break;
         }
+        imagedestroy($dest_image);
         if (!$imaged) {
             throw new WebserviceException(sprintf('Unable to write the image "%s".', str_replace(_PS_ROOT_DIR_, '[SHOP_ROOT_DIR]', $new_path)), array(70, 500));
         }
@@ -1103,6 +1104,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                     $const = defined('FILEINFO_MIME_TYPE') ? FILEINFO_MIME_TYPE : FILEINFO_MIME;
                     $finfo = finfo_open($const);
                     $mime_type = finfo_file($finfo, $file['tmp_name']);
+                    finfo_close($finfo);
                 } elseif (Tools::isCallable('mime_content_type')) {
                     $mime_type = mime_content_type($file['tmp_name']);
                 } elseif (Tools::isCallable('exec')) {
@@ -1237,7 +1239,7 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                         @unlink(_PS_TMP_IMG_DIR_.$tmp_name);
                         $this->imgToDisplay = $reception_path;
                     } elseif ($this->imageType == 'customizations') {
-                        $filename = md5(uniqid(rand(), true));
+                        $filename = md5(uniqid(random_int(0, mt_getrandmax()), true));
                         $this->imgToDisplay = _PS_UPLOAD_DIR_.$filename;
                         if (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($file['tmp_name'], $tmp_name)) {
                             throw new WebserviceException('An error occurred during the image upload', array(76, 400));

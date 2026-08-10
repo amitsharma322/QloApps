@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-class TreeCore
+class TreeCore implements \Stringable
 {
     const DEFAULT_TEMPLATE_DIRECTORY   = 'helpers/tree';
     const DEFAULT_TEMPLATE             = 'tree.tpl';
@@ -62,9 +62,9 @@ class TreeCore
         }
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->render();
+        return (string) $this->render();
     }
 
     public function setActions($value)
@@ -281,7 +281,7 @@ class TreeCore
 
     public function getTemplateFile($template)
     {
-        if (preg_match_all('/[^Admin].*(?=Controller)/', get_class($this->getContext()->controller), $matches) !== false) {
+        if (preg_match_all('/[^Admin].*(?=Controller)/', $this->getContext()->controller::class, $matches) !== false) {
             $controller_name = strtolower(Tools::toUnderscoreCase($matches[0][0]));
         }
 

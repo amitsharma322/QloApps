@@ -305,7 +305,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
             );
         }
 
-        $timestamp = time().rand(100, 999);
+        $timestamp = time().random_int(100, 999);
         $currency = Currency::getCurrency((int) $cart->id_currency);
 
         $discountTI = $cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS);

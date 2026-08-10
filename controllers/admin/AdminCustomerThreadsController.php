@@ -1339,7 +1339,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                     $match_found = true;
                 }
 
-                $new_ct = (Configuration::get('PS_SAV_IMAP_CREATE_THREADS') && !$match_found && (strpos($subject, '[no_sync]') == false));
+                $new_ct = (Configuration::get('PS_SAV_IMAP_CREATE_THREADS') && !$match_found && (!str_contains($subject, '[no_sync]')));
 
                 if ($match_found || $new_ct) {
                     if ($new_ct) {
@@ -1355,7 +1355,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                         }
 
                         foreach ($contacts as $contact) {
-                            if (strpos($overview->to, $contact['email']) !== false) {
+                            if (str_contains($overview->to, $contact['email'])) {
                                 $id_contact = $contact['id_contact'];
                             }
                         }
