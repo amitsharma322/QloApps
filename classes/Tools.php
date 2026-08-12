@@ -163,7 +163,7 @@ class ToolsCore
             if (str_starts_with($url, $base_uri)) {
                 $url = substr($url, strlen($base_uri));
             }
-            if (str_contains($url, 'index.php?controller=') && str_starts_with($url, 'index.php/')) {
+            if (str_starts_with($url, 'index.php?controller=')) {
                 $url = substr($url, strlen('index.php?controller='));
                 if (Configuration::get('PS_REWRITING_SETTINGS')) {
                     $url = Tools::strReplaceFirst('&', '?', $url);
@@ -206,7 +206,7 @@ class ToolsCore
             if (str_contains($url, __PS_BASE_URI__) && str_starts_with($url, __PS_BASE_URI__)) {
                 $url = substr($url, strlen(__PS_BASE_URI__));
             }
-            if (str_contains($url, 'index.php?controller=') && str_starts_with($url, 'index.php/')) {
+            if (str_starts_with($url, 'index.php?controller=')) {
                 $url = substr($url, strlen('index.php?controller='));
             }
             $explode = explode('?', $url);
