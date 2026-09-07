@@ -2894,6 +2894,18 @@ class AdminControllerCore extends Controller
     public function setDeprecatedMedia()
     {
     }
+    
+    public function addJqueryUI($component, $theme = 'base', $check_dependencies = true)
+    {
+        parent::addJqueryUI($component, $theme, $check_dependencies);
+
+        if ($component === 'ui.tooltip' || (is_array($component) && in_array('ui.tooltip', $component))) {
+            $bootstrap_js = Media::getJSPath(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/vendor/bootstrap.min.js');
+            if ($bootstrap_js) {
+                $this->js_files[] = $bootstrap_js.'?reclaim_tooltip=1';
+            }
+        }
+    }
 
     public function setMedia()
     {
