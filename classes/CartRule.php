@@ -1007,7 +1007,7 @@ class CartRuleCore extends ObjectModel
                     continue;
                 }
             }
-            $cache_id .= '_'.(int)$product['id_product'].'_'.(int)$product['id_product_attribute'].(isset($product['in_stock']) ? '_'.(int)$product['in_stock'] : '');
+            $cache_id .= '_'.(int)$product['id_product'].'_'.(int)$product['id_product_attribute'].'_'.(int)$product['cart_quantity'].(isset($product['in_stock']) ? '_'.(int)$product['in_stock'] : '');
         }
 
         $package_products = $package['products'];

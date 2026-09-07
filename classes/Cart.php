@@ -1762,11 +1762,26 @@ class CartCore extends ObjectModel
 
                 if ($param_product && isset($product['selling_preference_type'])) {
                     $canSellWithRoomType = $canSellWithRoomType
-                        && ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
+                        && in_array((int) $product['selling_preference_type'], array(
+                            Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
+                            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
+                            Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                        ));
                     $canSellWithHotel = $canSellWithHotel
-                        && ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL);
+                        && in_array((int) $product['selling_preference_type'], array(
+                            Product::SELLING_PREFERENCE_WITH_HOTEL,
+                            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
+                            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                        ));
                     $canSellAsStandalone = $canSellAsStandalone
-                        && ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_STANDALONE);
+                        && in_array((int) $product['selling_preference_type'], array(
+                            Product::SELLING_PREFERENCE_WITH_STANDALONE,
+                            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                            Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                        ));
                 }
 
                 if ($canSellAsStandalone && !$isRoomServiceTotalType) {
