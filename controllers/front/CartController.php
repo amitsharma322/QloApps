@@ -634,8 +634,6 @@ class CartControllerCore extends FrontController
                 */
                 if ($product->booking_product) {
                     $objHotelCartBookingData = new HotelCartBookingData();
-                    $roomDemand = json_decode(Tools::getValue('room_demands'), true);
-                    $roomDemand = json_encode($roomDemand);
                     $availQty = $total_available_rooms;
                     $update_quantity = $objHotelCartBookingData->updateCartBooking(
                         $this->id_product,
@@ -645,7 +643,6 @@ class CartControllerCore extends FrontController
                         0,
                         $date_from,
                         $date_to,
-                        $roomDemand,
                         $serviceProducts,
                         $id_cart,
                         $id_guest
@@ -657,7 +654,6 @@ class CartControllerCore extends FrontController
                             'date_to' => $date_to,
                             'id_product' => $this->id_product,
                             'occupancy' => $occupancy,
-                            'room_demand' => $roomDemand,
                             'req_rm' => $req_rm
                         ));
                     } else {
