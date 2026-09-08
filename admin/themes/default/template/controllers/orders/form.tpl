@@ -22,6 +22,11 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+<style>
+.ui-tooltip.price_info-tooltip { border: unset; padding: 10px; box-shadow: 0px 0px 15px 0px #00000026; }
+.ui-tooltip.price_info-tooltip span { margin-left: 15px; }
+.ui-tooltip.price_info-tooltip label { font-weight: 600; }
+</style>
 <script type="text/javascript">
 	{if isset($cart->id) && $cart->id}
 		var id_cart = {$cart->id|intval};
@@ -48,6 +53,33 @@
 	var priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval};
 
 	$(document).ready(function() {
+
+		$('.total_taxes_price_info img').tooltip({
+			content: function () {
+				return $(this).closest('.data-focus').find('.price_info_container').html();
+			},
+			items: 'img',
+			trigger: 'hover',
+			tooltipClass: 'price_info-tooltip',
+			open: function (event, ui) {
+				if (typeof(event.originalEvent) === 'undefined') {
+					return false;
+				}
+				var $id = $(ui.tooltip).attr('id');
+				if ($('div.ui-tooltip').not('#' + $id).length) {
+					return false;
+				}
+			},
+			close: function (event, ui) {
+				ui.tooltip.hover(function () {
+					$(this).stop(true).fadeTo(400, 1);
+				}, function () {
+					$(this).fadeOut('400', function () {
+						$(this).remove();
+					});
+				});
+			}
+		});
 
 		$('#customer').typeWatch({
 			captureLength: 3,
@@ -763,10 +795,18 @@
 		$('#total_convenience_fees').html(formatCurrency(parseFloat(jsonSummary.summary.convenience_fee), currency_format, currency_sign, currency_blank));
 		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
 		// $('#total_service_products').html(formatCurrency(parseFloat(jsonSummary.summary.total_service_products), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount) + parseFloat(jsonSummary.summary.total_tourism_tax || 0), currency_format, currency_sign, currency_blank));
+		$('#total_taxes_vat').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount || 0), currency_format, currency_sign, currency_blank));
+		var totalTaxesTourismAmt = parseFloat(jsonSummary.summary.total_tourism_tax || 0);
+		$('#total_taxes_tourism').closest('div').toggle(totalTaxesTourismAmt > 0);
+		$('#total_taxes_tourism').html(formatCurrency(totalTaxesTourismAmt, currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
-		$('#payment_amount').val(jsonSummary.summary.total_price);
+		if (parseInt($('input[name="is_full_payment"]:checked').val())) {
+			$('#payment_amount').val(jsonSummary.summary.total_price);
+		}
+		$('#full_payment_amount_value').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
+
 		if (jsonSummary.summary.is_advance_payment_active) {
 			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
 			$('#advance_payment_amount_block').show();
@@ -778,7 +818,8 @@
 		if (jsonSummary.summary.total_price == 0) { // if free order
 			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
 		} else {
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+			$('#payment_amount').closest('.form-group').toggle(!parseInt($('input[name="is_full_payment"]:checked').val()));
 		}
 	}
 
@@ -1275,7 +1316,11 @@
 		shipping_price_selected_carrier = jsonSummary.summary.total_shipping;
 
 		$('#total_vouchers').html(formatCurrency(parseFloat(jsonSummary.summary.total_discounts), currency_format, currency_sign, currency_blank));
-		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
+		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount) + parseFloat(jsonSummary.summary.total_tourism_tax || 0), currency_format, currency_sign, currency_blank));
+		$('#total_taxes_vat').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount || 0), currency_format, currency_sign, currency_blank));
+		var totalTaxesTourismAmt2 = parseFloat(jsonSummary.summary.total_tourism_tax || 0);
+		$('#total_taxes_tourism').closest('div').toggle(totalTaxesTourismAmt2 > 0);
+		$('#total_taxes_tourism').html(formatCurrency(totalTaxesTourismAmt2, currency_format, currency_sign, currency_blank));
 		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 		$('#total_rooms').html(formatCurrency(parseFloat(jsonSummary.summary.total_rooms_with_services_without_discount_te), currency_format, currency_sign, currency_blank));
@@ -1297,7 +1342,11 @@
 		}
 		$('#order_message').val(jsonSummary.order_message);
 		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
-		$('#payment_amount').val(jsonSummary.summary.total_price);
+		if (parseInt($('input[name="is_full_payment"]:checked').val())) {
+			$('#payment_amount').val(jsonSummary.summary.total_price);
+		}
+		$('#full_payment_amount_value').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
+
 		if (jsonSummary.summary.is_advance_payment_active) {
 			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
 			$('#advance_payment_amount_block').show();
@@ -1309,7 +1358,8 @@
 		if (jsonSummary.summary.total_price == 0) { // if free order
 			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
 		} else {
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+			$('#payment_amount').closest('.form-group').toggle(!parseInt($('input[name="is_full_payment"]:checked').val()));
 		}
 
 		resetBind();
@@ -1640,11 +1690,13 @@
 
 		$(document).on('change', 'input[name="is_full_payment"]', function() {
 			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-				$('#payment_amount').attr('disabled', true);
+				$('#payment_amount').val({$order_total|floatval}).attr('disabled', true);
+				$('#payment_amount').closest('.form-group').hide(200);
 
-				$('#payment_type, #payment_transaction_id').closest('.form-group').show(200);
+				$('#payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
 			} else {
-				$('#payment_amount').attr('disabled', false);
+				$('#payment_amount').val({$order_total|floatval}).attr('disabled', false);
+				$('#payment_amount').closest('.form-group').show(200);
 
 				managePaymentOptions();
 			}
@@ -1658,9 +1710,9 @@
 			let paymentAmount = parseFloat($('#payment_amount').val().trim());
 
 			if (paymentAmount != 0) {
-				$('#payment_type, #payment_transaction_id').closest('.form-group').show(200);
+				$('#payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
 			} else {
-				$('#payment_type, #payment_transaction_id').closest('.form-group').hide(200);
+				$('#payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
 			}
 		}
 
@@ -2245,8 +2297,20 @@
 					</div>
 					<div class="col-lg-2">
 						<div class="data-focus">
-							<span>{l s='Total taxes'}</span><br/>
+							<span>{l s='Total taxes'}
+								<span class="price_info total_taxes_price_info">&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" /></span>
+							</span><br/>
 							<span id="total_taxes" class="size_l"></span>
+							<div class="price_info_container" style="display: none;">
+								<div>
+									<label>{l s='Room & Service Tax:'}</label>
+									<span class="pull-right" id="total_taxes_vat"></span>
+								</div>
+								<div>
+									<label>{l s='Tourism Tax:'}</label>
+									<span class="pull-right" id="total_taxes_tourism"></span>
+								</div>
+							</div>
 						</div>
 					</div>
                     <div class="col-lg-2">
@@ -2310,8 +2374,13 @@
 							<p class="help-block">{l s='If disabled, no mail related to this order will be sent during order creation.'}</p>
 						</div>
 					</div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-                        <label class="control-label col-lg-3">{l s="Full payment"}</label>
+                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                        <label class="control-label col-lg-3">
+                            <span class="label-tooltip" data-toggle="tooltip"
+                            title="{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}">
+                                {l s="Full payment"}
+                            </span>
+                        </label>
                         <div class="col-lg-9">
                             <span class="switch prestashop-switch fixed-width-lg">
                                 <input type="radio" name="is_full_payment" id="is_full_payment_on" value="1" {if $is_full_payment}checked="checked"{/if}>
@@ -2320,20 +2389,44 @@
                                 <label for="is_full_payment_off">{l s="No"}</label>
                                 <a class="slide-button btn"></a>
                             </span>
-                            <p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
+                            <p class="help-block">
+                                <span>{l s='Total amount: '}</span>
+                                <span id="full_payment_amount_value">{displayPrice price=$order_total currency=$currency->id}</span>
+                            </p>
                         </div>
                     </div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                    <div class="form-group" {if $order_total <= 0 || $is_full_payment}style="display: none;"{/if}>
                         <label class="control-label required col-lg-3">{l s='Payment amount'}</label>
                         <div class="col-lg-9">
                             <div class="input-group fixed-width-xxl">
                                 <span class="input-group-addon">{$currency->sign}</span>
-                                <input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{elseif $is_full_payment}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
+                                <input type="text" name="payment_amount" id="payment_amount" value="{if !$is_full_payment && isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{else}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
                             </div>
                             <p class="help-block" id="advance_payment_amount_block" {if isset($is_advance_payment_active) && $is_advance_payment_active}style="display: block;"{else}style="display: none;"{/if}>
                                 <span>{l s='Advance payment amount: '}</span>
                                 <span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_with_tax currency=$currency->id}</span>
                             </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-lg-3">{l s='Booking Source'}</label>
+                        <div class="col-lg-9">
+                            <select class="fixed-width-xxl" name="id_booking_source" id="id_booking_source">
+                                <option value="">{l s='-- Select Booking Source --'}</option>
+                                {assign var="prev_business_source" value=""}
+                                {foreach from=$booking_sources item=booking_source name=booking_sources_loop}
+                                    {if $booking_source.business_source_name != $prev_business_source}
+                                        {if !$smarty.foreach.booking_sources_loop.first}</optgroup>{/if}
+                                        <optgroup label="{$booking_source.business_source_name}">
+                                        {assign var="prev_business_source" value=$booking_source.business_source_name}
+                                    {/if}
+                                    <option value="{$booking_source.id_source}" {if (isset($smarty.post.id_booking_source) && $booking_source.id_source == $smarty.post.id_booking_source) || (!isset($smarty.post.id_booking_source) && $booking_source.code == 'WALKIN')}selected="selected"{/if}>
+                                        {$booking_source.name}
+                                    </option>
+                                {/foreach}
+                                {if $booking_sources}</optgroup>{/if}
+                            </select>
+                            <p class="help-block">{l s='Walk-in is selected by default. Change it if this booking came from a different source.'}</p>
                         </div>
                     </div>
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>

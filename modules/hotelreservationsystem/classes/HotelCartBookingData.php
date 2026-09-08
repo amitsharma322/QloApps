@@ -1623,6 +1623,7 @@ class HotelCartBookingData extends ObjectModel
                                         $cartHotelData[$prodKey]['date_diff'][$dateJoin]['child_ages'] = array_merge($cartHotelData[$prodKey]['date_diff'][$dateJoin]['child_ages'], json_decode($data_v['child_ages']));
                                     }
                                     $varQty = (int) $cartHotelData[$prodKey]['date_diff'][$dateJoin]['num_rm'];
+                                    $includeTourismTax = $price_tax && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
                                     $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                         $product['id_product'],
                                         $data_v['date_from'],
@@ -1631,7 +1632,10 @@ class HotelCartBookingData extends ObjectModel
                                         0,
                                         $context->cart->id,
                                         $context->cart->id_guest,
-                                        $data_v['id_room']
+                                        $data_v['id_room'],
+                                        1,
+                                        1,
+                                        $includeTourismTax
                                     );
                                     $roomTypeDateRangePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                         $product['id_product'],
@@ -1642,7 +1646,9 @@ class HotelCartBookingData extends ObjectModel
                                         $context->cart->id,
                                         $context->cart->id_guest,
                                         $data_v['id_room'],
-                                        0
+                                        0,
+                                        1,
+                                        $includeTourismTax
                                     );
                                     $priceWithoutDiscount = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                         $product['id_product'],
@@ -1654,7 +1660,8 @@ class HotelCartBookingData extends ObjectModel
                                         $context->cart->id_guest,
                                         $data_v['id_room'],
                                         1,
-                                        0
+                                        0,
+                                        $includeTourismTax
                                     );
                                     if (!$price_tax) {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_excl'];
@@ -1685,6 +1692,7 @@ class HotelCartBookingData extends ObjectModel
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['children'] = $data_v['children'];
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['child_ages'] = json_decode($data_v['child_ages']);
 
+                                    $includeTourismTax = $price_tax && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
                                     $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                         $product['id_product'],
                                         $data_v['date_from'],
@@ -1693,7 +1701,10 @@ class HotelCartBookingData extends ObjectModel
                                         0,
                                         $context->cart->id,
                                         $context->cart->id_guest,
-                                        $data_v['id_room']
+                                        $data_v['id_room'],
+                                        1,
+                                        1,
+                                        $includeTourismTax
                                     );
                                     $roomTypeDateRangePriceWithoutAutoAdd = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                         $product['id_product'],
@@ -1704,7 +1715,9 @@ class HotelCartBookingData extends ObjectModel
                                         $context->cart->id,
                                         $context->cart->id_guest,
                                         $data_v['id_room'],
-                                        0
+                                        0,
+                                        1,
+                                        $includeTourismTax
                                     );
                                     $priceWithoutDiscount = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                                         $product['id_product'],
@@ -1716,7 +1729,8 @@ class HotelCartBookingData extends ObjectModel
                                         $context->cart->id_guest,
                                         $data_v['id_room'],
                                         1,
-                                        0
+                                        0,
+                                        $includeTourismTax
                                     );
                                     if (!$price_tax) {
                                         $amount = $roomTypeDateRangePrice['total_price_tax_excl'];

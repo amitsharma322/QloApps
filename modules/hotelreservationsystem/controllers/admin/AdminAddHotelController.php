@@ -234,6 +234,8 @@ class AdminAddHotelController extends ModuleAdminController
             $selectedHotelPropertyType = $hotelBranchInfo->id_property_type;
         }
         $smartyVars['selected_hotel_property_type'] = (int) $selectedHotelPropertyType;
+        $smartyVars['tourism_tax_collection_type'] = (int) $this->object->tourism_tax_collection_type;
+        $smartyVars['use_tourism_tax'] = (int) Configuration::get('QLO_USE_TOURISM_TAX');
 
         $this->context->smarty->assign($smartyVars);
 
@@ -535,6 +537,7 @@ class AdminAddHotelController extends ModuleAdminController
             }
             $objHotelBranch->active = $active;
             $objHotelBranch->active_refund = $activeRefund;
+            $objHotelBranch->tourism_tax_collection_type = (int) Tools::getValue('tourism_tax_collection_type', 0);
             $objHotelBranch->fax = $fax;
             $objHotelBranch->id_property_type = $idHotelPropertyType;
 
