@@ -472,7 +472,6 @@ class ProductControllerCore extends FrontController
                             );
                         }
                     }
-
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignRoomServiceProductVars();
 
@@ -485,6 +484,36 @@ class ProductControllerCore extends FrontController
                         $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, false, 0, 0, 0, 0, 1, 1, $occupancy_value);
                     }
                     $productPriceWithoutReduction = $this->product->getPriceWithoutReduct(!$useTax);
+                    if ($useTax && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP')) {
+                        $totalExclTourismTax = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                            $this->product->id,
+                            $date_from,
+                            $date_to,
+                            $occupancy_value,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0
+                        );
+                        $totalInclTourismTax = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                            $this->product->id,
+                            $date_from,
+                            $date_to,
+                            $occupancy_value,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0,
+                            true
+                        );
+                        $tourismTaxTotal = $totalInclTourismTax['total_price_tax_incl'] - $totalExclTourismTax['total_price_tax_incl'];
+                        $numDaysInDuration = HotelHelper::getNumberOfDays($date_from, $date_to);
+                        $productPriceWithoutReduction += $tourismTaxTotal / $numDaysInDuration;
+                    }
                     $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
                     $this->context->smarty->assign('feature_price', $feature_price);
                     $this->context->smarty->assign('feature_price_diff', $feature_price_diff);
@@ -716,6 +745,7 @@ class ProductControllerCore extends FrontController
         // calculate room type price first
         $useTax = HotelBookingDetail::useTax();
         $totalPrice = 0;
+        $includeTourismTax = $useTax && Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
         $priceWithoutDiscount = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
             $idProduct,
             $dateFrom,
@@ -726,13 +756,21 @@ class ProductControllerCore extends FrontController
             0,
             0,
             1,
-            0
+            0,
+            $includeTourismTax
         );
         $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
             $idProduct,
             $dateFrom,
             $dateTo,
-            $occupancy
+            $occupancy,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            $includeTourismTax
         );
 
         $featurePrice = 0;
@@ -750,9 +788,8 @@ class ProductControllerCore extends FrontController
                 1,
                 $occupancy
             );
-            $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
             $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
-
+            $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
         } else {
             $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
                 $idProduct,
@@ -780,6 +817,10 @@ class ProductControllerCore extends FrontController
             if ($roomServiceProducts = json_decode($roomServiceProducts, true)) {
                 $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                $serviceOccupancy = (is_array($occupancy) && isset($occupancy[0])) ? $occupancy[0] : array('adults' => 1, 'child_ages' => array());
+                $serviceNumAdults = isset($serviceOccupancy['adults']) ? (int) $serviceOccupancy['adults'] : 1;
+                $serviceChildAges = !empty($serviceOccupancy['child_ages']) ? (array) $serviceOccupancy['child_ages'] : array();
+
                 foreach ($roomServiceProducts as &$product) {
                     if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($idProduct, $product['id_product'])) {
                         unset($product);
@@ -804,8 +845,17 @@ class ProductControllerCore extends FrontController
                         $useTax,
                         $product['quantity'],
                         $dateFrom,
-                        $dateTo
+                        $dateTo,
+                        false,
+                        null,
+                        1,
+                        null,
+                        0,
+                        $useTax && Configuration::get('QLO_TOURISM_TAX_GROSSED_UP'),
+                        $serviceNumAdults,
+                        $serviceChildAges
                     );
+
                     $product['price'] = $productPrice;
                     $serviceProductsPrice += $productPrice;
                 }
@@ -871,6 +921,11 @@ class ProductControllerCore extends FrontController
                     }
                 }
                 $smartyVars['associated_hotels'] = $associatedHotels;
+                if (!$idHotel) {
+                    // no hotel picked yet (e.g. initial page load) — price/tourism tax must match
+                    // the hotel the dropdown defaults to, which is simply its first option
+                    $idHotel = reset($associatedHotels)['id_hotel'];
+                }
             }
         }
         if ($idHotel) {
@@ -880,6 +935,7 @@ class ProductControllerCore extends FrontController
             $smartyVars['buying_option'] = $buying_option;
         }
         $useTax = HotelBookingDetail::useTax();
+        $includeTourismTax = $useTax && Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
         $objServiceProductOption = new ServiceProductOption();
         if ($serviceProductOptions = $objServiceProductOption->getProductOptions($this->product->id)) {
             foreach ($serviceProductOptions as &$serviceProductOption) {
@@ -892,7 +948,15 @@ class ProductControllerCore extends FrontController
                     $idHotel,
                     false,
                     $useTax,
-                    1
+                    1,
+                    null,
+                    null,
+                    false,
+                    null,
+                    1,
+                    null,
+                    0,
+                    $includeTourismTax
                 );
             }
 
@@ -904,7 +968,15 @@ class ProductControllerCore extends FrontController
             $idHotel,
             false,
             $useTax,
-            $quantity
+            $quantity,
+            null,
+            null,
+            false,
+            null,
+            1,
+            null,
+            0,
+            $includeTourismTax
         );
         $smartyVars['service_price_without_reduction']  = Product::getServiceProductPrice(
             $this->product->id,
@@ -917,7 +989,10 @@ class ProductControllerCore extends FrontController
             null,
             false,
             null,
-            false
+            false,
+            null,
+            0,
+            $includeTourismTax
         );
         if ($quantity) {
             $smartyVars['quantity']  = $quantity;

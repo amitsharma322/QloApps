@@ -364,6 +364,14 @@ class ParentOrderControllerCore extends FrontController
                 0
             );
 
+            foreach ($standaloneProducts as &$standaloneProduct) {
+                if (TaxConfiguration::isGrossedUp($standaloneProduct['tourism_tax_amount'])) {
+                    $standaloneProduct['unit_price_tax_incl'] += $standaloneProduct['tourism_tax_amount'] / max(1, (int) $standaloneProduct['quantity']);
+                    $standaloneProduct['total_price_tax_incl'] += $standaloneProduct['tourism_tax_amount'];
+                }
+            }
+            unset($standaloneProduct);
+
             if (count($standaloneProducts)) {
                 $this->context->smarty->assign('standalone_products', $standaloneProducts);
             }
