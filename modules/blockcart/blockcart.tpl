@@ -138,7 +138,7 @@
 												{if $show_tax && $use_tax}
 													<div class="cart-prices-line">
 														<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
-														<span>{l s='Room and Service Tax' mod='blockcart'}</span>
+														<span>{l s='Stay and Service Tax' mod='blockcart'}</span>
 													</div>
 												{/if}
 											{/block}
@@ -352,7 +352,7 @@
 							{block name='blockcart_layer_cart_total_tax'}
 								{if $show_tax && $use_tax}
 									<div class="layer_cart_row">
-										<strong class="dark">{l s='Room and Service Tax' mod='blockcart'}</strong>
+										<strong class="dark">{l s='Stay and Service Tax' mod='blockcart'}</strong>
 										<span class="price cart_block_tax_cost ajax_cart_tax_cost pull-right">{$tax_cost}</span>
 									</div>
 								{/if}

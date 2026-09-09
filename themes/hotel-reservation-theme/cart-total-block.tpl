@@ -91,7 +91,7 @@
     {/block}
     {if $show_taxes}
         <p class="cart_total_tax">
-            <span>{l s='Room and Service Tax'}</span>
+            <span>{l s='Stay and Service Tax'}</span>
             <span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
         </p>
     {/if}

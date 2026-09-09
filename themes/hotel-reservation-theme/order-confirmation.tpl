@@ -475,7 +475,7 @@
 														{/if}
 														<tr class="item">
 															<td>
-																<strong>{l s='Room and Service Tax'}</strong>
+																<strong>{l s='Stay and Service Tax'}</strong>
 															</td>
 															<td class="text-right">
 																<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_tax_without_discount'] currency=$objOrderCurrency convert=1}</span>

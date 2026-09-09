@@ -374,7 +374,7 @@
                                         {/if}
 
                                         <tr class="totalprice item">
-                                            <td>{l s='Room and Service Tax'}</td>
+                                            <td>{l s='Stay and Service Tax'}</td>
                                             <td class="text-right">
                                                 <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>
@@ -802,7 +802,7 @@
                                         {/if}
 
                                         <tr class="totalprice item">
-                                            <td>{l s='Room and Service Tax'}</td>
+                                            <td>{l s='Stay and Service Tax'}</td>
                                             <td class="text-right">
                                                 <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>

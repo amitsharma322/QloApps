@@ -41,7 +41,7 @@
     {/if}
     <tr>
         <td>
-            <strong>{l s="Room and Service Tax"}</strong>
+            <strong>{l s="Stay and Service Tax"}</strong>
         </td>
         <td>
             {$list['total_order_tax']}
