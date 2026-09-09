@@ -692,7 +692,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
         if ($this->display == 'view') {
             $this->addJqueryUI('ui.tooltip', 'base', true);
-            $this->removeJS(Media::getJqueryUIPath('effects.core', 'base', false), false);
+            $this->removeJS(Media::getJqueryUIPath('ui.effect', 'base', false), false);
 
             $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');
             $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/admin/wk_refund_request.css');

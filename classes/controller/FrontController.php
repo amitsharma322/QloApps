@@ -660,11 +660,11 @@ class FrontControllerCore extends Controller
     }
 
     /**
-     * Renders and outputs maintenance page and ends controller process.
+     * Redirects a cursed request (e.g. an invalid/expired access token) to page not found and ends controller process.
      */
     public function initCursedPage()
     {
-        $this->displayMaintenancePage();
+        Tools::redirect($this->context->link->getPageLink('pagenotfound'));
     }
 
     /**
