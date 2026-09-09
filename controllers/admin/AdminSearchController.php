@@ -189,7 +189,6 @@ class AdminSearchControllerCore extends AdminController
 
             if (!$searchType) {
                 $this->searchAddress();
-                $this->searchHotelFeatures();
                 $this->searchHotelAmenities();
                 $this->searchRefundRules();
             }
@@ -435,6 +434,7 @@ class AdminSearchControllerCore extends AdminController
                 if ($hotelAmenities = $objHotelAmenities->searchByName($this->query, $this->context->language->id)) {
                     $amenities = array();
                     foreach ($hotelAmenities as $key => $hotelAmenity) {
+                        $amenities[$hotelAmenity['id_amenity']]['id_amenity'] = $hotelAmenity['id_amenity'];
                         $amenities[$hotelAmenity['id_amenity']]['name'] = $hotelAmenity['name'];
                         if ($hotelAmenity['id_parent']) {
                             $amenities[$hotelAmenity['id_amenity']]['id'] = $hotelAmenity['id_parent'];
@@ -818,10 +818,10 @@ class AdminSearchControllerCore extends AdminController
                 $helper = new HelperList();
                 $helper->shopLinkType = '';
                 $helper->simple_header = true;
-                $helper->identifier = 'id_customer_message';
-                $helper->actions = array('edit');
+                $helper->identifier = 'id_customer_thread';
+                $helper->actions = array('view');
                 $helper->show_toolbar = false;
-                $helper->table = 'feature';
+                $helper->table = 'customer_thread';
                 $helper->currentIndex = $this->context->link->getAdminLink('AdminCustomerThreads', false);
 
                 $query = trim(Tools::getValue('bo_query'));
