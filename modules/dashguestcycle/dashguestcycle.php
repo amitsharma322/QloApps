@@ -110,7 +110,7 @@ class DashGuestCycle extends Module
             ),
             array(
                 'id'      => 'box-dgc-guests',
-                'color'   => 'color1',
+                'color'   => 'color7',
                 'title'   => $this->l('Guests (Adults/Children)'),
                 'tooltip' => $this->l('The number of adults and children scheduled to stay today.'),
                 'value'   => $kpiValues['box-dgc-guests'],
