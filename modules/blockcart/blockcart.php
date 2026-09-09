@@ -429,7 +429,7 @@ class Blockcart extends Module
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
             'room_total' => ($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice),
-            'room_total_format' => Tools::displayPrice($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice - $totalConvenienceFee),
+            'room_total_format' => Tools::displayPrice($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice),
             'totalToPay' => $totalToPay,
             'total_convenience_fee' => $totalConvenienceFee,
             'total_convenience_fee_format' => Tools::displayPrice(($totalConvenienceFee), $currency),
