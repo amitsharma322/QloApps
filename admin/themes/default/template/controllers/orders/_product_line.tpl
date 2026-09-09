@@ -110,7 +110,7 @@
 			</span>
 			<div class="price_info_container" style="display: none;">
 				<div>
-					<label>{l s='Room & Service Tax:'}</label>
+					<label>{l s='Stay & Service Tax:'}</label>
 					<span class="pull-right">{convertPriceWithCurrency price=$data.total_room_service_tax_only currency=$currency->id}</span>
 				</div>
 				{if isset($data.tourism_tax_total) && $data.tourism_tax_total > 0}

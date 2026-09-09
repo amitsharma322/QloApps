@@ -2303,7 +2303,7 @@
 							<span id="total_taxes" class="size_l"></span>
 							<div class="price_info_container" style="display: none;">
 								<div>
-									<label>{l s='Room & Service Tax:'}</label>
+									<label>{l s='Stay & Service Tax:'}</label>
 									<span class="pull-right" id="total_taxes_vat"></span>
 								</div>
 								<div>
