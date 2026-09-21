@@ -7555,6 +7555,9 @@ div.star a:hover {
   .ie8 .breadcrumb .navigation-pipe {
     width: 20px; }
 
+.copyRightWrapper {
+  text-align: center; }
+
 .footer-container {
   background-color: #333333;
   padding-top: 30px; }
@@ -9013,7 +9016,7 @@ body .ui-tooltip {
 
 .home_block_container {
   padding-top: 45px;
-  padding-bottom: 60px;
+  padding-bottom: 15px;
   position: relative;
 }
 .home_block_desc_wrapper {
@@ -9042,6 +9045,17 @@ body .ui-tooltip {
   .home_block_description {
     font-size: 15px;
     line-height: 20px; }
+  .home_block_desc_wrapper {
+    padding: 0 15px;
+    margin-bottom: 30px;
+  }
+  .home_block_seperator {
+  display: none;   
+  }
+  .home_block_container{
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
 }
 .home_block_desc_line {
   border-color: #333333;
